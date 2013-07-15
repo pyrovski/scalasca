@@ -229,6 +229,8 @@ int esd_metric_open()
   elg_cntl_msg("EPK_METRICS=%s", var);
         
   /* read metrics from specification string */
+  /*! @todo this is broken; it doesn't work for native PAPI event names with colons
+   */
   token = strtok(var, ":");
   while ( token && (nmetrics < ELG_METRIC_MAXNUM) ) {
     /* search metricmap for a suitable definition */
