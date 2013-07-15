@@ -1,0 +1,272 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+
+/**
+@defgroup EPIK_utils EPIK utils
+
+The module \ref EPIK_utils provides a set of basic definitions and functions,
+used throughout the entire project. These can be further devided into several
+functional areas, which are described in more detail in the submodules listed
+below.
+*/
+
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup EPIK_utils_error Control & error message routines
+@ingroup  EPIK_utils
+*/
+
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup EPIK_utils_conf Runtime configuration management
+@ingroup  EPIK_utils
+
+In the former KOJAK system, the different components accessed their
+(optional) environment variables with different approaches. Several
+components used methods from the EPILOG module elg_env, e.g.,
+<tt>elg_is_verbose()</tt> which returns the boolean value of the
+<tt>ELG_VERBOSE</tt> environment variable. Additionally, EARL and EXPERT
+had several environment variables which were handled inside the
+corresponding modules themselves, i.e., these modules used special
+methods which give back the value of the respective environment variables.
+
+These environment variables could be used to override internal defaults,
+and thereby provide runtime configurability. While their use was
+optional, and KOJAK could (generally) be used without them, when it was
+desirable to set/review/update several values this approach became more
+awkward (and more limiting when additional configurability was desired).
+
+Furthermore, during the transfer of the underlying approach to
+metacomputing environments two new environment variables
+<tt>EPK_MACHINE_ID</tt> and <tt>EPK_MACHINE_NAME</tt> were introduced
+into the measurement system, and additional runtime configurability was
+desired for EPIK and other components.
+
+A generic mechanism for runtime configuration specification and
+management, including environment variable handling, has therefore been
+introduced. (Only environment variables specific to Scalasca/KOJAK are
+currently managed by this scheme, not standard environment variables
+such as <tt>PATH</tt>.) The introduced approach and the influence on
+other modules are described below.
+
+<h1>Revised runtime configuration management</h1>
+
+The introduced approach aims to provide generic management of the
+runtime configuration (including internal defaults and optional
+re-configuration via files and environment variables) used during
+measurement and analysis. A new EPIK module epk_conf and an optional
+configuration file ("EPIK.CONF") are introduced.
+
+The configuration file contains key-value pairs and comments in the
+following format
+<pre>
+[#] key = value [# comment]
+</pre>
+
+The keys correspond to environment variables (both former KOJAK
+environment variables and new ones) and accepted values
+similarly correspond to those of the environment variables.  As with
+environment variables, values can be defined in terms of previously
+defined values. Optional comments can be provided as documentation.
+
+The module epk_conf internally maintains an array of data structures for
+different configuration variables and provides external methods to read
+their values. First, the epk_conf module contains a global array
+epk_vars. The <tt>EPK_CONF_VARS</tt> elements of this array are data
+structures of the type epk_data. Such a data structure epk_data features
+a key, a default value, a comment and a current value.
+
+<pre>
+typedef struct {
+    char* key;
+    char* def;
+    char* comment;
+    char* val;
+} epk_data;
+</pre>
+
+Therefore, the array epk_vars has a separate entry of the type epk_data
+for each configuration variable. This entry can be accessed by a
+corresponding index which is defined in an enumeration similar to the following:
+
+<pre>
+typedef enum {
+    EPK_CONF,
+    EPK_MACHINE_ID,
+    EPK_MACHINE_NAME,
+    EPK_CONF_VARS
+} epk_type_i;
+</pre>
+One possible epk_vars specification is shown in the following section:
+<pre>
+static epk_data epk_vars [EPK_CONF_VARS]= {
+    {"EPK_CONF", NULL,
+        "E P I K configuration", (char*)EPK_CONF)},
+    {"EPK_MACHINE_ID", "0",
+        "Unique identifier of the Machine", (char*)EPK_MACHINE_ID},
+    {"EPK_MACHINE_NAME", "Machine",
+        "Define the name of the Machine", (char*)EPK_MACHINE_NAME},
+}
+</pre>
+
+Note that each epk_data entry value is initialized to its index
+(enumeration): this is checked the first time that the epk_vars are used
+to verify that the table entries and enumeration indices are consistent,
+before the values are set to their defaults.  (On encountering an
+internal inconsistency, parsing and further execution is aborted.)
+Additionally, epk_data entries with NULL def values (e.g., EPK_CONF) are
+internal section placeholders, used to output the associated comment as
+a header between sections of variables when the configuration is output.
+
+The module epk_conf also provides a method epk_get. This method
+returns the value of the configuration variable which corresponds to the
+index of the respective data structure epk_data within the array epk_vars.
+
+<pre>
+extern const char *epk_get(int index);
+epk_get(EPK_MACHINE_NAME) -> "Machine"
+</pre>
+
+Thus, this method encapsulates access to the different configuration
+variables. In the following the underlying approach is described. 
+
+The first call to the method epk_get updates all entries contained in
+the data structure epk_vars in a generic manner. More precisely, for
+each data structure epk_data within the array epk_vars the corresponding
+value entry will be updated. Therefore several values have to be
+considered.
+
+First, the value entry in each data structure epk_data is set to its
+corresponding default value. If a default value in the respective
+Makefile.defs is defined, this value will be used to update the value in
+the corresponding data structure epk_data within the array epk_vars:
+only <tt>EPK_MACHINE_NAME</tt> and <tt>EPK_LDIR</tt> are
+currently updated in this way. Then the configuration files are parsed
+and used to update the values in the data structure epk_data within the
+array epk_vars respectively. Two configuration files might be read. If a
+configuration file exists in the Scalasca/KOJAK installation DOCDIR, it will be
+read and processed first. An alternative default configuration file
+location can be specified at runtime with the special
+<tt>EPK_CONF</tt> environment variable: i.e., if
+<tt>EPK_CONF</tt> is set its value is used instead of the
+installation DOCDIR to locate the default EPIK.CONF file. (It makes no
+sense, and is an error, to specify EPK_CONF within a configuration file.) 
+
+The parsed key-value pairs are used to update the suitable values
+in the data structure epk_data within the array epk_vars. If a
+configuration file exists in the working directory as well, the same
+procedure will be repeated. Finally, for each corresponding environment
+variable that has also been set, its value is used to update the value
+in the respective data structure epk_data within the array epk_vars
+again.
+
+This processing is performed automatically with the first call made to
+the method epk_get. Subsequent calls return the values stored in the
+data structures epk_data within the static array epk_vars. Processing of
+configuration files and environment variables is therefore performed
+only once by each process, irrespective of how many variables are
+queried or how often. (The values can differ per process, according to
+their environment, though most will be identical.)
+
+Typically only a few variables will be specified in local configuration
+files, and some variables may be more convenient to specify via
+environment variables. The configuration file permits specification of
+as few or as many variables as desired. Although entries are optional,
+if present their syntax is checked and problems reported. Whenever a
+variable is multiply defined, the last value takes precedence.
+
+The epk_conf_print method can be used to print the effective
+configuration, after processing defaults, files and environment
+variables, to the provided stream.
+
+Additionally, the module epk_conf features two converters. They can be
+used to convert the returned string into a Boolean value or into an
+integer value, including appropriate handling of special strings such as
+"Yes," "TRUE," "Unlimited," etc.
+
+<pre>
+epk_str2bool(epk_get(EPK_VERBOSE)) -> 0 (false)
+epk_str2int(epk_get(ELG_COMPRESSION)) -> 6
+epk_str2bool(epk_get(ELG_COMPRESSION)) -> 1 (true)
+</pre>
+
+Incorporating new configuration variables is a straightforward matter of
+adding new variable definitions and corresponding entries to the
+epk_vars table, which includes the default values and short
+descriptions. (If it is desired to support old names for variables, e.g.,
+<tt>ELG_FILE_PREFIX=EPK_TITLE</tt>, these might ultimately be specified
+as an additional mapping table which is scanned to get the updated name
+prior to retrieving the value.)
+
+The default configuration is reported by running the new epk_conf
+utility in an environment where no existing files are installed and no
+environment variables are set.  The settings which correspond to the
+currently active configuration can be similarly output, based on the
+internal defaults updated with located configuration files and any
+environment variables which are set. Such output is stored within
+corresponding experiments for reference (epik_a/epik.conf), installed as
+is or manually edited prior to installation in the current directory (or
+the installation DOCDIR, if preferred), for use with subsequent experiments.
+
+<h1>Summary</h1>
+
+The presented approach was introduced to support generic extensible
+management of different runtime configuration variables within the
+various components of the Scalasca/KOJAK toolset.
+
+The module elg_env previously provided access to some environment
+variables for runtime configuration as already mentioned. Since the
+introduced module epk_conf provides more generic configuration
+management, while incorporating the prior functionality of elg_env,
+revised elg_env methods would simply call the corresponding epk_conf
+methods. Notably, in the absence of (installed or local) configuration
+files, the behaviour matches that of previously, while the optional
+configuration files can be used to specify configuration variables in a
+syntax matching that of the environment variables themselves. Therefore,
+the module elg_env has been removed from the sources and calls to the
+respective methods of elg_env have been replaced with calls to epk_conf.
+
+*/
+
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup EPIK_utils_archive Measurement archive management
+@ingroup  EPIK_utils
+*/
+
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup EPIK_utils_containers Generic & special-purpose containers
+@ingroup  EPIK_utils
+
+This utility module provides generic container data structures, which can be
+used to manage collections of "objects". However, since the C programming
+language does not provide any sort of template support, these implementations
+store their entries as generic @c void pointers. Currently, two different types
+of containers are provided: dynamic arrays (epk_vector.h) and hash tables
+(epk_hashtab.h).
+
+In addition, a special-purpose container for storing mapping tables of
+numerical object identifiers (epk_idmap.h) is provided.
+*/
+
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup EPIK_utils_misc Miscellaneous routines
+@ingroup  EPIK_utils
+
+This module provides various helpful routines that didn't fit into one of
+the other categories.
+*/

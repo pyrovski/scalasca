@@ -1,0 +1,22 @@
+# Scalasca instrumentation for C
+BEGIN_INSTRUMENT_SECTION
+  file="*" line=1 code="#include <epik_user.h>" lang="c"
+  entry code="EPIK_User_start(\"@ROUTINE@\", \"@FILE@\", @BEGIN_LINE@);" lang="c"
+  exit  code="EPIK_User_end(\"@ROUTINE@\", \"@FILE@\", @END_LINE@);" lang="c"
+END_INSTRUMENT_SECTION
+
+# Scalasca instrumentation for C++
+BEGIN_INSTRUMENT_SECTION
+  file="*" line=1 code="#include <epik_user.h>" lang="c++"
+  decl code="EPIK_Tracer EPIK_Trc__(\"@ROUTINE@\", \"@FILE@\", @BEGIN_LINE@);" lang="c++"
+END_INSTRUMENT_SECTION
+
+# Scalasca instrumentation for Fortran
+BEGIN_INSTRUMENT_SECTION
+  decl  code="character(len=*),parameter::epik_func_name__=\"@ROUTINE@\"//char(0)" lang="fortran"
+  decl  code="integer,parameter::epik_fname_len__=len(epik_func_name__)" lang="fortran"
+  decl  code="character(len=epik_fname_len__)::epik_func_id__=epik_func_name__" lang="fortran"
+  entry code="call EPIK_User_start(epik_func_id__, \"@FILE@\", @BEGIN_LINE@_4)" lang="fortran"
+  exit  code="call EPIK_User_end(epik_func_id__, \"@FILE@\", @END_LINE@_4)" lang="fortran"
+END_INSTRUMENT_SECTION
+

@@ -1,0 +1,162 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.sun)
+#------------------------------------------------------------------------------
+
+CFGKEY = sun
+CONFIG = Solaris cluster with Sun Studio compilers
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC    = 32
+PFLAG32= -m32
+PFLAG64= -m64
+# Uncomment the following two lines for older Sun compilers
+#PFLAG32= -xarch=generic32
+#PFLAG64= -xarch=generic64
+PFLAG   = $(PFLAG$(PREC))
+AFLAG   =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = sun
+MACHINE   = -DMACHINE=\"Sun\ SPARC\ Solaris\ \($(PREC)-bit\)\"
+#PLAT_LDIR = -DPFORM_LDIR=\"/tmp\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = cc
+PLAT_CFLAGS =
+
+OPTFLAGS =
+CC       = cc
+CFLAGS   = $(PFLAG) $(OPTFLAGS)
+CXX      = CC
+CXXFLAGS = $(PFLAG) $(OPTFLAGS) -xO3
+F77      = f77
+F90      = f95
+FFLAGS   = -O $(PFLAG) $(OPTFLAGS)
+FPP      = -xpp=cpp
+FDOPT    = -D
+LDFLAGS  = $(PFLAG) $(OPTFLAGS)
+UTILLIB  =
+FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+MPICC     = mpcc
+MPICXX    = mpCC
+MPIF90    = mpf95
+MPILIB    = -lmpi
+PMPILIB   = 
+FMPILIB   = -lepk.ad.fmpi
+FMPIOBJ   = libepk.ad.fmpi.a
+MPIEXTRA  = -DHAS_MPI2_1SIDED -DNEED_F2C_CONV
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = $(CC)
+OMPCXX     = $(CXX)
+OMPF90     = $(F90)
+OMPFLAG    = -xopenmp -xO3 -D_REENTRANT
+OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+HYBCC      = $(MPICC)
+HYBCXX     = $(MPICXX)
+HYBF90     = $(MPIF90)
+HYBFLAG    = $(OMPFLAG)
+HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+#METR       = papi
+#METRDIR    = /usr/local/papi
+#METRINC    = -I$(METRDIR)/include
+#METRLIB32  = -lpapi
+#METRLIB64  = -lpapi
+#METRLDIR32 = $(METRDIR)/lib
+#METRLDIR64 = $(METRDIR)/lib
+#METRLIB    = -L$(METRLDIR$(PREC)) -R$(METRLDIR$(PREC)) $(METRLIB$(PREC)) -lcpc
+
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS = -xO3
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Alternative compiler for EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+ECXX         = CC
+ECXXLIBS     =
+ECXX_AR      = CC
+ECXX_ARFLAGS = -xar -o
+
+LIBERTY32    =
+LIBERTY64    = -L/usr/local/lib/sparcv9
+LIBERTY      = $(LIBERTY$(PREC)) -liberty
+
+#ECXX         = g++
+#ECXXLIBS     = -lstdc++
+#ECXX_AR      = ar
+#ECXX_ARFLAGS = -rcs
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = phat
+CINSTFLAG = -O -Qoption f90comp -phat
+LINSTFLAG = -O -Qoption f90comp -phat
+EXTRAOBJS =
+KINST_EXTRA = kinst-phat
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#ANAME32     = solaris2
+#ANAME64     = solaris2-64
+#VTF3LIB     = -L$(VTF3DIR)/$(ANAME$(PREC))/lib -lvtf3
+#INST_VTF3   = install-vtf3
+
+#------------------------------------------------------------------------------
+# OTF Support
+#-----------------------------------------------------------------------------
+
+#OTFDIR      =
+#OTFRTTI     =
+#OTFUNIFY    = elg_otfunify
+##OTFUNIFY    = elg_otfunify.omp
+#ELG_OTF     = elg2otf
+#OTFLIB      = -L$(OTFDIR)/lib64 -L$(OTFDIR)/lib -lotf$(PREC) -lz
+#INST_OTF    = install-otf
+#OTFELGLIB     = libelg.otf.a
+#OTFMPIELGLIB  = libelg.otf.mpi.a
+#OTFOMPELGLIB  = libelg.otf.omp.a
+#OTFHYBELGLIB  = libelg.otf.ompi.a
+

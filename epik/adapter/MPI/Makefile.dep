@@ -1,0 +1,101 @@
+epk_mpiwrap.o: epk_mpiwrap.c $(CFGDIR)/epk_defs_mpi.h epk_mpicom.h \
+  $(CFGDIR)/elg_types.h epk_mpireg.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h epk_mpireq.h epk_mpiwrap.h \
+  $(EPKDIR)/elg_error.h $(ESDDIR)/esd_def.h \
+  $(ESDDIR)/elg_defs.h $(ESDDIR)/esd_event.h \
+  $(ESDDIR)/esd_run.h
+epk_mpiwrap_cg.o: epk_mpiwrap_cg.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(CFGDIR)/epk_defs_mpi.h epk_mpicom.h \
+  $(CFGDIR)/elg_types.h epk_mpiwrap.h epk_mpireg.h \
+  $(ESDDIR)/elg_defs.h
+epk_mpiwrap_coll.o: epk_mpiwrap_coll.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(CFGDIR)/epk_defs_mpi.h epk_mpicom.h \
+  $(CFGDIR)/elg_types.h epk_mpiwrap.h epk_mpireg.h \
+  $(ESDDIR)/elg_defs.h
+epk_mpiwrap_env.o: epk_mpiwrap_env.c \
+  $(EPKDIR)/elg_error.h $(ESDDIR)/esd_def.h \
+  $(ESDDIR)/elg_defs.h $(CFGDIR)/elg_types.h \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/esd_run.h \
+  $(CFGDIR)/epk_defs_mpi.h epk_mpicom.h $(CFGDIR)/elg_types.h \
+  epk_mpireq.h $(ESDDIR)/elg_defs.h epk_mpiwrap.h epk_mpireg.h
+epk_mpiwrap_err.o: epk_mpiwrap_err.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(CFGDIR)/epk_defs_mpi.h epk_mpiwrap.h \
+  epk_mpireg.h $(ESDDIR)/elg_defs.h
+epk_mpiwrap_ext.o: epk_mpiwrap_ext.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(EPKDIR)/elg_error.h \
+  $(CFGDIR)/epk_defs_mpi.h epk_mpiwrap.h epk_mpireg.h \
+  $(ESDDIR)/elg_defs.h
+epk_mpiwrap_io.o: epk_mpiwrap_io.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(CFGDIR)/epk_defs_mpi.h epk_mpiwrap.h \
+  epk_mpireg.h $(ESDDIR)/elg_defs.h
+epk_mpiwrap_misc.o: epk_mpiwrap_misc.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(CFGDIR)/epk_defs_mpi.h epk_mpiwrap.h \
+  epk_mpireg.h $(ESDDIR)/elg_defs.h
+epk_mpiwrap_p2p.o: epk_mpiwrap_p2p.c \
+  $(EPKDIR)/elg_error.h $(ESDDIR)/esd_event.h \
+  $(ESDDIR)/elg_defs.h $(CFGDIR)/elg_types.h \
+  $(CFGDIR)/epk_defs_mpi.h epk_mpicom.h $(CFGDIR)/elg_types.h \
+  epk_mpireq.h $(ESDDIR)/elg_defs.h epk_mpiwrap.h epk_mpireg.h
+epk_mpiwrap_rma.o: epk_mpiwrap_rma.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h epk_mpiwrap.h epk_mpireg.h \
+  $(ESDDIR)/elg_defs.h epk_mpicom.h $(CFGDIR)/elg_types.h \
+  $(CFGDIR)/epk_defs_mpi.h
+epk_mpiwrap_spawn.o: epk_mpiwrap_spawn.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(CFGDIR)/epk_defs_mpi.h epk_mpicom.h \
+  $(CFGDIR)/elg_types.h epk_mpiwrap.h epk_mpireg.h \
+  $(ESDDIR)/elg_defs.h
+epk_mpiwrap_topo.o: epk_mpiwrap_topo.c \
+  $(EPKDIR)/elg_error.h $(ESDDIR)/esd_def.h \
+  $(ESDDIR)/elg_defs.h $(CFGDIR)/elg_types.h \
+  $(ESDDIR)/esd_event.h $(CFGDIR)/epk_defs_mpi.h epk_mpicom.h \
+  $(CFGDIR)/elg_types.h epk_mpiwrap.h epk_mpireg.h \
+  $(ESDDIR)/elg_defs.h
+epk_mpiwrap_type.o: epk_mpiwrap_type.c \
+  $(ESDDIR)/esd_event.h $(ESDDIR)/elg_defs.h \
+  $(CFGDIR)/elg_types.h $(CFGDIR)/epk_defs_mpi.h epk_mpiwrap.h \
+  epk_mpireg.h $(ESDDIR)/elg_defs.h
+epk_fmpiwrap_cg.1.o epk_fmpiwrap_cg.2.o epk_fmpiwrap_cg.3.o epk_fmpiwrap_cg.4.o: epk_fmpiwrap_cg.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_coll.1.o epk_fmpiwrap_coll.2.o epk_fmpiwrap_coll.3.o epk_fmpiwrap_coll.4.o: epk_fmpiwrap_coll.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_env.1.o epk_fmpiwrap_env.2.o epk_fmpiwrap_env.3.o epk_fmpiwrap_env.4.o: epk_fmpiwrap_env.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h \
+  epk_fmpiwrap_init.h
+epk_fmpiwrap_err.1.o epk_fmpiwrap_err.2.o epk_fmpiwrap_err.3.o epk_fmpiwrap_err.4.o: epk_fmpiwrap_err.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_ext.1.o epk_fmpiwrap_ext.2.o epk_fmpiwrap_ext.3.o epk_fmpiwrap_ext.4.o: epk_fmpiwrap_ext.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_io.1.o epk_fmpiwrap_io.2.o epk_fmpiwrap_io.3.o epk_fmpiwrap_io.4.o: epk_fmpiwrap_io.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_misc.1.o epk_fmpiwrap_misc.2.o epk_fmpiwrap_misc.3.o epk_fmpiwrap_misc.4.o: epk_fmpiwrap_misc.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_p2p.1.o epk_fmpiwrap_p2p.2.o epk_fmpiwrap_p2p.3.o epk_fmpiwrap_p2p.4.o: epk_fmpiwrap_p2p.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_rma.1.o epk_fmpiwrap_rma.2.o epk_fmpiwrap_rma.3.o epk_fmpiwrap_rma.4.o: epk_fmpiwrap_rma.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_spawn.1.o epk_fmpiwrap_spawn.2.o epk_fmpiwrap_spawn.3.o epk_fmpiwrap_spawn.4.o: epk_fmpiwrap_spawn.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_topo.1.o epk_fmpiwrap_topo.2.o epk_fmpiwrap_topo.3.o epk_fmpiwrap_topo.4.o: epk_fmpiwrap_topo.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h
+epk_fmpiwrap_type.1.o epk_fmpiwrap_type.2.o epk_fmpiwrap_type.3.o epk_fmpiwrap_type.4.o: epk_fmpiwrap_type.c \
+  $(EPKDIR)/elg_error.h $(CFGDIR)/elg_fmpi_defs.h epk_fmpiwrap.h \
+  $(CFGDIR)/epk_defs_mpi.h $(CFGDIR)/epk_fwrapper_def.h

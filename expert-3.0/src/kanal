@@ -1,0 +1,123 @@
+#!/bin/sh
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+EF="no"
+CF="no"
+
+if [ $# -eq 0 ]
+then
+  DIR="."
+  BASE=${EPK_TITLE:-"a"}
+elif [ $# -eq 1 ]
+then
+  DIR=`dirname $1`
+  case $1 in
+    *.elg)  BASE=`basename $1 .elg`
+	    EF="yes"
+	    ;;
+    *.cube) BASE=`basename $1 .cube`
+	    CF="yes"
+	    ;;
+    *.cube.gz) BASE=`basename $1 .cube.gz`
+	    CF="yes"
+	    ;;
+    *)      BASE=`basename $1`
+	    ;;
+  esac
+else
+  echo "usage: $0 [<file>]"
+  exit 1
+fi
+
+if [ "${DIR}" = "." -a -d epik_${BASE} ]
+then
+    BASE=epik_$BASE
+fi
+
+case $BASE in
+    epik_*) DIR="$DIR/$BASE"
+            BASE="epik"
+            CUBE="${DIR}/expert.cube*"
+            ;;
+    epik)   CUBE="${DIR}/expert.cube*"
+            ;;
+    *)      CUBE="${DIR}/${BASE}.cube*"
+            ;;
+esac
+
+# DIR  should contain the path to the experiment directory
+# BASE should contain the experiment name (without extension)
+
+TRACE="${DIR}/${BASE}.elg"
+
+# determine whether to process trace file
+if [ -f ${TRACE} ]
+then
+  if [ -f ${CUBE} ]
+  then
+    NEWER=`find ${CUBE} -prune -newer ${TRACE} 2>/dev/null`
+    if [ -n "${NEWER}" ]
+    then
+      # -- cube newer than trace
+      if [ ${EF} = "yes" ]
+      then
+        echo "INFO: Reusing old analysis result"
+      fi
+    else
+      # -- trace newer than cube
+      if [ ${CF} != "yes" ]
+      then
+        echo "INFO: both trace and cube file found - but trace file newer"
+	echo "INFO: Regenerate cube file (y/n) ?"
+	read ANSWER
+	if [ "${ANSWER}x" != "nx" ]
+	then
+          # expert generates cube file in current directory
+          ( cd ${DIR}; expert ${BASE}.elg )
+          if [ $? -ne 0 ]
+          then
+            echo "ABORT: expert analysis of ${BASE}.elg failed"
+            exit 2
+          fi
+	fi
+      fi
+    fi
+  else
+    # -- trace only
+    echo "INFO: Starting expert trace analysis"
+    echo "INFO: - result will be stored in ${CUBE}"
+    echo "INFO: - this can take some minutes ... please wait"
+    # expert generates cube file in current directory
+    ( cd ${DIR}; expert ${BASE}.elg )
+    if [ $? -ne 0 ]
+    then
+      echo "ABORT: expert analysis of ${BASE}.elg failed"
+      exit 2
+    fi
+  fi
+  EF="no" # have now a cube file
+fi
+
+# handle cube file
+if [ -f ${CUBE} ]
+then
+  # -- cube only
+  if [ ${EF} = "yes" ]
+  then
+    echo "INFO: No trace file found, but displaying corresponding analysis result"
+  fi
+  cube3 ${CUBE}
+elif [ -d ${DIR} ]
+then
+  # -- no suitable files
+  echo "ERROR: cannot find trace file '${TRACE}' or cube file '${CUBE}'"
+else
+  echo "ERROR: missing experiment directory '${DIR}'"
+fi

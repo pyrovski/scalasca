@@ -1,0 +1,417 @@
+/* -- automatically generated -- do not change ------------------------------ */
+/* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
+
+epk_shm_regid[EPK__SHMEM_SHORT_GET] =
+  esd_def_region("shmem_short_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_PUT] =
+  esd_def_region("shmem_short_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_IGET] =
+  esd_def_region("shmem_short_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_IPUT] =
+  esd_def_region("shmem_short_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_IXGET] =
+  esd_def_region("shmem_short_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_IXPUT] =
+  esd_def_region("shmem_short_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_P] =
+  esd_def_region("shmem_short_p", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_ADD] =
+  esd_def_region("shmem_short_add", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_INC] =
+  esd_def_region("shmem_short_inc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_G] =
+  esd_def_region("shmem_short_g", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_FADD] =
+  esd_def_region("shmem_short_fadd", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_FINC] =
+  esd_def_region("shmem_short_finc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_SWAP] =
+  esd_def_region("shmem_short_swap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_CSWAP] =
+  esd_def_region("shmem_short_cswap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_WAIT] =
+  esd_def_region("shmem_short_wait", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_WAIT_UNTIL] =
+  esd_def_region("shmem_short_wait_until", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_SHORT_MIN_TO_ALL] =
+  esd_def_region("shmem_short_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_SHORT_MAX_TO_ALL] =
+  esd_def_region("shmem_short_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_SHORT_AND_TO_ALL] =
+  esd_def_region("shmem_short_and_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_SHORT_OR_TO_ALL] =
+  esd_def_region("shmem_short_or_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_SHORT_XOR_TO_ALL] =
+  esd_def_region("shmem_short_xor_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_SHORT_SUM_TO_ALL] =
+  esd_def_region("shmem_short_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_SHORT_PROD_TO_ALL] =
+  esd_def_region("shmem_short_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_INT_GET] =
+  esd_def_region("shmem_int_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_PUT] =
+  esd_def_region("shmem_int_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_IGET] =
+  esd_def_region("shmem_int_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_IPUT] =
+  esd_def_region("shmem_int_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_IXGET] =
+  esd_def_region("shmem_int_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_IXPUT] =
+  esd_def_region("shmem_int_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_P] =
+  esd_def_region("shmem_int_p", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_ADD] =
+  esd_def_region("shmem_int_add", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_INC] =
+  esd_def_region("shmem_int_inc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_G] =
+  esd_def_region("shmem_int_g", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_FADD] =
+  esd_def_region("shmem_int_fadd", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_FINC] =
+  esd_def_region("shmem_int_finc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_SWAP] =
+  esd_def_region("shmem_int_swap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_CSWAP] =
+  esd_def_region("shmem_int_cswap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_WAIT] =
+  esd_def_region("shmem_int_wait", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_WAIT_UNTIL] =
+  esd_def_region("shmem_int_wait_until", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INT_MIN_TO_ALL] =
+  esd_def_region("shmem_int_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_INT_MAX_TO_ALL] =
+  esd_def_region("shmem_int_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_INT_AND_TO_ALL] =
+  esd_def_region("shmem_int_and_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_INT_OR_TO_ALL] =
+  esd_def_region("shmem_int_or_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_INT_XOR_TO_ALL] =
+  esd_def_region("shmem_int_xor_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_INT_SUM_TO_ALL] =
+  esd_def_region("shmem_int_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_INT_PROD_TO_ALL] =
+  esd_def_region("shmem_int_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONG_GET] =
+  esd_def_region("shmem_long_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_PUT] =
+  esd_def_region("shmem_long_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_IGET] =
+  esd_def_region("shmem_long_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_IPUT] =
+  esd_def_region("shmem_long_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_IXGET] =
+  esd_def_region("shmem_long_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_IXPUT] =
+  esd_def_region("shmem_long_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_P] =
+  esd_def_region("shmem_long_p", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_ADD] =
+  esd_def_region("shmem_long_add", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_INC] =
+  esd_def_region("shmem_long_inc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_G] =
+  esd_def_region("shmem_long_g", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_FADD] =
+  esd_def_region("shmem_long_fadd", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_FINC] =
+  esd_def_region("shmem_long_finc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_SWAP] =
+  esd_def_region("shmem_long_swap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_CSWAP] =
+  esd_def_region("shmem_long_cswap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_WAIT] =
+  esd_def_region("shmem_long_wait", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_WAIT_UNTIL] =
+  esd_def_region("shmem_long_wait_until", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONG_MIN_TO_ALL] =
+  esd_def_region("shmem_long_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONG_MAX_TO_ALL] =
+  esd_def_region("shmem_long_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONG_AND_TO_ALL] =
+  esd_def_region("shmem_long_and_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONG_OR_TO_ALL] =
+  esd_def_region("shmem_long_or_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONG_XOR_TO_ALL] =
+  esd_def_region("shmem_long_xor_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONG_SUM_TO_ALL] =
+  esd_def_region("shmem_long_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONG_PROD_TO_ALL] =
+  esd_def_region("shmem_long_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGLONG_GET] =
+  esd_def_region("shmem_longlong_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_PUT] =
+  esd_def_region("shmem_longlong_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_IGET] =
+  esd_def_region("shmem_longlong_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_IPUT] =
+  esd_def_region("shmem_longlong_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_IXGET] =
+  esd_def_region("shmem_longlong_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_IXPUT] =
+  esd_def_region("shmem_longlong_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_P] =
+  esd_def_region("shmem_longlong_p", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_ADD] =
+  esd_def_region("shmem_longlong_add", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_INC] =
+  esd_def_region("shmem_longlong_inc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_G] =
+  esd_def_region("shmem_longlong_g", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_FADD] =
+  esd_def_region("shmem_longlong_fadd", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_FINC] =
+  esd_def_region("shmem_longlong_finc", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_SWAP] =
+  esd_def_region("shmem_longlong_swap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_CSWAP] =
+  esd_def_region("shmem_longlong_cswap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_WAIT] =
+  esd_def_region("shmem_longlong_wait", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_WAIT_UNTIL] =
+  esd_def_region("shmem_longlong_wait_until", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGLONG_MIN_TO_ALL] =
+  esd_def_region("shmem_longlong_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGLONG_MAX_TO_ALL] =
+  esd_def_region("shmem_longlong_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGLONG_AND_TO_ALL] =
+  esd_def_region("shmem_longlong_and_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGLONG_OR_TO_ALL] =
+  esd_def_region("shmem_longlong_or_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGLONG_XOR_TO_ALL] =
+  esd_def_region("shmem_longlong_xor_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGLONG_SUM_TO_ALL] =
+  esd_def_region("shmem_longlong_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGLONG_PROD_TO_ALL] =
+  esd_def_region("shmem_longlong_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_FLOAT_GET] =
+  esd_def_region("shmem_float_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_PUT] =
+  esd_def_region("shmem_float_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_IGET] =
+  esd_def_region("shmem_float_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_IPUT] =
+  esd_def_region("shmem_float_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_IXGET] =
+  esd_def_region("shmem_float_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_IXPUT] =
+  esd_def_region("shmem_float_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_P] =
+  esd_def_region("shmem_float_p", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_G] =
+  esd_def_region("shmem_float_g", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_SWAP] =
+  esd_def_region("shmem_float_swap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_FLOAT_MIN_TO_ALL] =
+  esd_def_region("shmem_float_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_FLOAT_MAX_TO_ALL] =
+  esd_def_region("shmem_float_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_FLOAT_SUM_TO_ALL] =
+  esd_def_region("shmem_float_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_FLOAT_PROD_TO_ALL] =
+  esd_def_region("shmem_float_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_DOUBLE_GET] =
+  esd_def_region("shmem_double_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_PUT] =
+  esd_def_region("shmem_double_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_IGET] =
+  esd_def_region("shmem_double_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_IPUT] =
+  esd_def_region("shmem_double_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_IXGET] =
+  esd_def_region("shmem_double_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_IXPUT] =
+  esd_def_region("shmem_double_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_P] =
+  esd_def_region("shmem_double_p", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_G] =
+  esd_def_region("shmem_double_g", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_SWAP] =
+  esd_def_region("shmem_double_swap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_DOUBLE_MIN_TO_ALL] =
+  esd_def_region("shmem_double_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_DOUBLE_MAX_TO_ALL] =
+  esd_def_region("shmem_double_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_DOUBLE_SUM_TO_ALL] =
+  esd_def_region("shmem_double_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_DOUBLE_PROD_TO_ALL] =
+  esd_def_region("shmem_double_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_GET] =
+  esd_def_region("shmem_longdouble_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_PUT] =
+  esd_def_region("shmem_longdouble_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_IGET] =
+  esd_def_region("shmem_longdouble_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_IPUT] =
+  esd_def_region("shmem_longdouble_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_IXGET] =
+  esd_def_region("shmem_longdouble_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_IXPUT] =
+  esd_def_region("shmem_longdouble_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_P] =
+  esd_def_region("shmem_longdouble_p", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_G] =
+  esd_def_region("shmem_longdouble_g", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_SWAP] =
+  esd_def_region("shmem_longdouble_swap", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_MIN_TO_ALL] =
+  esd_def_region("shmem_longdouble_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_MAX_TO_ALL] =
+  esd_def_region("shmem_longdouble_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_SUM_TO_ALL] =
+  esd_def_region("shmem_longdouble_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_LONGDOUBLE_PROD_TO_ALL] =
+  esd_def_region("shmem_longdouble_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_GET] =
+  esd_def_region("shmem_complexf_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_PUT] =
+  esd_def_region("shmem_complexf_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_IGET] =
+  esd_def_region("shmem_complexf_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_IPUT] =
+  esd_def_region("shmem_complexf_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_IXGET] =
+  esd_def_region("shmem_complexf_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_IXPUT] =
+  esd_def_region("shmem_complexf_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_MIN_TO_ALL] =
+  esd_def_region("shmem_complexf_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_MAX_TO_ALL] =
+  esd_def_region("shmem_complexf_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_SUM_TO_ALL] =
+  esd_def_region("shmem_complexf_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXF_PROD_TO_ALL] =
+  esd_def_region("shmem_complexf_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_GET] =
+  esd_def_region("shmem_complexd_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_PUT] =
+  esd_def_region("shmem_complexd_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_IGET] =
+  esd_def_region("shmem_complexd_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_IPUT] =
+  esd_def_region("shmem_complexd_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_IXGET] =
+  esd_def_region("shmem_complexd_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_IXPUT] =
+  esd_def_region("shmem_complexd_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_MIN_TO_ALL] =
+  esd_def_region("shmem_complexd_min_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_MAX_TO_ALL] =
+  esd_def_region("shmem_complexd_max_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_SUM_TO_ALL] =
+  esd_def_region("shmem_complexd_sum_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_COMPLEXD_PROD_TO_ALL] =
+  esd_def_region("shmem_complexd_prod_to_all", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ALL);
+epk_shm_regid[EPK__SHMEM_GET] =
+  esd_def_region("shmem_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_PUT] =
+  esd_def_region("shmem_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IGET] =
+  esd_def_region("shmem_iget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IPUT] =
+  esd_def_region("shmem_iput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXGET] =
+  esd_def_region("shmem_ixget", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXPUT] =
+  esd_def_region("shmem_ixput", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_BROADCAST] =
+  esd_def_region("shmem_broadcast", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ONE2ALL);
+epk_shm_regid[EPK__SHMEM_COLLECT] =
+  esd_def_region("shmem_collect", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_FCOLLECT] =
+  esd_def_region("shmem_fcollect", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_GET32] =
+  esd_def_region("shmem_get32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_PUT32] =
+  esd_def_region("shmem_put32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IGET32] =
+  esd_def_region("shmem_iget32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IPUT32] =
+  esd_def_region("shmem_iput32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXGET32] =
+  esd_def_region("shmem_ixget32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXPUT32] =
+  esd_def_region("shmem_ixput32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_BROADCAST32] =
+  esd_def_region("shmem_broadcast32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ONE2ALL);
+epk_shm_regid[EPK__SHMEM_COLLECT32] =
+  esd_def_region("shmem_collect32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_FCOLLECT32] =
+  esd_def_region("shmem_fcollect32", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_GET64] =
+  esd_def_region("shmem_get64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_PUT64] =
+  esd_def_region("shmem_put64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IGET64] =
+  esd_def_region("shmem_iget64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IPUT64] =
+  esd_def_region("shmem_iput64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXGET64] =
+  esd_def_region("shmem_ixget64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXPUT64] =
+  esd_def_region("shmem_ixput64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_BROADCAST64] =
+  esd_def_region("shmem_broadcast64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ONE2ALL);
+epk_shm_regid[EPK__SHMEM_COLLECT64] =
+  esd_def_region("shmem_collect64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_FCOLLECT64] =
+  esd_def_region("shmem_fcollect64", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_GET128] =
+  esd_def_region("shmem_get128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_PUT128] =
+  esd_def_region("shmem_put128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IGET128] =
+  esd_def_region("shmem_iget128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IPUT128] =
+  esd_def_region("shmem_iput128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXGET128] =
+  esd_def_region("shmem_ixget128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_IXPUT128] =
+  esd_def_region("shmem_ixput128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_BROADCAST128] =
+  esd_def_region("shmem_broadcast128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ONE2ALL);
+epk_shm_regid[EPK__SHMEM_COLLECT128] =
+  esd_def_region("shmem_collect128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_FCOLLECT128] =
+  esd_def_region("shmem_fcollect128", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_CHARACTER_GET] =
+  esd_def_region("shmem_character_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_CHARACTER_PUT] =
+  esd_def_region("shmem_character_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LOGICAL_GET] =
+  esd_def_region("shmem_logical_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_LOGICAL_PUT] =
+  esd_def_region("shmem_logical_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INTEGER_GET] =
+  esd_def_region("shmem_integer_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_INTEGER_PUT] =
+  esd_def_region("shmem_integer_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_REAL_GET] =
+  esd_def_region("shmem_real_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_REAL_PUT] =
+  esd_def_region("shmem_real_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEX_GET] =
+  esd_def_region("shmem_complex_get", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_COMPLEX_PUT] =
+  esd_def_region("shmem_complex_put", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_GET4] =
+  esd_def_region("shmem_get4", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_PUT4] =
+  esd_def_region("shmem_put4", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_BROADCAST4] =
+  esd_def_region("shmem_broadcast4", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ONE2ALL);
+epk_shm_regid[EPK__SHMEM_COLLECT4] =
+  esd_def_region("shmem_collect4", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_FCOLLECT4] =
+  esd_def_region("shmem_fcollect4", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_GET8] =
+  esd_def_region("shmem_get8", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_PUT8] =
+  esd_def_region("shmem_put8", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION);
+epk_shm_regid[EPK__SHMEM_BROADCAST8] =
+  esd_def_region("shmem_broadcast8", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ONE2ALL);
+epk_shm_regid[EPK__SHMEM_COLLECT8] =
+  esd_def_region("shmem_collect8", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);
+epk_shm_regid[EPK__SHMEM_FCOLLECT8] =
+  esd_def_region("shmem_fcollect8", fid, ELG_NO_LNO, ELG_NO_LNO, "SHMEM", EPK_FUNCTION_COLL_ALL2ONE);

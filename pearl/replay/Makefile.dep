@@ -1,0 +1,60 @@
+#------------------------------------------------------------------------------
+# Dependencies
+# (automatically generated using 'make depend')
+#------------------------------------------------------------------------------
+
+CallbackData.o: \
+	CallbackData.cpp \
+	CallbackData.h
+CallbackManager.o: \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	Callback.h \
+	CallbackManager.cpp \
+	CallbackManager.h
+CompoundTask.o: \
+	CompoundTask.cpp \
+	CompoundTask.h \
+	Task.h
+ReplayTask.o: \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	Callback.h \
+	CallbackManager.h \
+	ReplayTask.cpp \
+	ReplayTask.h \
+	Task.h \
+	pearl_replay.h
+Task.o: \
+	Task.cpp \
+	Task.h
+TaskWrapper.o: \
+	Task.h \
+	TaskWrapper.cpp \
+	TaskWrapper.h
+pearl_replay.o: \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	Callback.h \
+	CallbackData.h \
+	CallbackManager.h \
+	pearl_replay.cpp \
+	pearl_replay.h

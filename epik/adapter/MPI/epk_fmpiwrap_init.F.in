@@ -1,0 +1,33 @@
+!****************************************************************************
+!*  SCALASCA    http://www.scalasca.org/                                   **
+!****************************************************************************
+!*  Copyright (c) 1998-2013                                                **
+!*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+!*                                                                         **
+!*  Copyright (c) 2003-2008                                                **
+!*  University of Tennessee, Innovative Computing Laboratory               **
+!*                                                                         **
+!*  Copyright (c) 2010-2013                                                **
+!*  German Research School for Simulation Sciences GmbH,                   **
+!*  Laboratory for Parallel Programming                                    **
+!*                                                                         **
+!*  See the file COPYRIGHT in the package base directory for details       **
+!****************************************************************************
+!>
+!! @file       epk_fmpiwrap_init.f
+!! @brief      Fortran functions, called during the initialization of
+!!             the mpi adapter to obtain fortran specific values
+!!
+!! @maintainer Marc-Andre Hermanns <m.a.hermanns@grs-sim.de>
+!! @ingroup    adapter_mpif_utility
+!<
+
+      SUBROUTINE epk_mpif_init_cb
+      INCLUDE  'mpif.h'
+
+!!      CALL epk_mpif_init_bottom(MPI_BOTTOM)
+!!      CALL epk_mpif_init_in_place(MPI_IN_PLACE)
+!!      CALL epk_mpif_init_status_ignore(MPI_STATUS_IGNORE)
+!!      CALL epk_mpif_init_statuses_ignore(MPI_STATUSES_IGNORE)
+!!      CALL epk_mpif_init_unweighted(MPI_UNWEIGHTED)
+      END

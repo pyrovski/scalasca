@@ -1,0 +1,237 @@
+TOPDIR = ..
+
+include Makefile.defs.fe
+include $(TOPDIR)/mf/common.defs
+
+all: allfe allbe 
+
+install: installfe installbe combine $(BINDIR)/kinst-pomp combine-$(CFGKEY)
+
+clean: cleanfe cleanbe
+
+relink: setupfe mklinksfe chklinksfe setupbe mklinksbe chklinksbe
+
+setup: setupfe setupbe
+
+setupfe:
+	@if test ! -d buildfe; then ${MAKE} setupfe-real; fi
+
+setupfe-real: mk-build-dirfe buildfe/lndir mklinksfe
+
+mk-build-dirfe:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Initializing Shadow Frontend  Build Directories   +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	-mkdir buildfe
+
+mklinksfe:
+	cd buildfe; ./lndir ../..
+	cd buildfe; rm -f RealMakefile; ln -s ../../utils/build/RealMakefile .
+	cd buildfe; rm -f GNUmakefile; ln -s RealMakefile GNUmakefile
+	cd buildfe; rm -f Makefile; \
+		ln -s ../../utils/build/Makefile.redirect Makefile
+	cd buildfe; rm -f Makefile.defs; \
+		echo "DSUF=/fe" > Makefile.defs; \
+		echo 'include $$(TOPDIR)/../Makefile.defs.fe' >> Makefile.defs
+	cd buildfe; rm -f qt.pro.defs; ln -s ../qt.pro.defs qt.pro.defs
+	cd buildfe; rm -f mpi-support.defs; ln -s ../mpi-support.defs
+
+chklinksfe:
+	$(TOPDIR)/utils/build/cleanlinks.sh buildfe
+
+setupbe:
+	@if test ! -d buildbe; then ${MAKE} setupbe-real; fi
+
+setupbe-real: mk-build-dirbe buildfe/lndir mklinksbe
+
+mk-build-dirbe:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Initializing Shadow Backend  Build Directories    +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	-mkdir buildbe
+
+mklinksbe:
+	cd buildbe; ../buildfe/lndir ../..
+	cd buildbe; rm -f RealMakefile; ln -s ../../utils/build/RealMakefile .
+	cd buildbe; rm -f GNUmakefile; ln -s RealMakefile GNUmakefile
+	cd buildbe; rm -f Makefile; \
+		ln -s ../../utils/build/Makefile.redirect Makefile
+	cd buildbe; rm -f Makefile.defs; \
+		echo "DSUF=/be" > Makefile.defs; \
+		echo 'include $$(TOPDIR)/../Makefile.defs.be' >> Makefile.defs
+	cd buildbe; rm -f qt.pro.defs; ln -s ../qt.pro.defs qt.pro.defs
+	cd buildbe; rm -f mpi-support.defs; ln -s ../mpi-support.defs
+
+chklinksbe:
+	$(TOPDIR)/utils/build/cleanlinks.sh buildbe
+
+buildfe/lndir: $(TOPDIR)/utils/build/lndir.c
+	$(CC) $(TOPDIR)/utils/build/lndir.c -o buildfe/lndir
+	                                                                        
+realclean:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Removing Shadow Build Directories                 +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	rm -rf buildfe buildbe
+
+allfe: setupfe
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Building Front-End Version                        +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd buildfe; $(MAKE) -f RealMakefile all-fe DSUF="/fe"
+
+installfe: allfe
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Installing Front-End Version                      +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd buildfe; $(MAKE) -f RealMakefile install-fe DSUF="/fe"
+
+cleanfe: 
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  cleaning Front-End Version                        +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd buildfe; $(MAKE) -f RealMakefile clean DSUF="/fe"
+
+allbe: setupbe
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Building Back-End Version                         +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd buildbe; $(MAKE) -f RealMakefile all-be DSUF="/be"
+
+installbe: allbe
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Installing Back-End Version                       +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd buildbe; $(MAKE) -f RealMakefile install-be DSUF="/be"
+
+cleanbe: 
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  cleaning Back-End Version                         +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd buildbe; $(MAKE) -f RealMakefile clean DSUF="/be"
+
+combine:
+	$(MKDIR) -m 755 $(BINDIR)
+	# select front-end components
+	-( cd $(BINDIR); test -f fe/opari2               && ln -f -s fe/opari2 . )
+	-( cd $(BINDIR); test -f fe/opari2-config        && ln -f -s fe/opari2-config . )
+	-( cd $(BINDIR); test -f fe/pomp2_parse_init_regions.awk && ln -f -s fe/pomp2_parse_init_regions.awk . )
+	-( cd $(BINDIR); test -f fe/expert               && ln -f -s fe/expert . )
+	-( cd $(BINDIR); test -f fe/kanal                && ln -f -s fe/kanal . )
+	-( cd $(BINDIR); test -f fe/cube3-qt             && ln -f -s fe/cube3-qt . )
+	-( cd $(BINDIR); test -f fe/cube3                && ln -f -s fe/cube3 . )
+	-( cd $(BINDIR); test -f fe/cube3_clean          && ln -f -s fe/cube3_clean . )
+	-( cd $(BINDIR); test -f fe/cube3_cmp            && ln -f -s fe/cube3_cmp . )
+	-( cd $(BINDIR); test -f fe/cube3_cut            && ln -f -s fe/cube3_cut . )
+	-( cd $(BINDIR); test -f fe/cube3_diff           && ln -f -s fe/cube3_diff . )
+	-( cd $(BINDIR); test -f fe/cube3_mean           && ln -f -s fe/cube3_mean . )
+	-( cd $(BINDIR); test -f fe/cube3_merge          && ln -f -s fe/cube3_merge . )
+	-( cd $(BINDIR); test -f fe/cube3_remap          && ln -f -s fe/cube3_remap . )
+	-( cd $(BINDIR); test -f fe/cube3_score          && ln -f -s fe/cube3_score . )
+	-( cd $(BINDIR); test -f fe/cube3_stat           && ln -f -s fe/cube3_stat . )
+	-( cd $(BINDIR); test -f fe/tau2cube3            && ln -f -s fe/tau2cube3 . )
+	-( cd $(BINDIR); test -f fe/skin                 && ln -f -s fe/skin . )
+	-( cd $(BINDIR); test -f fe/scan                 && ln -f -s fe/scan . )
+	-( cd $(BINDIR); test -f fe/square               && ln -f -s fe/square . )
+	-( cd $(BINDIR); test -f fe/scalasca             && ln -f -s fe/scalasca . )
+	-( cd $(BINDIR); test -f fe/elg2vtf              && ln -f -s fe/elg2vtf . )
+	-( cd $(BINDIR); test -f fe/elg_merge            && ln -f -s fe/elg_merge . )
+	-( cd $(BINDIR); test -f fe/elg_msgord           && ln -f -s fe/elg_msgord . )
+	-( cd $(BINDIR); test -f fe/elg_print            && ln -f -s fe/elg_print . )
+	-( cd $(BINDIR); test -f fe/elg_stat             && ln -f -s fe/elg_stat . )
+	-( cd $(BINDIR); test -f fe/elg_vtf3             && ln -f -s fe/elg_vtf3 . )
+	-( cd $(BINDIR); test -f fe/elg2otf              && ln -f -s fe/elg2otf . )
+	-( cd $(BINDIR); test -f fe/vtotf2elg            && ln -f -s fe/vtotf2elg . )
+	-( cd $(BINDIR); test -f fe/elg_otfunify         && ln -f -s fe/elg_otfunify . )
+	-( cd $(BINDIR); test -f fe/elg_otfunify.omp     && ln -f -s fe/elg_otfunify.omp . )
+	-( cd $(BINDIR); test -f fe/elg_paraver          && ln -f -s fe/elg_paraver . )
+	-( cd $(BINDIR); test -f fe/elg2prv              && ln -f -s fe/elg2prv . )
+	-( cd $(BINDIR); test -f fe/elg_filter           && ln -f -s fe/elg_filter . )
+	-( cd $(BINDIR); test -f fe/elg_timecorrect      && ln -f -s fe/elg_timecorrect . )
+	-( cd $(BINDIR); test -f fe/vptmerge             && ln -f -s fe/vptmerge . )
+	-( cd $(BINDIR); test -f fe/epik_conf            && ln -f -s fe/epik_conf . )
+	# select back-end components
+	-( cd $(BINDIR); test -f be/scout.ser            && ln -f -s be/scout.ser . )
+	-( cd $(BINDIR); test -f be/scout.omp            && ln -f -s be/scout.omp . )
+	-( cd $(BINDIR); test -f be/scout.mpi            && ln -f -s be/scout.mpi . )
+	-( cd $(BINDIR); test -f be/scout.hyb            && ln -f -s be/scout.hyb . )
+	-( cd $(BINDIR); test -f be/salsa                && ln -f -s be/salsa . )
+	-( cd $(BINDIR); test -f be/clc_synchronize.mpi  && ln -f -s be/clc_synchronize.mpi . )
+	-( cd $(BINDIR); test -f be/clc_synchronize.hyb  && ln -f -s be/clc_synchronize.hyb . )
+	$(INSTALL) -c -m 755 $(BINDIR)/be/kconfig $(BINDIR)
+
+# Platform-specific "combine" stuff
+combine-bgl:
+combine-bgp:
+combine-bgq:
+combine-crayxt:
+combine-crayxt-cce:
+combine-crayxt-gnu:
+combine-crayxt-intel:
+combine-crayxt-pathscale:
+combine-crayxt-pgi:
+combine-fx10:
+
+combine-mic:
+	@echo "*** MIC-specific combine! ***"
+	-( cd $(BINDIR); rm -f scan; \
+	echo "#!/bin/sh" >> scan; \
+	echo "# switch to /fe for host or /be for mic" >> scan; \
+	echo "DIR=\`dirname \$$0\`" >> scan; \
+	echo "if [ -f /etc/mic-version ]; then" >> scan; \
+	echo "    DIR=\$$DIR/be" >> scan; \
+	echo "else" >> scan; \
+	echo "    DIR=\$$DIR/fe" >> scan; \
+	echo "fi" >> scan; \
+	echo "exec \$$DIR/scan \"\$$@\"" >> scan; \
+        chmod 755 scan )
+	# additional shadow links for back-end components
+	-( cd $(BINDIR); test -f be/scout.ser            && ln -f -s be/scout.ser scout.ser.mic )
+	-( cd $(BINDIR); test -f be/scout.omp            && ln -f -s be/scout.omp scout.omp.mic )
+	-( cd $(BINDIR); test -f be/scout.mpi            && ln -f -s be/scout.mpi scout.mpi.mic )
+	-( cd $(BINDIR); test -f be/scout.hyb            && ln -f -s be/scout.hyb scout.hyb.mic )
+	-( cd $(BINDIR); test -f be/salsa                && ln -f -s be/salsa salsa.mic )
+	-( cd $(BINDIR); test -f be/clc_synchronize.mpi  && ln -f -s be/clc_synchronize.mpi clc_synchronize.mpi.mic )
+	-( cd $(BINDIR); test -f be/clc_synchronize.hyb  && ln -f -s be/clc_synchronize.hyb clc_cynchronize.hyb.mic )
+	# select front-end components
+	-( cd $(BINDIR); test -f fe/scout.ser            && ln -f -s fe/scout.ser . )
+	-( cd $(BINDIR); test -f fe/scout.omp            && ln -f -s fe/scout.omp . )
+	-( cd $(BINDIR); test -f fe/scout.mpi            && ln -f -s fe/scout.mpi . )
+	-( cd $(BINDIR); test -f fe/scout.hyb            && ln -f -s fe/scout.hyb . )
+	-( cd $(BINDIR); test -f fe/salsa                && ln -f -s fe/salsa . )
+	-( cd $(BINDIR); test -f fe/clc_synchronize.mpi  && ln -f -s fe/clc_synchronize.mpi . )
+	-( cd $(BINDIR); test -f fe/clc_synchronize.hyb  && ln -f -s fe/clc_synchronize.hyb . )
+	-( cd $(BINDIR); rm -f kinst; ln -f -s fe/kinst . )
+
+combine-necsx:
+	-( cd $(BINDIR); test -L scan && ln -f -s be/scan . )
+
+$(BINDIR)/kinst-pomp: $(BINDIR)/be/kinst-pomp
+	@grep ' #FE#' $(BINDIR)/fe/kinst-pomp > /tmp/kinst-sed-fix
+	sed -e ' /#FE#/d' -e '/^OCC=/r /tmp/kinst-sed-fix' \
+		$(BINDIR)/be/kinst-pomp > $(BINDIR)/kinst-pomp
+	chmod 755 $(BINDIR)/kinst-pomp
+	if test -f $(BINDIR)/be/kinst; then \
+		sed -e ' /#FE#/d' -e '/^OCC=/r /tmp/kinst-sed-fix' \
+			$(BINDIR)/be/kinst > $(BINDIR)/kinst ; \
+		chmod 755 $(BINDIR)/kinst ; \
+	fi
+	@rm /tmp/kinst-sed-fix

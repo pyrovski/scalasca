@@ -1,0 +1,149 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.crayxt-cce-be)
+#------------------------------------------------------------------------------
+
+CFGKEY = crayxt-cce
+CONFIG = Cray XT system with CCE compilers
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC   = 64
+PFLAG  =
+AFLAG  =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+# Default target (catamount|linux) can be overridden by XTARGET
+XTARGET = -target=linux
+
+PLAT      = crayxt
+MACHINE   = -DMACHINE=\"Cray\ XT\ CCE\"
+PLAT_LDIR = -DPFORM_LDIR=\".\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = gcc
+PLAT_CFLAGS =
+
+OPTFLAGS = -O
+CC       = cc $(XTARGET) -hnoomp
+CFLAGS   = $(OPTFLAGS)
+CXX      = CC $(XTARGET) -hnoomp
+CXXFLAGS = $(OPTFLAGS)
+F77      = ftn $(XTARGET) -hnoomp
+F90      = ftn $(XTARGET) -hnoomp
+FFLAGS   =
+FPP      =
+FDOPT    = -D
+LDFLAGS  = $(OPTFLAGS)
+UTILLIB  =
+FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+MPICC     = $(CC)
+MPICXX    = $(CXX)
+MPIF90    = $(F90)
+MPILIB    = -lmpich
+PMPILIB   = 
+FMPILIB   = -lfmpich
+FMPIOBJ   =
+MPIEXTRA  = -DMPICH_IGNORE_CXX_SEEK -DHAS_MPI2_1SIDED
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = $(CC)
+OMPCXX     = $(CXX)
+OMPF90     = $(F90)
+OMPFLAG    = -homp
+OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+HYBCC      = $(MPICC)
+HYBCXX     = $(MPICXX)
+HYBF90     = $(MPIF90)
+HYBFLAG    = $(OMPFLAG)
+HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+# The module xt-papi defines PAPI_INCLUDE_OPTS and PAPI_POST_LINK_OPTS
+# which are independent of the METRDIR (set by configure --with-papi=METRDIR)
+
+#METR       = papi
+#METRDIR    = /opt/xt-tools/papi/default
+#METRINC    = $(PAPI_INCLUDE_OPTS)
+#METRLIB    = $(PAPI_POST_LINK_OPTS)
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS = -O3
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+ECXX         = $(CXX)
+ECXXLIBS     =
+ECXX_AR      = ar
+ECXX_ARFLAGS = -rcs
+
+BINUTILS     = /opt/binutils
+LIBERTY      = -L$(BINUTILS)/lib64 -liberty
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|cce|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = cce
+CINSTFLAG = -hfunc_trace
+LINSTFLAG = $(CINSTFLAG)
+DEMANGLE  = -DGNU_DEMANGLE -I$(BINUTILS)/include
+BFDLIB    = -L$(BINUTILS)/lib64 -L$(BINUTILS)/lib -lbfd -lz $(LIBERTY)
+EXTRAOBJS =
+KINST_EXTRA = kinst-cce
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+# --> removed as not needed on backend
+
+#------------------------------------------------------------------------------
+# OTF Support
+#-----------------------------------------------------------------------------
+
+#OTFDIR      =
+#OTFRTTI     =
+# --> not on backend: OTFUNIFY    = elg_otfunify
+# --> not on backend: #OTFUNIFY    = elg_otfunify.omp
+# --> not on backend: ELG_OTF     = elg2otf
+#OTFLIB      = -L$(OTFDIR)/lib64 -L$(OTFDIR)/lib -lotf -lz
+# --> not on backend: INST_OTF    = install-otf
+#OTFELGLIB     = libelg.otf.a
+#OTFMPIELGLIB  = libelg.otf.mpi.a
+#OTFOMPELGLIB  = libelg.otf.omp.a
+#OTFHYBELGLIB  = libelg.otf.ompi.a
+

@@ -1,0 +1,24 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+
+/**
+@defgroup EPISODE EPISODE measurement management
+
+The EPISODE measurement management system can be further subdivided into
+several functional areas, which are described in more detail in the submodules
+listed below.
+*/
+
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup EPISODE_unify Unification of static program entities
+@ingroup EPISODE
+*/

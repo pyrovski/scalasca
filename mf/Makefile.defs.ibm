@@ -1,0 +1,164 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.ibm)
+#------------------------------------------------------------------------------
+
+CFGKEY = ibm
+CONFIG = AIX cluster with IBM XL compilers
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC   = 32
+PFLAG  = -q$(PREC)
+AFLAG  = -X32_64
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = ibm
+MACHINE   = -DMACHINE=\"IBM\ AIX\ POWER\ \($(PREC)-bit\)\"
+#PLAT_LDIR = -DPFORM_LDIR=\"/tmp\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = xlc
+PLAT_CFLAGS =
+#PLAT_CFLAGS = -DUSE_SWITCH_CLOCK
+
+OPTFLAGS =
+CC       = xlc
+CFLAGS   = $(PFLAG) $(OPTFLAGS)
+CXX      = xlC
+CXXFLAGS = $(PFLAG) -qstaticinline $(OPTFLAGS) -qrtti -qsuppress=1500-029:1500-030 -O2
+F77      = xlf #-qsuppress=cmpmsg
+F90      = xlf90 -qfree=f90 -qsuffix=f=f90 #-qsuppress=cmpmsg
+FFLAGS   = $(PFLAG) $(OPTFLAGS)
+FPP      = -qsuffix=cpp=F90
+FDOPT    = -WF,-D
+LDFLAGS32 = -bmaxdata:0x80000000
+LDFLAGS64 =
+LDFLAGS   = $(PFLAG) $(OPTFLAGS) $(LDFLAGS$(PREC))
+UTILLIB  =
+#UTILLIB  = -lswclock
+FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+MPICC     = mpcc
+MPICXX    = mpCC
+MPIF90    = mpxlf90 -qsuffix=f=f90 -qfree=f90 #-qsuppress=cmpmsg
+MPILIB    = -lmpi_r
+PMPILIB   = 
+FMPILIB   = -lepk.ad.fmpi
+FMPIOBJ   = libepk.ad.fmpi.a
+MPIEXTRA  = -DHAS_MPI2_1SIDED
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = xlc_r
+OMPCXX     = xlC_r
+OMPF90     = xlf90_r -qsuffix=f=f90 -qfree=f90 #-qsuppress=cmpmsg
+OMPFLAG    = -qsmp=omp
+OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+HYBCC      = mpcc_r
+HYBCXX     = mpCC_r
+HYBF90     = mpxlf_r -qsuffix=f=f90 -qfree=f90 #-qsuppress=cmpmsg
+HYBFLAG    = $(OMPFLAG)
+HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# SHMEM Settings
+#------------------------------------------------------------------------------
+
+# NOTE: Requires IBM ACTC TurboSHMEM package
+#SHMEMSYS   = -DAIXTURBO
+#SHMEMINC   = -I/usr/local/TurboSHMEM/include
+#SHMEMOBJS  = elg_shmem.o elg_fshmem.o
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+#METR       = papi
+#METRDIR    = /usr/local/papi
+#METRINC    = -I$(METRDIR)/include -qenum=4
+#METRLIB32  = -lpapi
+#METRLIB64  = -lpapi
+#METRLDIR32 = $(METRDIR)/lib
+#METRLDIR64 = $(METRDIR)/lib
+#METRLIB    = -L$(METRLDIR$(PREC)) $(METRLIB$(PREC)) -lpmapi
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS = -O3
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+ECXX         = xlC
+ECXXLIBS     =
+ECXX_AR      = ar
+ECXX_ARFLAGS = -rcs
+
+LIBERTY32    = -L/usr/local/beta/gcc/lib
+LIBERTY64    = $(LIBERTY32)/ppc64
+LIBERTY      = $(LIBERTY$(PREC)) -liberty
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = xl
+CINSTFLAG = -qdebug=function_trace
+LINSTFLAG = $(CINSTFLAG)
+#DEMANGLE  = -DGNU_DEMANGLE # -I$(BINUTILS)/include
+#BFDLIB    = $(LIBERTY)
+EXTRAOBJS =
+KINST_EXTRA = kinst-xl
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#VTF3LIB     = -L$(VTF3DIR)/ibm$(PREC)/lib -lvtf3
+#INST_VTF3   = install-vtf3
+
+#------------------------------------------------------------------------------
+# OTF Support
+#-----------------------------------------------------------------------------
+
+#OTFDIR      =
+#OTFRTTI     = -qrtti
+#OTFUNIFY    = elg_otfunify
+##OTFUNIFY    = elg_otfunify.omp
+#ELG_OTF     = elg2otf
+#OTFLIB      = -L$(OTFDIR)/lib64 -L$(OTFDIR)/lib -lotf$(PREC) -lz
+#INST_OTF    = install-otf
+#OTFELGLIB     = libelg.otf.a
+#OTFMPIELGLIB  = libelg.otf.mpi.a
+#OTFOMPELGLIB  = libelg.otf.omp.a
+#OTFHYBELGLIB  = libelg.otf.ompi.a
+

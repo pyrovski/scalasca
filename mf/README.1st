@@ -1,0 +1,184 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  Copyright (c) 2003-2008                                                **
+**  University of Tennessee, Innovative Computing Laboratory               **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+This directory contains "Makefile Definition Files templates" used by
+configure to generate suitable build configurations for a specific system.
+The files are:
+
+  common.defs                  Generic settings for all systems
+
+  gui.defs                     Common settings for all system regarding
+                               the CUBE GUI tools (libxml2, wxGTK, QT)
+                               NOTE: for manual configuration, add gui.defs
+                               to the Makefile.defs templates below
+
+  Makefile.defs.generic        Should work on any UNIX operating system.
+                               Only builds basic EPIK measurement library and
+                               tools to analyze traces.
+
+  Makefile.defs.linux-gnu      Linux IA-32, IA-64, Opteron, or PPC cluster
+  Makefile.defs.linux-gomp     with MPICH-1 and GNU compilers. Starting
+                               with GCC 4.2 there is GNU OpenMP (GOMP)
+                               support. For other MPI libraries see section
+                               "Linux MPI" below. Builds "generic" parts plus
+                               MPI measurement support.
+
+  Makefile.defs.linux-pgi      Linux IA-32, IA-64, or Opteron cluster
+                               with MPICH-1 and PGI compilers. For other
+                               MPI libraries see section "Linux MPI" below.
+                               Also works for Cray XD1.
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.linux-intel    Linux IA-32, IA-64, or Opteron cluster
+                               with MPICH-1 and Intel compilers. For other
+                               MPI libraries see section "Linux MPI" below.
+                               NOTE: for SGI Altix use Makefile.defs.sgi-intel!
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.linux-pathscale  Linux IA-32, IA-64, or Opteron cluster
+                               with MPICH-1 and PathScale compilers. For other
+                               MPI libraries see section "Linux MPI" below.
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.linux-ibm      Linux PPC cluster
+                               with MPICH-1 and IBM compilers. For other
+                               MPI libraries see section "Linux MPI" below.
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.linux-sun      Linux IA-32 or Opteron cluster
+                               with MPICH-1 and Sun studio compilers. For other
+                               MPI libraries see section "Linux MPI" below.
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.ibm            Clusters of IBM Power3/4/5/6 machines
+                               with POE MPI and IBM compilers.
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.bgl-fe         IBM BlueGene Front-End
+  Makefile.defs.bgp-fe         Builds basic EPIK library and tools to
+  Makefile.defs.bgq-fe         analyze traces.
+  Makefile.defs.bgl-be         IBM BlueGene Back-End for Compute Nodes
+  Makefile.defs.bgp-be         Builds MPI, OpenMP and hybrid MPI+OpenMP
+  Makefile.defs.bgq-be         measurement support (as appropriate).
+
+  Makefile.defs.crayx1         Cray X1
+                               Builds MPI, OpenMP and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.crayxt-fe      Cray XT Front-End
+                               Builds basic EPIK library and tools to
+                               analyze traces.
+  Makefile.defs.crayxt-be      Cray XT Back-End (generic)
+                               Builds MPI, OpenMP and hybrid MPI+OpenMP
+                               measurement support.
+  Makefile.defs.crayxt-cce-be  PrgEnv/compiler-specific Cray XT Back-Ends
+  Makefile.defs.crayxt-gnu-be
+  Makefile.defs.crayxt-intel-be
+  Makefile.defs.crayxt-pathscale-be
+  Makefile.defs.crayxt-pgi-be
+
+  Makefile.defs.fx10-fe        Fujitsu FX10 & K computer Front-End
+                               Builds basic EPIK library and tools to
+                               analyze traces.
+  Makefile.defs.fx10-be        Fujitsu FX10 & K computer Back-End
+                               Builds MPI, OpenMP and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.mic-fe         Intel Xeon Phi (MIC) Front-End (host)
+                               using Intel MPI and compilers.
+                               Builds MPI, OpenMP and hybrid MPI+OpenMP
+                               measurement support, in addition to
+                               CUBE3 GUI and OPARI2.
+  Makefile.defs.mic-be         Intel Xeon Phi (MIC) Back-End
+                               using Intel MPI and compilers.
+                               Builds MPI, OpenMP and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.sgi-mips       SGI MIPS-based clusters (O2k, O3k, ...)
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.sgi-intel      SGI IA64-based clusters (Altix)
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+  Makefile.defs.sun            Sun Solaris SPARC- or Opteron-based clusters
+                               with HPC Clustertools MPI and Studio compilers.
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI+OpenMP
+                               measurement support.
+
+
+Linux MPI Library Definitions
+-----------------------------
+
+These files contain the settings for the various MPI libraries in use on
+Linux systems. After selecting the right basic Makefile Definition File
+for your Linux system (Makefile.defs.linux*) replace its MPI section
+with the content of one of the following files:
+
+  mpi-no.def         NO MPI
+  mpi-mpich.def      MPICH version 1.x
+  mpi-mpich2.def     MPICH version 2.x
+  mpi-mpich3.def     MPICH version 3.x
+  mpi-lam.def        LAM
+  mpi-openmpi.def    Open MPI
+  mpi-intel.def      Intel MPI 1.x
+  mpi-intel2.def     Intel MPI 2.x or later
+  mpi-hp.def         HP MPI
+  mpi-scali.def      Scali MPI
+  mpi-sgimpt.def     SGI MPT MPI
+  mpi-bullxmpi.def   Bullx MPI
+
+
+UNSUPPORTED Configurations
+--------------------------
+
+The following KOJAK platforms have not been tested recently because we
+no longer have access to such a system. However the supplied makefile
+definition files might still work on these systems or might be a good
+starting point for successor systems.
+
+  Makefile.defs.crayt3e        Cray T3E
+                               Builds MPI measurement support.
+
+  Makefile.defs.hitachi        Hitachi SR-8000
+                               Builds MPI, OpenMP, and hybrid MPI/OpenMP
+                               measurement support.
+
+  Makefile.defs.nec-sx         NEC SX
+                               Builds MPI, OpenMP, and hybrid MPI/OpenMP
+                               measurement support.
+
+  Makefile.defs.fujitsu        Fujitsu Primepower
+                               Builds "generic" parts plus
+                               Builds MPI, OpenMP, and hybrid MPI/OpenMP
+                               measurement support.
+
+  Makefile.defs.tru64          HP [DEC] Tru64 Alpha-based clusters
+                               Builds "generic" parts plus
+                               MPI, OpenMP, and hybrid MPI/OpenMP
+                               measurement support.

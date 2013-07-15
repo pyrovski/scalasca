@@ -1,0 +1,1348 @@
+#****************************************************************************
+#*  KOJAK                                                                  **
+#****************************************************************************
+#*  Copyright (c) 2006-2013                                                     **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************
+
+PROLOG {
+  #include <cfloat>
+  #include <list>
+
+  #include <CallbackManager.h>
+  #include <Location.h>
+  #include <Machine.h>
+  #include <MpiComm.h>
+  #include <MpiMessage.h>
+  #include <Node.h>
+  #include <Process.h>
+  #include <elg_error.h>
+
+  #include "Roles.h"
+  #include "user_events.h"
+}
+
+#--- General GRID-related performance patterns -------------------------------
+
+PATTERN "GRID" = [
+  NAME    = "Grid"
+  CLASS   = "GridPatternTime"
+  INFO   = "Total CPU allocation time (includes time allocated for idle threads)"
+  UNIT    = "sec"
+  PROFILE = { true }
+]
+
+
+PATTERN "GRID_EXECUTION" = [
+  PARENT  = "GRID"
+  NAME    = "Grid Execution"
+  CLASS   = "GridPatternExec"
+  INFO   = "Execution time (does not includes time allocated for idle threads)"
+  UNIT    = "sec"
+  PROFILE = { !is_overhead(region) }
+]
+
+
+PATTERN "GRID_OVERHEAD" = [
+  PARENT  = "GRID"
+  NAME    = "Grid Overhead"
+  CLASS   = "GridPatternOverhead"
+  INFO   = "Time spent performing tasks related to trace generation"
+  UNIT    = "sec"
+  PROFILE = { is_overhead(region) }
+]
+
+
+PATTERN "GRID_MPI" = [
+  PARENT  = "GRID_EXECUTION"
+  NAME    = "Grid MPI"
+  CLASS   = "GridPatternMPI"
+  INFO   = "Time spent in MPI calls"
+  UNIT    = "sec"
+  PROFILE = { is_mpi_api(region) }
+]
+
+
+PATTERN "G_COMMUNICATION" = [
+  PARENT  = "GRID_MPI"
+  NAME    = "Communication"
+  CLASS   = "GridPatternMPI_Comm"
+  INFO   = "Time spent in MPI communication calls"
+  UNIT    = "sec"
+  PROFILE = { is_mpi_comm(region) }
+]
+
+PATTERN "GRID_MPI_IO" = [
+  PARENT  = "GRID_MPI"
+  NAME    = "Grid IO"
+  CLASS   = "GridPatternMPI_IO"
+  INFO   = "Time spent in MPI I/O calls"
+  UNIT    = "sec"
+  PROFILE = { is_mpi_io(region) }
+]
+
+
+PATTERN "GRID_MPI_INIT_EXIT" = [
+  PARENT  = "GRID_MPI"
+  NAME    = "Grid Init/Exit"
+  CLASS   = "GridPatternMPI_Init"
+  INFO   = "Time spent in MPI initialization calls"
+  UNIT    = "sec"
+  PROFILE = { is_mpi_init(region) }
+]
+
+
+
+PATTERN "G_SYNCHRONIZATION" = [
+  PARENT  = "GRID_MPI"
+  NAME    = "Synchronization"
+  CLASS   = "GridPatternMPI_Sync"
+  INFO   = "Time spent in MPI barrier calls"
+  UNIT    = "sec"
+  PROFILE = { is_mpi_sync(region) }
+]
+
+#--- GRID-related performance patterns ---------------------------------------
+
+PROLOG {
+  #include <cfloat>
+  #include <list>
+
+  #include <Location.h>
+  #include <Machine.h>
+  #include <MpiComm.h>
+  #include <MpiMessage.h>
+  #include <Node.h>
+  #include <Process.h>
+  #include <elg_error.h>
+
+  #include "Roles.h"
+}
+
+
+
+PATTERN "GRID_MPI_COLLECTIVE" = [
+  PARENT    = "G_COMMUNICATION"
+  NAME      = "Grid Collective"
+  CLASS     = "GridPatternMPI_Collective"
+  INFO     = "MPI collective communication"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_COLLEXIT" = {
+
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (!isGrid)
+        return;
+
+      Event   enter     = event.enterptr();
+      Region* region    = enter->get_region();      
+      double  idle_time = event->get_time() - enter->get_time();
+      if (idle_time > 0 && is_mpi_collcomm(region))
+        m_severity[event.get_cnode()] += idle_time;
+
+      data->m_local.add_event(event, ROLE_COLL_EXIT);
+      data->m_local.add_event(event.enterptr(), ROLE_COLL_ENTER);
+
+
+      if (is_mpi_12n(region))
+	cbmanager.notify(GCOLL_12N, event, data);
+      else if (is_mpi_n21(region))
+	cbmanager.notify(GCOLL_N21, event, data);
+      else if (is_mpi_n2n(region))
+	cbmanager.notify(GCOLL_N2N, event, data);
+    }
+  ]
+]
+
+PATTERN "NGRID_MPI_COLLECTIVE" = [
+  PARENT    = "G_COMMUNICATION"
+  NAME      = "Non Grid Collective"
+  CLASS     = "NGridPatternMPI_Collective"
+  INFO     = "MPI collective communication"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_COLLEXIT" = {
+
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (isGrid)
+        return;
+   
+      Event   enter     = event.enterptr();
+      Region* region    = enter->get_region();      
+      double  idle_time = event->get_time() - enter->get_time();
+      if (idle_time > 0 && is_mpi_collcomm(region))
+        m_severity[event.get_cnode()] += idle_time;
+
+      data->m_local.add_event(event, ROLE_COLL_EXIT);
+      data->m_local.add_event(event.enterptr(), ROLE_COLL_ENTER);
+
+      
+      if (is_mpi_12n(region))
+	cbmanager.notify(NGCOLL_12N, event, data);
+      else if (is_mpi_n21(region))
+	cbmanager.notify(NGCOLL_N21, event, data);
+      else if (is_mpi_n2n(region))
+	cbmanager.notify(NGCOLL_N2N, event, data);
+    }
+  ]
+]
+
+
+PATTERN "GRID_MPI_EARLYREDUCE" = [
+  PARENT    = "GRID_MPI_COLLECTIVE"
+  NAME      = "Grid Early Reduce"
+  CLASS     = "GridPatternMPI_EarlyReduce"
+  INFO     = "Waiting time due to an early receiver in MPI n-to-1 operations"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "GCOLL_N21" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (!isGrid)
+        return;
+
+      pearl::timestamp_t local_time;
+      if (event.get_location() == event->get_root())
+        // We need a timestamp > timestamp of all ENTER events ==> DBL_MAX
+        local_time = DBL_MAX;
+      else
+        local_time = event.enterptr()->get_time();
+
+      // Retrieve earliest ENTER event (without considering root location)
+      pearl::timestamp_t min_time;
+      MPI_Reduce(&local_time, &min_time, 1, MPI_DOUBLE, MPI_MIN,
+                 comm->get_rank(event->get_root()->get_process()),
+                 comm->get_comm());
+
+      if (event.get_location() == event->get_root()) {
+        // Validate clock condition
+        if (min_time > event->get_time()) {
+          elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                      event.get_location()->get_id(), get_name().c_str(),
+                      min_time - event->get_time());
+          min_time = event->get_time();
+        }
+
+        // Calculate waiting time
+	double idle_time = min_time - event.enterptr()->get_time();
+	if (idle_time > 0)
+          m_severity[event.get_cnode()] += idle_time;
+      }
+    }
+  ]
+]
+
+
+
+PATTERN "GRID_MPI_LATEBROADCAST" = [
+  PARENT    = "GRID_MPI_COLLECTIVE"
+  NAME      = "Grid Late Broadcast"
+  CLASS     = "GridPatternMPI_LateBroadcast"
+  INFO     = "Waiting time due to a late sender in MPI 1-to-n operations"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "GCOLL_12N" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (!isGrid)
+        return;
+
+      // Broadcast timestamp of root's ENTER event
+      pearl::timestamp_t root_time = event.enterptr()->get_time();
+      MPI_Bcast(&root_time, 1, MPI_DOUBLE,
+                comm->get_rank(event->get_root()->get_process()),
+                comm->get_comm());
+
+      if (event.get_location() != event->get_root()) {
+        // Validate clock condition
+        if (root_time > event->get_time()) {
+          elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                      event.get_location()->get_id(), get_name().c_str(),
+                      root_time - event->get_time());
+          root_time = event->get_time();
+        }
+
+        // Calculate waiting time
+        double idle_time = root_time - event.enterptr()->get_time();
+        if (idle_time > 0)
+          m_severity[event.get_cnode()] += idle_time;
+      }
+    }
+  ]
+]
+
+PATTERN "GRID_MPI_WAIT_NXN" = [
+  PARENT    = "GRID_MPI_COLLECTIVE"
+  NAME      = "Grid Wait at N x N"
+  CLASS     = "GridPatternMPI_WaitNxN"
+  INFO     = "Waiting time due to inherent synchronization in MPI n-to-n operations across multiple machines"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "GCOLL_N2N" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (!isGrid)
+        return;
+
+      // Retrieve latest ENTER event
+      pearl::timestamp_t local_time = event.enterptr()->get_time();
+      pearl::timestamp_t max_time;
+      MPI_Allreduce(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX,
+                    comm->get_comm());
+
+      // Validate clock condition
+      if (max_time > event->get_time()) {
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    max_time - event->get_time());
+        max_time = event->get_time();
+      }
+
+      // Calculate waiting time
+      double idle_time = max_time - event.enterptr()->get_time();
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+    }
+  ]
+]
+
+
+
+PATTERN "NGRID_MPI_EARLYREDUCE" = [
+  PARENT    = "NGRID_MPI_COLLECTIVE"
+  NAME      = "Early Reduce"
+  CLASS     = "NGridPatternMPI_EarlyReduce"
+  INFO     = "Waiting time due to an early receiver in MPI n-to-1 operations"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "NGCOLL_N21" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (isGrid)
+        return;
+
+      pearl::timestamp_t local_time;
+      if (event.get_location() == event->get_root())
+        // We need a timestamp > timestamp of all ENTER events ==> DBL_MAX
+        local_time = DBL_MAX;
+      else
+        local_time = event.enterptr()->get_time();
+
+      // Retrieve earliest ENTER event (without considering root location)
+      pearl::timestamp_t min_time;
+      MPI_Reduce(&local_time, &min_time, 1, MPI_DOUBLE, MPI_MIN,
+                 comm->get_rank(event->get_root()->get_process()),
+                 comm->get_comm());
+
+      if (event.get_location() == event->get_root()) {
+        // Validate clock condition
+        if (min_time > event->get_time()) {
+          elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                      event.get_location()->get_id(), get_name().c_str(),
+                      min_time - event->get_time());
+          min_time = event->get_time();
+        }
+
+        // Calculate waiting time
+	double idle_time = min_time - event.enterptr()->get_time();
+	if (idle_time > 0)
+          m_severity[event.get_cnode()] += idle_time;
+      }
+    }
+  ]
+]
+
+PATTERN "NGRID_MPI_LATEBROADCAST" = [
+  PARENT    = "NGRID_MPI_COLLECTIVE"
+  NAME      = "Late Broadcast"
+  CLASS     = "NGridPatternMPI_LateBroadcast"
+  INFO     = "Waiting time due to a late sender in MPI 1-to-n operations"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "NGCOLL_12N" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (isGrid)
+        return;
+
+      // Broadcast timestamp of root's ENTER event
+      pearl::timestamp_t root_time = event.enterptr()->get_time();
+      MPI_Bcast(&root_time, 1, MPI_DOUBLE,
+                comm->get_rank(event->get_root()->get_process()),
+                comm->get_comm());
+
+      if (event.get_location() != event->get_root()) {
+        // Validate clock condition
+        if (root_time > event->get_time()) {
+          elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                      event.get_location()->get_id(), get_name().c_str(),
+                      root_time - event->get_time());
+          root_time = event->get_time();
+        }
+
+        // Calculate waiting time
+        double idle_time = root_time - event.enterptr()->get_time();
+        if (idle_time > 0)
+          m_severity[event.get_cnode()] += idle_time;
+      }
+    }
+  ]
+]
+
+
+PATTERN "NGRID_MPI_WAIT_NXN" = [
+  PARENT    = "NGRID_MPI_COLLECTIVE"
+  NAME      = "Wait at N x N"
+  CLASS     = "NGridPatternMPI_WaitNxN"
+  INFO     = "Waiting time due to inherent synchronization in MPI n-to-n operations across multiple machines"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "NGCOLL_N2N" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (isGrid)
+        return;
+
+      // Retrieve latest ENTER event
+      pearl::timestamp_t local_time = event.enterptr()->get_time();
+      pearl::timestamp_t max_time;
+      MPI_Allreduce(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX,
+                    comm->get_comm());
+
+      // Validate clock condition
+      if (max_time > event->get_time()) {
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    max_time - event->get_time());
+        max_time = event->get_time();
+      }
+
+      // Calculate waiting time
+      double idle_time = max_time - event.enterptr()->get_time();
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+    }
+  ]
+]
+
+
+PATTERN "GRID_MPI_POINT2POINT" = [
+  PARENT    = "G_COMMUNICATION"
+  NAME      = "Grid P2P"
+  CLASS     = "GridPatternMPI_P2P"
+  INFO     = "MPI point-to-point communication"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_SEND" = {
+      data->m_local.add_event(event, ROLE_SEND);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_SEND);
+      
+      if (event.get_location()->get_machine() != event->get_dest()->get_machine())
+        m_severity[event.get_cnode()] += event.exitptr()->get_time()-event.enterptr()->get_time();
+      cbmanager.notify(GPRE_SEND, event, data);
+
+      MpiComm* comm = event->get_comm();
+      data->m_local.send(*comm,
+                         comm->get_rank(event->get_dest()->get_process()),
+                         event->get_tag());
+
+      cbmanager.notify(GPOST_SEND, event, data);
+    }
+
+    "MPI_RECV" = {
+      data->m_local.add_event(event, ROLE_RECV);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_RECV);
+      if (event.get_location()->get_machine() != event->get_source()->get_machine()) {
+        int count = 0;
+        Event it = event.enterptr();
+	if ( is_mpi_waitall(it->get_region()) ) {
+          while ( !it->is_typeof(EXIT) ) {
+            if (it->is_typeof(MPI_RECV))
+              count++;
+            ++it;
+          }
+        } else {
+          count = 1;
+        }
+        m_severity[event.get_cnode()] += (event.exitptr()->get_time()-event.enterptr()->get_time())/count;
+      }
+      cbmanager.notify(GPRE_RECV, event, data);
+
+      MpiComm* comm = event->get_comm();
+      data->m_remote.recv(data->m_defs,
+                          *comm,
+                          comm->get_rank(event->get_source()->get_process()),
+                          event->get_tag());
+
+      // Validate clock condition
+      RemoteEvent send = data->m_remote.get_event(ROLE_SEND);
+      if (send->get_time() > event->get_time())
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    send->get_time() - event->get_time());
+
+      cbmanager.notify(GPOST_RECV, event, data);
+    }
+  ]
+]
+
+
+PATTERN "GRID_MPI_LATERECEIVER" = [
+  PARENT    = "GRID_MPI_POINT2POINT"
+  NAME      = "Grid Late Receiver"
+  CLASS     = "GridPatternMPI_LateReceiver"
+  INFO     = "Time a sending process is waiting for the receiver to become ready"
+  UNIT      = "sec"
+  DATA      = {
+    typedef std::map<pearl::Location*,map<pearl::CNode*,double> > rem_sev_container;
+
+    rem_sev_container m_remote_sev;
+  }
+  CALLBACKS = [
+    "GPRE_SEND" = {
+      data->m_local.add_event(event, ROLE_SEND_LR);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_SEND_LR);
+      data->m_local.add_event(event.exitptr(), ROLE_EXIT_SEND_LR);
+    }
+
+    "GPRE_RECV" = {
+      data->m_local.add_event(event, ROLE_RECV_LR);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_RECV_LR);
+      data->m_local.add_event(event.exitptr(), ROLE_EXIT_RECV_LR);
+    }
+
+    "GPOST_RECV" = {
+      RemoteEvent send       = data->m_remote.get_event(ROLE_SEND_LR);
+      RemoteEvent enter_send = data->m_remote.get_event(ROLE_ENTER_SEND_LR);
+      RemoteEvent exit_send  = data->m_remote.get_event(ROLE_EXIT_SEND_LR);
+      Event       enter_recv = data->m_local.get_event(ROLE_ENTER_RECV_LR);
+ 
+      Event   recv   = data->m_local.get_event(ROLE_RECV_LR);
+      Region* region = enter_send->get_region();
+      if (!is_mpi_block_send(region))
+	return;
+
+      // No overlap?
+      if (exit_send->get_time() < enter_recv->get_time())
+	return;
+
+      // Calculate waiting time
+      double idle_time = enter_recv->get_time() - enter_send->get_time();
+      if (idle_time > 0)
+	if (send.get_location()->get_machine() != recv.get_location()->get_machine())
+          m_remote_sev[send.get_location()][send.get_cnode()] += idle_time;
+    }
+
+    "FINISHED" = {
+      // Retrieve number of processes and rank
+      int rank;
+      int num_procs;
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+      MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+
+      // Create message counter arrays
+      int* lcounts = new int[num_procs];
+      int* gcounts = new int[num_procs];
+      memset(lcounts, 0, num_procs * sizeof(int));
+      memset(gcounts, 0, num_procs * sizeof(int));
+
+      // Store message counts
+      rem_sev_container::iterator lit = m_remote_sev.begin();
+      while (lit != m_remote_sev.end()) {
+        lcounts[lit->first->get_process()->get_id()]++;
+        ++lit;
+      }
+
+      // Distribute message counters
+      MPI_Allreduce(lcounts, gcounts, num_procs, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+      int num_msgs = gcounts[rank];
+
+      // Delete message counter arrays
+      delete[] lcounts;
+      delete[] gcounts;
+
+      // Create messages
+      vector<MpiMessage*> messages;
+      messages.reserve(m_remote_sev.size());
+      lit = m_remote_sev.begin();
+      while (lit != m_remote_sev.end()) {
+        MpiMessage* msg = new MpiMessage(MPI_COMM_WORLD,
+                                         sizeof(uint32_t) +
+                                         lit->second.size() *
+                                           (sizeof(ident_t) + sizeof(double)));
+        msg->put_uint32(lit->second.size());
+        map<CNode*,double>::iterator sit = lit->second.begin();
+        while (sit != lit->second.end()) {
+          msg->put_id(sit->first->get_id());
+          msg->put_double(sit->second);
+
+          ++sit;
+        }
+        messages.push_back(msg);
+        msg->isend(lit->first->get_process()->get_id(), 15);
+
+        ++lit;
+      }
+
+      // Receive messages
+      for (int i = 0; i < num_msgs; ++i) {
+        MpiMessage msg(MPI_COMM_WORLD);
+        msg.recv(MPI_ANY_SOURCE, 15);
+        uint32_t count = msg.get_uint32();
+        for (uint32_t j = 0; j < count; ++j) {
+          ident_t cnode = msg.get_id();
+          double  value = msg.get_double();
+          m_severity[data->m_defs.get_cnode(cnode)] += value;
+        }
+      }
+
+      // Wait for sending to complete and free messages
+      vector<MpiMessage*>::iterator mit = messages.begin();
+      while (mit != messages.end()) {
+        (*mit)->wait();
+        delete *mit;
+        ++mit;
+      }
+    }
+  ]
+]
+
+
+PATTERN "GRID_MPI_LATESENDER" = [
+  PARENT    = "GRID_MPI_POINT2POINT"
+  NAME      = "Grid Late Sender"
+  CLASS     = "GridPatternMPI_LateSender"
+  INFO     = "Time a receiving process is waiting for a message"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "GPRE_SEND" = {
+      data->m_local.add_event(event, ROLE_SEND_LS);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_SEND_LS);
+    }
+
+    "GPRE_RECV" = {
+      data->m_local.add_event(event, ROLE_RECV_LS);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_RECV_LS);
+    }
+
+    "GPOST_RECV" = {
+      RemoteEvent enter_send = data->m_remote.get_event(ROLE_ENTER_SEND_LS);
+      Event       enter_recv = data->m_local.get_event(ROLE_ENTER_RECV_LS);
+
+      RemoteEvent send = data->m_remote.get_event(ROLE_SEND_LS);
+      Event       recv = data->m_local.get_event(ROLE_RECV_LS);
+
+      Region* region = enter_recv->get_region();
+      if (is_mpi_testx(region)   ||
+          is_mpi_waitall(region) ||
+	  is_mpi_waitsome(region))
+	return;
+
+      double idle_time = enter_send->get_time() - enter_recv->get_time();
+      if (idle_time > 0) {
+	if (send.get_location()->get_machine() != recv.get_location()->get_machine()){
+          m_severity[event.get_cnode()] += idle_time;
+	  cbmanager.notify(GLATE_SENDER, event, data);
+	}
+      }
+    }
+  ]
+]
+
+
+
+PATTERN "GRID_MPI_LATESENDER_WO" = [
+  PARENT    = "GRID_MPI_LATESENDER"
+  NAME      = "Grid Messages in Wrong Order (Late Sender)"
+  CLASS     = "GridPatternMPI_LateSenderWO"
+  INFO     = "Late Sender situation due to messages received in the wrong order"
+  UNIT      = "sec"
+  DATA      = {
+    static const uint32_t BUFFERSIZE = 100;
+
+    struct entry_t {
+      pearl::timestamp_t stime;
+      pearl::timestamp_t idle;
+      pearl::CNode*      cnode;
+    };
+    typedef std::list<entry_t> LsBuffer;
+
+    LsBuffer m_buffer;
+  }
+  CALLBACKS = [
+    "GLATE_SENDER" = {
+      RemoteEvent send       = data->m_remote.get_event(ROLE_SEND_LS);
+      RemoteEvent enter_send = data->m_remote.get_event(ROLE_ENTER_SEND_LS);
+      Event       enter_recv = data->m_local.get_event(ROLE_ENTER_RECV_LS);
+
+      // Construct entry
+      entry_t item;
+      item.stime = send->get_time();
+      item.idle  = enter_send->get_time() - enter_recv->get_time();
+      item.cnode = event.get_cnode();
+
+      // Store entry in buffer
+      if (m_buffer.size() == BUFFERSIZE)
+        m_buffer.pop_front();
+      m_buffer.push_back(item);
+    }
+
+    "GPOST_RECV" = {
+      RemoteEvent send = data->m_remote.get_event(ROLE_SEND);
+      Event       recv = data->m_local.get_event(ROLE_RECV_LS);
+
+      // Search for "wrong order" situations
+      LsBuffer::iterator it = m_buffer.begin();
+      while (it != m_buffer.end()) {
+        if (it->stime > send->get_time()) {
+	  if (send.get_location()->get_machine() != recv.get_location()->get_machine())
+            m_severity[it->cnode] += it->idle;
+          it = m_buffer.erase(it);
+        } else  {
+          ++it;
+        }
+      }
+    }
+  ]
+]
+
+PATTERN "GRID_MPI_BARRIER" = [
+  PARENT    = "G_SYNCHRONIZATION"
+  NAME      = "Grid Barrier"
+  CLASS     = "GridPatternMPI_Barrier"
+  INFO     = "Time spent in MPI barriers"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_COLLEXIT" = {
+      if (!is_mpi_barrier(event.enterptr()->get_region()))
+        return;
+      
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (!isGrid)
+        return;
+
+      Event enter = event.enterptr();
+      double idle_time = event->get_time() - enter->get_time();
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+
+      data->m_local.add_event(event, ROLE_BARRIER_EXIT);
+      data->m_local.add_event(event.enterptr(), ROLE_BARRIER_ENTER);
+
+      cbmanager.notify(GCOLL_BARRIER, event, data);
+    }
+  ]
+]
+
+
+PATTERN "GRID_MPI_BARRIER_COMPLETION" = [
+  PARENT    = "GRID_MPI_BARRIER"
+  NAME      = "Grid Barrier Completion"
+  CLASS     = "GridPatternMPI_BarrierCompletion"
+  INFO     = "Time needed to finish an MPI barrier"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "GCOLL_BARRIER" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (!isGrid)
+        return;
+
+      // Retrieve earliest EXIT event
+      pearl::timestamp_t local_time = event->get_time();
+      pearl::timestamp_t min_time;
+      MPI_Allreduce(&local_time, &min_time, 1, MPI_DOUBLE, MPI_MIN,
+                    comm->get_comm());
+
+      // Validate clock condition
+      if (min_time < event.enterptr()->get_time()) {
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    event.enterptr()->get_time() - min_time);
+        min_time = event.enterptr()->get_time();
+      }
+
+      // Calculate waiting time
+      double idle_time = event->get_time() - min_time;
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+    }
+  ]
+]
+
+
+PATTERN "GRID_MPI_BARRIER_WAIT" = [
+  PARENT    = "GRID_MPI_BARRIER"
+  NAME      = "Grid Wait at Barrier"
+  CLASS     = "GridPatternMPI_BarrierWait"
+  INFO     = "Waiting time in front of MPI barriers"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "GCOLL_BARRIER" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (!isGrid)
+        return;
+
+      // Retrieve latest ENTER event
+      pearl::timestamp_t local_time = event.enterptr()->get_time();
+      pearl::timestamp_t max_time;
+      MPI_Allreduce(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX,
+                    comm->get_comm());
+
+      // Validate clock condition
+      if (max_time > event->get_time()) {
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    max_time - event->get_time());
+        max_time = event->get_time();
+      }
+
+      // Calculate waiting time
+      double idle_time = max_time - event.enterptr()->get_time();
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+    }
+  ]
+]
+
+PATTERN "NGRID_MPI_POINT2POINT" = [
+  PARENT    = "G_COMMUNICATION"
+  NAME      = "Non Grid P2P"
+  CLASS     = "NGridPatternMPI_P2P"
+  INFO     = "MPI point-to-point communication"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_SEND" = {
+      data->m_local.add_event(event, ROLE_SEND);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_SEND);
+      
+      if (event.get_location()->get_machine() == event->get_dest()->get_machine())
+        m_severity[event.get_cnode()] += event.exitptr()->get_time()-event.enterptr()->get_time();
+      cbmanager.notify(NGPRE_SEND, event, data);
+
+      MpiComm* comm = event->get_comm();
+      data->m_local.send(*comm,
+                         comm->get_rank(event->get_dest()->get_process()),
+                         event->get_tag());
+
+      cbmanager.notify(GPOST_SEND, event, data);
+    }
+
+    "MPI_RECV" = {
+      data->m_local.add_event(event, ROLE_RECV);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_RECV);
+    
+      if (event.get_location()->get_machine() == event->get_source()->get_machine()) {
+        int count = 0;
+        Event it = event.enterptr();
+	if ( is_mpi_waitall(it->get_region()) ) {
+          while ( !it->is_typeof(EXIT) ) {
+            if (it->is_typeof(MPI_RECV))
+              count++;
+            ++it;
+          }
+        } else {
+          count = 1;
+        }
+        m_severity[event.get_cnode()] += (event.exitptr()->get_time()-event.enterptr()->get_time())/count;
+      }
+      cbmanager.notify(NGPRE_RECV, event, data);
+
+      MpiComm* comm = event->get_comm();
+      data->m_remote.recv(data->m_defs,
+                          *comm,
+                          comm->get_rank(event->get_source()->get_process()),
+                          event->get_tag());
+
+      // Validate clock condition
+      RemoteEvent send = data->m_remote.get_event(ROLE_SEND);
+      if (send->get_time() > event->get_time())
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    send->get_time() - event->get_time());
+
+      cbmanager.notify(NGPOST_RECV, event, data);
+    }
+  ]
+]
+
+
+PATTERN "NGRID_MPI_LATERECEIVER" = [
+  PARENT    = "NGRID_MPI_POINT2POINT"
+  NAME      = "Late Receiver"
+  CLASS     = "NGridPatternMPI_LateReceiver"
+  INFO     = "Time a sending process is waiting for the receiver to become ready"
+  UNIT      = "sec"
+  DATA      = {
+    typedef std::map<pearl::Location*,map<pearl::CNode*,double> > rem_sev_container;
+
+    rem_sev_container m_remote_sev;
+  }
+  CALLBACKS = [
+    "NGPRE_SEND" = {
+      data->m_local.add_event(event, ROLE_SEND_LR);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_SEND_LR);
+      data->m_local.add_event(event.exitptr(), ROLE_EXIT_SEND_LR);
+    }
+
+    "NGPRE_RECV" = {
+      data->m_local.add_event(event, ROLE_RECV_LR);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_RECV_LR);
+      data->m_local.add_event(event.exitptr(), ROLE_EXIT_RECV_LR);
+    }
+
+    "NGPOST_RECV" = {
+      RemoteEvent send       = data->m_remote.get_event(ROLE_SEND_LR);
+      RemoteEvent enter_send = data->m_remote.get_event(ROLE_ENTER_SEND_LR);
+      RemoteEvent exit_send  = data->m_remote.get_event(ROLE_EXIT_SEND_LR);
+      Event       enter_recv = data->m_local.get_event(ROLE_ENTER_RECV_LR);
+ 
+      Event   recv   = data->m_local.get_event(ROLE_RECV_LR);
+      Region* region = enter_send->get_region();
+      if (!is_mpi_block_send(region))
+	return;
+
+      // No overlap?
+      if (exit_send->get_time() < enter_recv->get_time())
+	return;
+
+      // Calculate waiting time
+      double idle_time = enter_recv->get_time() - enter_send->get_time();
+      if (idle_time > 0)
+	if (send.get_location()->get_machine() == recv.get_location()->get_machine())
+          m_remote_sev[send.get_location()][send.get_cnode()] += idle_time;
+    }
+
+    "FINISHED" = {
+      // Retrieve number of processes and rank
+      int rank;
+      int num_procs;
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+      MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+
+      // Create message counter arrays
+      int* lcounts = new int[num_procs];
+      int* gcounts = new int[num_procs];
+      memset(lcounts, 0, num_procs * sizeof(int));
+      memset(gcounts, 0, num_procs * sizeof(int));
+
+      // Store message counts
+      rem_sev_container::iterator lit = m_remote_sev.begin();
+      while (lit != m_remote_sev.end()) {
+        lcounts[lit->first->get_process()->get_id()]++;
+        ++lit;
+      }
+
+      // Distribute message counters
+      MPI_Allreduce(lcounts, gcounts, num_procs, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+      int num_msgs = gcounts[rank];
+
+      // Delete message counter arrays
+      delete[] lcounts;
+      delete[] gcounts;
+
+      // Create messages
+      vector<MpiMessage*> messages;
+      messages.reserve(m_remote_sev.size());
+      lit = m_remote_sev.begin();
+      while (lit != m_remote_sev.end()) {
+        MpiMessage* msg = new MpiMessage(MPI_COMM_WORLD,
+                                         sizeof(uint32_t) +
+                                         lit->second.size() *
+                                           (sizeof(ident_t) + sizeof(double)));
+        msg->put_uint32(lit->second.size());
+        map<CNode*,double>::iterator sit = lit->second.begin();
+        while (sit != lit->second.end()) {
+          msg->put_id(sit->first->get_id());
+          msg->put_double(sit->second);
+
+          ++sit;
+        }
+        messages.push_back(msg);
+        msg->isend(lit->first->get_process()->get_id(), 15);
+
+        ++lit;
+      }
+
+      // Receive messages
+      for (int i = 0; i < num_msgs; ++i) {
+        MpiMessage msg(MPI_COMM_WORLD);
+        msg.recv(MPI_ANY_SOURCE, 15);
+        uint32_t count = msg.get_uint32();
+        for (uint32_t j = 0; j < count; ++j) {
+          ident_t cnode = msg.get_id();
+          double  value = msg.get_double();
+          m_severity[data->m_defs.get_cnode(cnode)] += value;
+        }
+      }
+
+      // Wait for sending to complete and free messages
+      vector<MpiMessage*>::iterator mit = messages.begin();
+      while (mit != messages.end()) {
+        (*mit)->wait();
+        delete *mit;
+        ++mit;
+      }
+    }
+  ]
+]
+
+
+PATTERN "NGRID_MPI_LATESENDER" = [
+  PARENT    = "NGRID_MPI_POINT2POINT"
+  NAME      = "Late Sender"
+  CLASS     = "NGridPatternMPI_LateSender"
+  INFO     = "Time a receiving process is waiting for a message"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "NGPRE_SEND" = {
+      data->m_local.add_event(event, ROLE_SEND_LS);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_SEND_LS);
+    }
+
+    "NGPRE_RECV" = {
+      data->m_local.add_event(event, ROLE_RECV_LS);
+      data->m_local.add_event(event.enterptr(), ROLE_ENTER_RECV_LS);
+    }
+
+    "NGPOST_RECV" = {
+      RemoteEvent enter_send = data->m_remote.get_event(ROLE_ENTER_SEND_LS);
+      Event       enter_recv = data->m_local.get_event(ROLE_ENTER_RECV_LS);
+
+      RemoteEvent send = data->m_remote.get_event(ROLE_SEND_LS);
+      Event       recv = data->m_local.get_event(ROLE_RECV_LS);
+
+      Region* region = enter_recv->get_region();
+      if (is_mpi_testx(region)   ||
+          is_mpi_waitall(region) ||
+	  is_mpi_waitsome(region))
+	return;
+
+      double idle_time = enter_send->get_time() - enter_recv->get_time();
+      if (idle_time > 0) {
+	if (send.get_location()->get_machine() == recv.get_location()->get_machine()){
+          m_severity[event.get_cnode()] += idle_time;
+	  cbmanager.notify(NGLATE_SENDER, event, data);
+	}
+      }
+    }
+  ]
+]
+
+
+
+PATTERN "NGRID_MPI_LATESENDER_WO" = [
+  PARENT    = "NGRID_MPI_LATESENDER"
+  NAME      = "Messages in Wrong Order (Late Sender)"
+  CLASS     = "NGridPatternMPI_LateSenderWO"
+  INFO     = "Late Sender situation due to messages received in the wrong order"
+  UNIT      = "sec"
+  DATA      = {
+    static const uint32_t BUFFERSIZE = 100;
+
+    struct entry_t {
+      pearl::timestamp_t stime;
+      pearl::timestamp_t idle;
+      pearl::CNode*      cnode;
+    };
+    typedef std::list<entry_t> LsBuffer;
+
+    LsBuffer m_buffer;
+  }
+  CALLBACKS = [
+    "NGLATE_SENDER" = {
+      RemoteEvent send       = data->m_remote.get_event(ROLE_SEND_LS);
+      RemoteEvent enter_send = data->m_remote.get_event(ROLE_ENTER_SEND_LS);
+      Event       enter_recv = data->m_local.get_event(ROLE_ENTER_RECV_LS);
+
+      // Construct entry
+      entry_t item;
+      item.stime = send->get_time();
+      item.idle  = enter_send->get_time() - enter_recv->get_time();
+      item.cnode = event.get_cnode();
+
+      // Store entry in buffer
+      if (m_buffer.size() == BUFFERSIZE)
+        m_buffer.pop_front();
+      m_buffer.push_back(item);
+    }
+
+    "NGPOST_RECV" = {
+      RemoteEvent send = data->m_remote.get_event(ROLE_SEND);
+      Event       recv = data->m_local.get_event(ROLE_RECV_LS);
+
+      // Search for "wrong order" situations
+      LsBuffer::iterator it = m_buffer.begin();
+      while (it != m_buffer.end()) {
+        if (it->stime > send->get_time()) {
+	  if (send.get_location()->get_machine() == recv.get_location()->get_machine())
+            m_severity[it->cnode] += it->idle;
+          it = m_buffer.erase(it);
+        } else  {
+          ++it;
+        }
+      }
+    }
+  ]
+]
+
+PATTERN "NGRID_MPI_BARRIER" = [
+  PARENT    = "G_SYNCHRONIZATION"
+  NAME      = "Non Grid Barrier"
+  CLASS     = "NGridPatternMPI_Barrier"
+  INFO     = "Time spent in MPI barriers"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_COLLEXIT" = {
+      if (!is_mpi_barrier(event.enterptr()->get_region()))
+        return;
+      
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (isGrid)
+        return;
+
+      Event enter = event.enterptr();
+      double idle_time = event->get_time() - enter->get_time();
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+
+      data->m_local.add_event(event, ROLE_BARRIER_EXIT);
+      data->m_local.add_event(event.enterptr(), ROLE_BARRIER_ENTER);
+
+      cbmanager.notify(NGCOLL_BARRIER, event, data);
+    }
+  ]
+]
+
+
+PATTERN "NGRID_MPI_BARRIER_COMPLETION" = [
+  PARENT    = "NGRID_MPI_BARRIER"
+  NAME      = "Barrier Completion"
+  CLASS     = "NGridPatternMPI_BarrierCompletion"
+  INFO     = "Time needed to finish an MPI barrier"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "NGCOLL_BARRIER" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (isGrid)
+        return;
+
+      // Retrieve earliest EXIT event
+      pearl::timestamp_t local_time = event->get_time();
+      pearl::timestamp_t min_time;
+      MPI_Allreduce(&local_time, &min_time, 1, MPI_DOUBLE, MPI_MIN,
+                    comm->get_comm());
+
+      // Validate clock condition
+      if (min_time < event.enterptr()->get_time()) {
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    event.enterptr()->get_time() - min_time);
+        min_time = event.enterptr()->get_time();
+      }
+
+      // Calculate waiting time
+      double idle_time = event->get_time() - min_time;
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+    }
+  ]
+]
+
+
+PATTERN "NGRID_MPI_BARRIER_WAIT" = [
+  PARENT    = "NGRID_MPI_BARRIER"
+  NAME      = "Wait at Barrier"
+  CLASS     = "NGridPatternMPI_BarrierWait"
+  INFO     = "Waiting time in front of MPI barriers"
+  UNIT      = "sec"
+  CALLBACKS = [
+    "NGCOLL_BARRIER" = {
+      MpiComm* comm = event->get_comm();
+
+      // Check for multiple machines within the communicator
+      Machine* mach = comm->get_process(0)->get_node()->get_machine();
+      bool isGrid = false;
+      long count = comm->num_processes();
+      for ( long i = 1 ; i< count ; i++) {
+        if (comm->get_process(i)->get_node()->get_machine() != mach) {
+          isGrid = true;
+          break;
+        }
+      }
+
+      if (isGrid)
+        return;
+
+      // Retrieve latest ENTER event
+      pearl::timestamp_t local_time = event.enterptr()->get_time();
+      pearl::timestamp_t max_time;
+      MPI_Allreduce(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX,
+                    comm->get_comm());
+
+      // Validate clock condition
+      if (max_time > event->get_time()) {
+        elg_warning("Unsynchronized clocks! (loc: %d, pat: %s, diff: %fs)",
+                    event.get_location()->get_id(), get_name().c_str(),
+                    max_time - event->get_time());
+        max_time = event->get_time();
+      }
+
+      // Calculate waiting time
+      double idle_time = max_time - event.enterptr()->get_time();
+      if (idle_time > 0)
+        m_severity[event.get_cnode()] += idle_time;
+    }
+  ]
+]

@@ -1,0 +1,93 @@
+#!/bin/sh
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+
+VERSION="1.4.3"
+VERBOSE=${SKIN_VERBOSE:+"-@"}
+PDTARCH=@PDTARCH@
+PDT=${PDTARCH:+"[-pdt] "}
+COMP="[-comp] "
+
+# Determine installation directory
+BINDIR=`dirname $0`
+
+# Check whether "kinst" script is available
+if [ ! -x "${BINDIR}/kinst" ]; then
+  KINST=${BINDIR}/kinst-pomp
+  unset COMP
+else
+  KINST=${BINDIR}/kinst
+fi
+
+# Validate command line (to some extent)
+if [ $# -eq 0 ]; then
+  echo "SCALASCA $VERSION: application instrumenter"
+  echo "usage: `basename $0` [-v] $COMP$PDT[-pomp] [-user] <compile-or-link-command>"
+# echo "  -mode={auto|mpi|omp|ompi|none|serial}: measurement mode [default: auto]"
+  if [ -n "$COMP" ]; then
+  echo "  -comp={all|none|...}: routines to be instrumented by compiler [default: all]"
+  echo "                 (... custom instrumentation specification depends on compiler)"
+  fi
+  if [ -n "$PDT" ]; then
+  echo "  -pdt:  process source files with PDT/TAU instrumenter"
+  fi
+  echo "  -pomp: process source files for POMP directives"
+  echo "  -user: enable EPIK user instrumentation API macros in source code"
+  echo "  -v:    enable verbose commentary when instrumenting"
+  if [ -z "$COMP" ]; then
+  echo "WARNING: automatic source routine instrumentation is not supported by this compiler!"
+  fi
+  exit 1
+fi
+
+# Process options
+unset INST_OPTS
+while [ $# -ne 0 ]; do
+  case $1 in
+    -mode=*)
+      INST_OPTS="${INST_OPTS} $1"
+      shift
+      ;;
+    -comp=*)
+      INST_OPTS="${INST_OPTS} $1"
+      shift
+      ;;
+    -pomp)
+      INST_OPTS="${INST_OPTS} $1"
+      shift
+      ;;
+    -pdt|-tau)
+      INST_OPTS="${INST_OPTS} -pdt"
+      shift
+      ;;
+    -user)
+      INST_OPTS="${INST_OPTS} -user"
+      shift
+      ;;
+    -@|-v)
+      VERBOSE="-@"
+      shift
+      ;;
+    -h|-help|--help)
+      exec $0 # usage
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [ $# -eq 0 ]; then
+  echo "Error: no compile or link command"
+  exec $0 # usage
+fi
+
+# Execute appropriate "kinst" script
+${KINST} ${INST_OPTS} ${VERBOSE} "$@"

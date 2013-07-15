@@ -1,0 +1,162 @@
+#!/bin/sh
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+USAGE1="usage: kconfig [--32|--64] [--for] [--ser|--mpi|--omp|--hybrid] [--user] "
+USAGE2="               (--cflags|--libs|--cc|--prefix)"
+
+if [ $# -eq 0 ]
+then
+  echo "${USAGE1}"
+  echo "${USAGE2}"
+  exit 1
+fi
+
+# Initialization
+PREC=${OBJECT_MODE:-@PREC@}
+USESOMP=no
+USESMPI=yes
+USESOTF=no
+USEAPI=no
+OLINK=""
+DOPT="-D"
+FLIB=""
+ULIB="-lcubew3 @BFDLIB@"
+TASK="dontknow"
+SEQELGLIB=-lelg.ser
+OMPELGLIB=-lelg.omp
+MPIELGLIB=-lelg.mpi
+HYBELGLIB=-lelg.ompi
+
+# Process command line
+for arg in "$@"
+do
+  case ${arg} in
+  -*64)                  PREC=64
+                         ;;
+  -*32)                  PREC=32
+                         ;;
+  -f|--for|--fortran)    FLIB="@FMPILIB@"
+                         DOPT="@FDOPT@"
+                         ;;
+  -u|--user)             USEAPI=yes
+                         ;;
+  -s|--ser|--serial|--seq|--sequential) 
+                         USESMPI=no
+                         USESOMP=no
+                         ;;
+  -m|--mpi)              USESMPI=yes
+                         USESOMP=no
+                         ;;
+  -o|--omp|--openmp)     USESMPI=no
+                         USESOMP=yes
+                         ;;
+  -h|--ompi|--hybrid)    USESMPI=yes
+                         USESOMP=yes
+                         ;;
+  --otf)                 if [ -z "@OTFLIB@" ]
+                         then
+                           echo "ERROR: OTF generation not supported by this installation of KOJAK/SCALASCA"
+                           exit 42
+                         else
+	                   SEQELGLIB=-lelg.otf
+                           OMPELGLIB=-lelg.otf.omp
+                           MPIELGLIB=-lelg.otf.mpi
+                           HYBELGLIB=-lelg.otf.ompi
+                           USESOTF=yes
+                         fi
+                         ;;
+  --cflags)              TASK=cflags
+                         ;;
+  -l|--libs)             TASK=libs
+                         ;;
+  -c|--cc)               echo "@CC@"
+                         exit 0
+                         ;;
+  -p|--prefix)           echo "@PREFIX@"
+                         exit 0
+                         ;;
+  *)                     ;;
+  esac
+done
+
+# Handle precision flags
+if [ "${PREC}" = "@PREC@" ]
+then
+  # -- note: "then" block needs to be marked with #COPY# for 32/64 combine
+  if [ ${USESOTF} = "yes" ]; then ULIB="${ULIB} @OTFLIB@"; fi  #COPY#
+  ELGLIB="-L@LIBDIR@"                                          #COPY#
+  EXTRALIBS="${ULIB} @METRLIB@ @SIONLIB@ @UTILLIB@"            #COPY#
+  INCPATH="-I@INCDIR@"                                         #COPY#
+else
+  echo "ERROR: ${PREC}bit-mode not supported by this installation of KOJAK/SCALASCA"
+  exit 32
+fi
+
+if [ ${USEAPI} = "yes" ]
+then
+  INCPATH="${DOPT}EPIK ${INCPATH}"
+fi
+
+# Determine linking flags
+if [ ${USESOMP} = "yes" ]
+then
+  if [ ${USESMPI} = "yes" ]
+  then
+    VARIANT="OMP+MPI"
+    ELIB="${ELGLIB} ${FLIB} ${HYBELGLIB} @PMPILIB@ ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${HYBELGLIB} | cut -c3-`.a
+  else
+    VARIANT="OMP"
+    ELIB="${ELGLIB} ${OMPELGLIB} ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${OMPELGLIB} | cut -c3-`.a
+  fi
+else
+  if [ ${USESMPI} = "yes" ]
+  then
+    VARIANT="MPI"
+    ELIB="${ELGLIB} ${FLIB} ${MPIELGLIB} @PMPILIB@ ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${MPIELGLIB} | cut -c3-`.a
+  else
+    VARIANT="serial"
+    ELIB="${ELGLIB} ${SEQELGLIB} ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${SEQELGLIB} | cut -c3-`.a
+  fi
+fi
+
+# verify measurement library/support exists
+if [ ! -f ${LIBA} ]
+then
+  [ -n "${V}" ] && echo "INFO: ${LIBA} not found!"
+  echo "ERROR: ${VARIANT} mode not supported by this installation of Scalasca!"
+  exit 66
+else
+  [ -n "${V}" ] && echo "INFO: ${VARIANT} instrumentation mode ..."
+fi
+
+# set additional linker flag for OPARI2 instrumentation if necessary
+KERNEL=`uname -s`
+if [ "${KERNEL}" = "AIX" ]
+then
+  [ -n "${V}" ] && echo "INFO: AIX linker ..."
+  OLINK="-bexpfull"
+fi
+
+# Output
+case ${TASK} in
+cflags)    echo "${INCPATH}"
+           ;;
+libs)      echo "${ELIB}"
+           ;;
+*)         echo "${USAGE1}"
+           echo "${USAGE2}"
+           exit 1
+           ;;
+esac
+exit 0

@@ -1,0 +1,138 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  Copyright (c) 2003-2008                                                **
+**  University of Tennessee, Innovative Computing Laboratory               **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+#ifndef _ELG_TRC_H_GEN
+#define _ELG_TRC_H_GEN
+
+#ifdef __cplusplus
+#   define EXTERN extern "C" 
+#else
+#   define EXTERN extern 
+#endif
+
+#include "elg_defs.h"
+
+/*
+ *-----------------------------------------------------------------------------
+ * Event records
+ *-----------------------------------------------------------------------------
+ */
+
+/* -- Attributes -- */
+
+EXTERN void elg_attr_ui1(elg_ui1 type, elg_ui1 val);
+
+EXTERN void elg_attr_ui4(elg_ui1 type, elg_ui4 val);
+
+
+/* -- automatically generated -- do not change ------------------------------ */
+/* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
+
+/* -- Region -- */
+
+EXTERN void elg_enter(elg_ui4 rid);
+
+EXTERN void elg_enter_cs(elg_ui4 csid);
+
+EXTERN void elg_exit();
+
+/* -- MPI-1 -- */
+
+EXTERN void elg_mpi_send(elg_ui4 dpid, elg_ui4 cid, elg_ui4 tag, elg_ui4 sent);
+
+EXTERN void elg_mpi_recv(elg_ui4 spid, elg_ui4 cid, elg_ui4 tag, elg_ui4 recvd);
+
+EXTERN void elg_mpi_collexit(elg_ui4 rid, elg_ui4 rpid, elg_ui4 cid,
+       elg_ui4 sent, elg_ui4 recvd);
+
+/* -- MPI-1 Non-blocking -- */
+
+EXTERN void elg_mpi_send_complete(elg_ui4 reqid);
+
+EXTERN void elg_mpi_recv_request(elg_ui4 reqid);
+
+EXTERN void elg_mpi_request_tested(elg_ui4 reqid);
+
+EXTERN void elg_mpi_cancelled(elg_ui4 reqid);
+
+/* -- MPI-2 One-sided Operations -- */
+
+EXTERN void elg_mpi_put_1ts(elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid,
+       elg_ui4 nbytes);
+
+EXTERN void elg_mpi_put_1te(elg_ui4 spid, elg_ui4 wid, elg_ui4 rmaid);
+
+EXTERN void elg_mpi_put_1te_remote(elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid);
+
+EXTERN void elg_mpi_get_1ts(elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid,
+       elg_ui4 nbytes);
+
+EXTERN void elg_mpi_get_1ts_remote(elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid,
+       elg_ui4 nbytes);
+
+EXTERN void elg_mpi_get_1te(elg_ui4 spid, elg_ui4 wid, elg_ui4 rmaid);
+
+EXTERN void elg_mpi_winexit(elg_ui4 wid, elg_ui4 cid, elg_ui1 synex);
+
+EXTERN void elg_mpi_wincollexit(elg_ui4 wid);
+
+EXTERN void elg_mpi_win_lock(elg_ui4 lpid, elg_ui4 wid, elg_ui1 ltype);
+
+EXTERN void elg_mpi_win_unlock(elg_ui4 lpid, elg_ui4 wid);
+
+/* -- Generic One-sided Operations -- */
+
+EXTERN void elg_put_1ts(elg_ui4 dpid, elg_ui4 rmaid, elg_ui4 nbytes);
+
+EXTERN void elg_put_1te(elg_ui4 spid, elg_ui4 rmaid);
+
+EXTERN void elg_put_1te_remote(elg_ui4 dpid, elg_ui4 rmaid);
+
+EXTERN void elg_get_1ts(elg_ui4 dpid, elg_ui4 rmaid, elg_ui4 nbytes);
+
+EXTERN void elg_get_1ts_remote(elg_ui4 dpid, elg_ui4 rmaid, elg_ui4 nbytes);
+
+EXTERN void elg_get_1te(elg_ui4 spid, elg_ui4 rmaid);
+
+EXTERN void elg_collexit(elg_ui4 rpid, elg_ui4 cid, elg_ui4 sent,
+       elg_ui4 recvd);
+
+EXTERN void elg_alock(elg_ui4 lkid);
+
+EXTERN void elg_rlock(elg_ui4 lkid);
+
+/* -- OpenMP -- */
+
+EXTERN void elg_omp_fork();
+
+EXTERN void elg_omp_join();
+
+EXTERN void elg_omp_alock(elg_ui4 lkid);
+
+EXTERN void elg_omp_rlock(elg_ui4 lkid);
+
+EXTERN void elg_omp_collexit();
+
+/* -- EPILOG Internal -- */
+
+EXTERN void elg_log_off();
+
+EXTERN void elg_log_on();
+
+EXTERN void elg_enter_tracing();
+
+EXTERN void elg_exit_tracing();
+
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+/* -- end automatically generated ------------------------------------------- */
+
+#endif

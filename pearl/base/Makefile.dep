@@ -1,0 +1,411 @@
+#------------------------------------------------------------------------------
+# Dependencies
+# (automatically generated using 'make depend')
+#------------------------------------------------------------------------------
+
+BlockAllocator.o: \
+	$(EPK_DIR)/elg_error.h \
+	BlockAllocator.cpp \
+	BlockAllocator.h \
+	MemoryChunk.h
+Buffer.o: \
+	$(CFG_DIR)/elg_types.h \
+	$(ESD_DIR)/elg_defs.h \
+	Buffer.cpp \
+	Buffer.h \
+	CountedPtr.h \
+	Event.h \
+	Event_rep.h \
+	$(PEARL_DS)/Event.h \
+	RemoteEvent.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+CNode.o: \
+	CNode.cpp \
+	CNode.h \
+	Error.h \
+	IdObject.h \
+	pearl_types.h
+Callsite.o: \
+	Callsite.cpp \
+	Callsite.h \
+	IdObject.h \
+	pearl_types.h
+Calltree.o: \
+	Buffer.h \
+	CNode.h \
+	Callsite.h \
+	Calltree.cpp \
+	Calltree.h \
+	Error.h \
+	GlobalDefs.h \
+	IdObject.h \
+	NamedObject.h \
+	Region.h \
+	pearl_types.h
+Cartesian.o: \
+	Cartesian.cpp \
+	Cartesian.h \
+	Error.h \
+	IdObject.h \
+	Topology.h \
+	pearl_types.h
+Comm.o: \
+	Comm.cpp \
+	Comm.h \
+	IdObject.h \
+	pearl_types.h
+DefsFactory.o: \
+	$(CFG_DIR)/elg_types.h \
+	$(ESD_DIR)/elg_defs.h \
+	CNode.h \
+	Callsite.h \
+	Cartesian.h \
+	Comm.h \
+	DefsFactory.cpp \
+	DefsFactory.h \
+	Error.h \
+	GlobalDefs.h \
+	Group.h \
+	IdObject.h \
+	Location.h \
+	Machine.h \
+	Metric.h \
+	NamedObject.h \
+	Node.h \
+	Process.h \
+	Region.h \
+	RmaWindow.h \
+	Thread.h \
+	Topology.h \
+	pearl_types.h
+EnterCS_rep.o: \
+	Buffer.h \
+	Callsite.h \
+	EnterCS_rep.cpp \
+	EnterCS_rep.h \
+	Enter_rep.h \
+	Event_rep.h \
+	Flow_rep.h \
+	GlobalDefs.h \
+	IdObject.h \
+	NamedObject.h \
+	Region.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+Enter_rep.o: \
+	Buffer.h \
+	CNode.h \
+	Enter_rep.cpp \
+	Enter_rep.h \
+	Event_rep.h \
+	Flow_rep.h \
+	GlobalDefs.h \
+	IdObject.h \
+	NamedObject.h \
+	Region.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+Error.o: \
+	Error.cpp \
+	Error.h
+EventFactory.o: \
+	EnterCS_rep.h \
+	Enter_rep.h \
+	Error.h \
+	EventFactory.cpp \
+	EventFactory.h \
+	Event_rep.h \
+	Exit_rep.h \
+	Flow_rep.h \
+	GlobalDefs.h \
+	RmaGetEnd_rep.h \
+	RmaGetStart_rep.h \
+	RmaPutEnd_rep.h \
+	RmaPutStart_rep.h \
+	Rma_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+Event_rep.o: \
+	Buffer.h \
+	Error.h \
+	Event_rep.cpp \
+	Event_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+Exit_rep.o: \
+	Event_rep.h \
+	Exit_rep.cpp \
+	Exit_rep.h \
+	Flow_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+Flow_rep.o: \
+	Event_rep.h \
+	Flow_rep.cpp \
+	Flow_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+GlobalDefs.o: \
+	$(CFG_DIR)/elg_types.h \
+	$(ELG_DIR)/elg_readcb.h \
+	$(ESD_DIR)/elg_defs.h \
+	$(ESD_DIR)/elg_impl.h \
+	$(EPK_DIR)/epk_archive.h \
+	Callsite.h \
+	Calltree.h \
+	Cartesian.h \
+	Comm.h \
+	Error.h \
+	GlobalDefs.cpp \
+	GlobalDefs.h \
+	Group.h \
+	IdObject.h \
+	Location.h \
+	Machine.h \
+	Metric.h \
+	NamedObject.h \
+	Node.h \
+	Process.h \
+	Region.h \
+	RmaWindow.h \
+	Thread.h \
+	Topology.h \
+	pearl_types.h \
+	readcb.h
+Group.o: \
+	Error.h \
+	Group.cpp \
+	Group.h \
+	IdObject.h \
+	pearl_types.h
+IdObject.o: \
+	IdObject.cpp \
+	IdObject.h \
+	pearl_types.h
+Location.o: \
+	IdObject.h \
+	Location.cpp \
+	Location.h \
+	Machine.h \
+	NamedObject.h \
+	Node.h \
+	Process.h \
+	Thread.h \
+	pearl_types.h
+Machine.o: \
+	Error.h \
+	Functors.h \
+	IdObject.h \
+	Machine.cpp \
+	Machine.h \
+	NamedObject.h \
+	Node.h \
+	pearl_types.h
+MappingTable.o: \
+	$(CFG_DIR)/elg_types.h \
+	$(ELG_DIR)/elg_readcb.h \
+	$(ESD_DIR)/elg_defs.h \
+	$(ESD_DIR)/elg_impl.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_idmap.h \
+	Error.h \
+	GlobalDefs.h \
+	IdObject.h \
+	Location.h \
+	MappingTable.cpp \
+	MappingTable.h \
+	NamedObject.h \
+	Process.h \
+	Thread.h \
+	pearl_types.h
+MemoryChunk.o: \
+	MemoryChunk.cpp \
+	MemoryChunk.h
+Metric.o: \
+	Error.h \
+	IdObject.h \
+	Metric.cpp \
+	Metric.h \
+	NamedObject.h \
+	pearl_types.h
+NamedObject.o: \
+	IdObject.h \
+	NamedObject.cpp \
+	NamedObject.h \
+	pearl_types.h
+Node.o: \
+	Error.h \
+	Functors.h \
+	IdObject.h \
+	NamedObject.h \
+	Node.cpp \
+	Node.h \
+	Process.h \
+	pearl_types.h
+Process.o: \
+	Error.h \
+	Functors.h \
+	IdObject.h \
+	NamedObject.h \
+	Process.cpp \
+	Process.h \
+	Thread.h \
+	pearl_types.h
+Region.o: \
+	$(CFG_DIR)/elg_types.h \
+	$(ESD_DIR)/elg_defs.h \
+	Error.h \
+	IdObject.h \
+	NamedObject.h \
+	Region.cpp \
+	Region.h \
+	pearl_types.h
+RemoteEvent.o: \
+	Buffer.h \
+	CountedPtr.h \
+	Event.h \
+	EventFactory.h \
+	Event_rep.h \
+	GlobalDefs.h \
+	IdObject.h \
+	$(PEARL_DS)/Event.h \
+	Location.h \
+	RemoteEvent.cpp \
+	RemoteEvent.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+RmaGetEnd_rep.o: \
+	Event_rep.h \
+	RmaGetEnd_rep.cpp \
+	RmaGetEnd_rep.h \
+	Rma_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+RmaGetStart_rep.o: \
+	Buffer.h \
+	Event_rep.h \
+	GlobalDefs.h \
+	RmaGetStart_rep.cpp \
+	RmaGetStart_rep.h \
+	Rma_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+RmaPutEnd_rep.o: \
+	Event_rep.h \
+	RmaPutEnd_rep.cpp \
+	RmaPutEnd_rep.h \
+	Rma_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+RmaPutStart_rep.o: \
+	Buffer.h \
+	Event_rep.h \
+	GlobalDefs.h \
+	IdObject.h \
+	Location.h \
+	RmaPutStart_rep.cpp \
+	RmaPutStart_rep.h \
+	Rma_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+RmaWindow.o: \
+	IdObject.h \
+	RmaWindow.cpp \
+	RmaWindow.h \
+	pearl_types.h
+Rma_rep.o: \
+	Buffer.h \
+	Event_rep.h \
+	IdObject.h \
+	RmaWindow.h \
+	Rma_rep.cpp \
+	Rma_rep.h \
+	SmallObject.h \
+	pearl_padding.h \
+	pearl_types.h
+SmallObjAllocator.o: \
+	BlockAllocator.h \
+	Error.h \
+	SmallObjAllocator.cpp \
+	SmallObjAllocator.h
+SmallObject.o: \
+	SmallObjAllocator.h \
+	SmallObject.cpp \
+	SmallObject.h
+Thread.o: \
+	IdObject.h \
+	NamedObject.h \
+	Thread.cpp \
+	Thread.h \
+	pearl_types.h
+Topology.o: \
+	IdObject.h \
+	Topology.cpp \
+	Topology.h \
+	pearl_types.h
+pearl_base.o: \
+	CNode.h \
+	Calltree.h \
+	Cartesian.h \
+	DefsFactory.h \
+	Enter_rep.h \
+	Error.h \
+	Event.h \
+	EventFactory.h \
+	Event_rep.h \
+	Flow_rep.h \
+	GlobalDefs.h \
+	Group.h \
+	IdObject.h \
+	$(PEARL_DS)/Event.h \
+	$(PEARL_DS)/LocalTrace.h \
+	LocalTrace.h \
+	SmallObjAllocator.h \
+	SmallObject.h \
+	Topology.h \
+	pearl.h \
+	pearl_base.cpp \
+	pearl_padding.h \
+	pearl_types.h
+readcb.o: \
+	$(CFG_DIR)/elg_types.h \
+	$(ELG_DIR)/elg_readcb.h \
+	$(ESD_DIR)/elg_defs.h \
+	$(ESD_DIR)/elg_impl.h \
+	$(EPK_DIR)/epk_idmap.h \
+	Cartesian.h \
+	Comm.h \
+	DefsFactory.h \
+	Error.h \
+	EventFactory.h \
+	Event_rep.h \
+	GlobalDefs.h \
+	Group.h \
+	IdObject.h \
+	$(PEARL_DS)/Event.h \
+	$(PEARL_DS)/LocalTrace.h \
+	LocalTrace.h \
+	Location.h \
+	MappingTable.h \
+	NamedObject.h \
+	RmaWindow.h \
+	SmallObject.h \
+	Thread.h \
+	Topology.h \
+	pearl_padding.h \
+	pearl_types.h \
+	readcb.cpp \
+	readcb.h

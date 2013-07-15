@@ -1,0 +1,163 @@
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+#### UltraSPARC-III/IV-specific extract ####
+### **** hierarchy uses approximations instead of incomplete computations ****
+
+# Kojak metrics specification for Epilog (measurement) and Expert (analysis)
+
+### UltraSPARC-III/IV groupings (max 2 in group, restricted)
+aggroup US3_CPI = Cycle_cnt Instr_cnt                   # duplicates
+
+# cycles/stalls groups
+aggroup US3_SMP = Dispatch_rs_mispred Dispatch0_mispred # stall misprediction
+aggroup US3_SUS = Rstall_IU_use Rstall_FP_use           # stall IU/FP use
+aggroup US3_SST = Rstall_storeQ Re_RAW_miss             # stall store
+aggroup US3_SCD = Cycle_cnt Re_DC_miss
+aggroup US3_SCO = Dispatch0_br_target Re_DC_missovhd
+aggroup US3_SCE = Dispatch0_2nd_br Re_EC_miss
+aggroup US3_SCP = Dispatch0_IC_miss Re_PC_miss
+aggroup US3_SCX = SI_ciq_flow Re_FPU_bypass       # Re_FPU_bypass always zero?
+
+# instruction and TLB groups
+aggroup US3_FPU = FA_pipe_completion FM_pipe_completion
+aggroup US3_BMS = IU_Stat_Br_miss_taken IU_Stat_Br_miss_untaken
+aggroup US3_BCS = IU_Stat_Br_count_taken IU_Stat_Br_count_untaken
+aggroup US3_ITL = Instr_cnt ITLB_miss
+aggroup US3_DTL = Cycle_cnt DTLB_miss
+
+# memory and cache groups
+aggroup US3_ICH = IC_ref IC_miss
+aggroup US3_DCR = DC_rd DC_rd_miss
+aggroup US3_DCW = DC_wr DC_wr_miss
+aggroup US3_ECI = EC_write_hit_RTO EC_ic_miss
+aggroup US3_ECM = EC_rd_miss EC_misses 
+
+# locality/SSM and other miscellaneous groups
+aggroup US3_ECL = EC_miss_local EC_miss_remote          # only SF15000/SF25000
+aggroup US3_ECX = EC_wb_remote EC_miss_mtag_remote      # only SF15000/SF25000
+aggroup US3_ECW = EC_ref EC_wb
+aggroup US3_ECS = EC_snoop_inv EC_snoop_cb
+aggroup US3_PCR = PC_port0_rd PC_port1_rd
+aggroup US3_ETC = SI_snoop PC_MS_misses
+aggroup US3_WCM = SI_owned WC_miss
+
+# memory controller groups
+aggroup US3_SM1 = MC_stalls_0 MC_stalls_1
+aggroup US3_SM2 = MC_stalls_2 MC_stalls_3
+aggroup US3_MC0 = MC_reads_0 MC_writes_0
+aggroup US3_MC1 = MC_reads_1 MC_writes_1
+aggroup US3_MC2 = MC_reads_2 MC_writes_2
+aggroup US3_MC3 = MC_reads_3 MC_writes_3
+
+
+### compositions are derived by combining measurements and create hierarchies
+### **** UltraSPARC-III/IV-specific (default) hierarchy ****
+### **** hierarchy uses approximations instead of incomplete computations ****
+
+### cycles (including stalls)
+compose CYCLES = BUSY + STALL
+measure CYCLES = Cycle_cnt # US3/4
+compose STALL = DISPATCH + UNIT_USE + RECIRCULATE
+compose DISPATCH = Dispatch0_IC_miss + Dispatch0_mispred + Dispatch_rs_mispred + Dispatch0_br_target + Dispatch0_2nd_br
+compose UNIT_USE = Rstall_IU_use + Rstall_FP_use + Rstall_storeQ
+compose RECIRCULATE = Re_RAW_miss + Re_PC_miss + Re_DC_miss + Re_FPU_bypass
+compose Re_DC_miss = Re_DC_missovhd + Re_EC_miss + RECIRC_EC_HIT
+
+### instructions
+compose INSTRUCTION = BRANCH + INTEGER + FLOATING_POINT + MEMORY
+measure INSTRUCTION = Instr_cnt # US3/4
+
+### requires computations that can't be collected together!
+#compose BRANCH = BRANCH_PRED + BRANCH_MISP
+#compose BRANCH_PRED = BRANCH_PRED_TAKEN + BRANCH_PRED_UNTAKEN
+#compute BRANCH_PRED_TAKEN = IU_Stat_Br_count_taken - IU_Stat_Br_miss_taken # US3/4
+#compute BRANCH_PRED_UNTAKEN = IU_Stat_Br_count_untaken - IU_Stat_Br_miss_untaken # US3/4
+#compose BRANCH_MISP = BRANCH_MISP_TAKEN + BRANCH_MISP_UNTAKEN
+#compute BRANCH_MISP_TAKEN = IU_Stat_Br_miss_taken # US3/4
+#compute BRANCH_MISP_UNTAKEN = IU_Stat_Br_miss_untaken # US3/4
+
+### alternate hierarchy avoiding partial computations
+compose BRANCH = BRANCH_TAKEN + BRANCH_UNTAKEN
+compose BRANCH_TAKEN = BRANCH_TAKEN_PRED + BRANCH_TAKEN_MISP
+measure BRANCH_TAKEN = IU_Stat_Br_count_taken # US3/4
+compute BRANCH_TAKEN_MISP = IU_Stat_Br_miss_taken # US3/4
+compose BRANCH_UNTAKEN = BRANCH_UNTAKEN_PRED + BRANCH_UNTAKEN_MISP
+measure BRANCH_UNTAKEN = IU_Stat_Br_count_untaken # US3/4
+compute BRANCH_UNTAKEN_MISP = IU_Stat_Br_miss_untaken # US3/4
+
+#compose FLOATING_POINT = FP_ADD + FP_MUL + FP_FMA + FP_DIV + FP_INV + FP_SQRT + FP_STORE + FP_MISC
+compose FLOATING_POINT = FA_pipe_completion + FM_pipe_completion # US3/4
+#compute FP_ADD = FA_pipe_completion
+#compute FP_MUL = FM_pipe_completion
+
+compose MEMORY = LOAD + STORE + SYNCH
+
+### data accesses (to cache hierarchy & memory)
+#compose DATA_ACCESS = DATA_HIT_L1$ + DATA_HIT_L2$ + DATA_HIT_L3$ + DATA_HIT_MEM
+compose DATA_ACCESS = DATA_HIT_L1$ + DATA_HIT_L2$ + DATA_HIT_MEM
+
+### level 1 data cache (D$)
+compose DATA_HIT_L1$ = DATA_STORE_INTO_L1$ + DATA_LOAD_FROM_L1$
+compute DATA_STORE_INTO_L1$ = DC_wr - DC_wr_miss # US3/4
+compute DATA_LOAD_FROM_L1$ = DC_rd - DC_rd_miss # US3/4
+
+### level 2 data cache (E$)
+compose DATA_HIT_L2$ = DATA_STORE_INTO_L2$ + DATA_LOAD_FROM_L2$
+compose DATA_STORE_INTO_L2$ = EC_write_hit_RTO + EC_WRITE_HIT_ETC
+measure DATA_STORE_INTO_L2$ = DC_wr_miss # US3/4
+#compute DATA_LOAD_FROM_L2$ = DC_rd_miss - EC_rd_miss # US3/4
+compute DATA_LOAD_FROM_L2$ = DC_rd_miss # US3/4 (*approx*)
+
+### no L3$ data cache alias definitions appropriate for US3/4
+#compose DATA_HIT_L3$ = DATA_STORE_INTO_L3$ + DATA_LOAD_FROM_L3$
+#compose DATA_STORE_INTO_L3$ = NA_US34
+#compose DATA_LOAD_FROM_L3$ = NA_US34
+
+### memory/system data
+compose DATA_HIT_MEM = DATA_STORE_INTO_MEM + DATA_LOAD_FROM_MEM
+#measure DATA_HIT_MEM = EC_misses # US3/4 (*approx*)
+#compute DATA_HIT_MEM = EC_misses - EC_ic_miss # US3/4
+#compute DATA_STORE_INTO_MEM = EC_misses - EC_rd_miss - EC_ic_miss # US3/4
+compute DATA_STORE_INTO_MEM = EC_misses - EC_rd_miss # US3/4 (*approx*)
+compute DATA_LOAD_FROM_MEM = EC_rd_miss # US3/4
+
+### instruction accesses (to cache hierarchy & memory)
+#compose INST_ACCESS = INST_HIT_L1$ + INST_HIT_L2$ + INST_HIT_L3$ + INST_HIT_MEM
+compose INST_ACCESS = INST_HIT_L1$ + INST_HIT_L2$ + INST_HIT_MEM
+#measure INST_ACCESS = IC_ref # US3/4
+
+compute INST_HIT_L1$ = IC_ref - IC_miss # US3/4
+#compute INST_HIT_L2$ = IC_miss - EC_ic_miss # US3/4 (both require PIC1!)
+compute INST_HIT_L2$ = IC_miss # US3/4 (*approx*)
+#compose INST_HIT_L3$ = NA_US
+compute INST_HIT_MEM = EC_ic_miss # US3/4
+
+### TLB accesses (instructions & data)
+compose TLB_ACCESS = DATA_TLB_ACCESS + INST_TLB_ACCESS
+compose DATA_TLB_ACCESS = DATA_TLB_HIT + DATA_TLB_MISS
+compute DATA_TLB_MISS = DTLB_miss # US3/4
+compose INST_TLB_ACCESS = INST_TLB_HIT + INST_TLB_MISS
+compute INST_TLB_MISS = ITLB_miss # US3/4
+
+### SSM locality
+compose SSM_LOCALITY = EC_MISSES + EC_wb
+compose EC_MISSES = EC_miss_local + EC_miss_remote
+compose EC_miss_local = EC_MISS_MTAG_LOCAL + EC_miss_mtag_remote
+compose EC_wb = EC_WB_LOCAL + EC_wb_remote
+
+### P$
+compose P$_READS = PC_port0_rd + PC_port1_rd
+compose PC_port0_rd = PC_MS_misses + PC_PORT0_ETC
+
+### memory controller
+compose MC_READS  = MC_reads_0 + MC_reads_1 + MC_reads_2 + MC_reads_3
+compose MC_WRITES = MC_writes_0 + MC_writes_1 + MC_writes_2 + MC_writes_3
+compose MC_STALLS = MC_stalls_0 + MC_stalls_1 + MC_stalls_2 + MC_stalls_3
+

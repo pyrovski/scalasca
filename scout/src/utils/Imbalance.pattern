@@ -1,0 +1,219 @@
+#****************************************************************************
+#*  SCALASCA    http://www.scalasca.org/                                   **
+#****************************************************************************
+#*  Copyright (c) 1998-2013                                                **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#***************************************************************************/
+
+
+#--- Load imbalance heuristic -----------------------------------------------
+
+PATTERN "IMBALANCE" = [
+  NAME    = "Computational load imbalance"
+  DOCNAME = "Computational load imbalance heuristic"
+  CLASS   = "PatternImbalance"
+  INFO    = "Computational load imbalance heuristic (see Online Description for details)"
+  DESCR   = {
+    This simple heuristic allows to identify computational load imbalances and
+    is calculated for each (call-path, process/thread) pair. Its value
+    represents the absolute difference to the average exclusive execution
+    time. This average value is the aggregated exclusive time spent by all
+    processes/threads in this call-path, divided by the number of
+    processes/threads visiting it.
+    </dd><p><dd>
+    @img(Imbalance.png)
+    </dd><p><dd>
+    <b>Note:</b>
+    A high value for a collapsed call tree node does not necessarily mean that
+    there is a load imbalance in this particular node, but the imbalance can
+    also be somewhere in the subtree underneath.  Unused threads outside
+    of OpenMP parallel regions are considered to constitute @ref(OMP_IDLE_THREADS)
+    and expressly excluded from the computational load imbalance heuristic.
+  }
+  UNIT    = "sec"
+  DIAGNOSIS = {
+    Total load imbalance comprises both above average computation time
+    and below average computation time, therefore at most half of it could
+    potentially be recovered with perfect (zero-overhead) load balance
+    that distributed the excess from overloaded to unloaded
+    processes/threads, such that all took exactly the same time.
+    </dd><p><dd>
+    Computation imbalance is often the origin of communication and
+    synchronization inefficiencies, where processes/threads block and
+    must wait idle for partners, however, work partitioning and
+    parallelization overheads may be prohibitive for complex computations
+    or unproductive for short computations.  Replicating computation on
+    all processes/threads will eliminate imbalance, but would typically
+    not result in recover of this imbalance time (though it may reduce
+    associated communication and synchronization requirements).
+    </dd><p><dd>
+    Call-paths with significant amounts of computational imbalance should
+    be examined, along with processes/threads with above/below-average
+    computation time, to identify parallelization inefficiencies.  Call-paths
+    executed by a subset of processes/threads may relate to parallelization
+    that hasn't been fully realized (@ref(IMBALANCE_BELOW_BYPASS)), whereas
+    call-paths executed only by a single process/thread
+    (@ref(IMBALANCE_ABOVE_SINGLE)) often represent unparallelized serial code,
+    which will be scalability impediments as the number of processes/threads
+    increase.
+  }
+  HIDDEN
+]
+
+
+PATTERN "IMBALANCE_ABOVE" = [
+  PARENT  = "IMBALANCE"
+  NAME    = "Overload"
+  DOCNAME = "Computational load imbalance heuristic (overload)"
+  CLASS   = "PatternImbalAbove"
+  INFO    = "Computational load imbalance heuristic (overload)"
+  DESCR   = {
+    This metric identifies processes/threads where the exclusive execution
+    time spent for a particular call-path was above the average value.
+    It is a complement to @ref(IMBALANCE_BELOW).
+    </dd><p><dd>
+    @img(Imbal_Overload.png)
+    </dd><p><dd>
+    See @ref(IMBALANCE) for details on how this heuristic is calculated.
+  }
+  UNIT    = "sec"
+  DIAGNOSIS = {
+     The CPU time which is above the average time for computation is the
+     maximum that could potentially be recovered with perfect (zero-overhead)
+     load balance that distributed the excess from overloaded to underloaded
+     processes/threads.
+  }
+  HIDDEN
+]
+
+
+PATTERN "IMBALANCE_ABOVE_SINGLE" = [
+  PARENT  = "IMBALANCE_ABOVE"
+  NAME    = "Single participant"
+  DOCNAME = "Computational load imbalance heuristic (single participant)"
+  CLASS   = "PatternImbalAboveSingle"
+  INFO    = "Computational load imbalance heuristic (single participant)"
+  DESCR   = {
+    This heuristic distinguishes the execution time for call-paths executed
+    by single processes/threads that potentially could be recovered with
+    perfect parallelization using all available processes/threads.
+    </dd><p><dd>
+    It is the @ref(IMBALANCE_ABOVE) time for call-paths that only have
+    non-zero @ref(VISITS) for one process or thread, and complements
+    @ref(IMBALANCE_BELOW_SINGULARITY).
+    </dd><p><dd>
+    @img(Imbal_Single.png)
+  }
+  UNIT    = "sec"
+  DIAGNOSIS = {
+    This time is often associated with activities done exclusively by a
+    "Master" process/thread (often rank 0) such as initialization,
+    finalization or I/O, but can apply to any process/thread that
+    performs computation that none of its peers do (or that does its
+    computation on a call-path that differs from the others).
+    </dd><p><dd>
+    The CPU time for singular execution of the particular call-path
+    typically presents a serial bottleneck impeding scalability as none of
+    the other available processes/threads are being used, and
+    they may well wait idling until the result of this computation becomes
+    available.  (Check the MPI communication and synchronization times,
+    particularly waiting times, for proximate call-paths.)
+    In such cases, even small amounts of singular execution can
+    have substantial impact on overall performance and parallel efficiency.
+    With perfect partitioning and (zero-overhead) parallel
+    execution of the computation, it would be possible to recover this time.
+    </dd><p><dd>
+    When the amount of time is small compared to the total execution time,
+    or when the cost of parallelization is prohibitive, it may not be
+    worth trying to eliminate this inefficiency.  As the number of
+    processes/threads are increased and/or total execution time decreases,
+    however, the relative impact of this inefficiency can be expected to grow.
+  }
+  HIDDEN
+]
+
+
+PATTERN "IMBALANCE_BELOW" = [
+  PARENT  = "IMBALANCE"
+  NAME    = "Underload"
+  DOCNAME = "Computational load imbalance heuristic (underload)"
+  CLASS   = "PatternImbalBelow"
+  INFO    = "Computational load imbalance heuristic (underload)"
+  DESCR   = {
+    This metric identifies processes/threads where the exclusive execution
+    time spent for a particular call-path was below the average value.
+    It is a complement to @ref(IMBALANCE_ABOVE).
+    </dd><p><dd>
+    @img(Imbal_Underload.png)
+    </dd><p><dd>
+    See @ref(IMBALANCE) for details on how this heuristic is calculated.
+  }
+  UNIT    = "sec"
+  DIAGNOSIS = {
+      The CPU time which is below the average time for computation could 
+      potentially be used to reduce the excess from overloaded processes/threads
+      with perfect (zero-overhead) load balancing.
+  }
+  HIDDEN
+]
+
+
+PATTERN "IMBALANCE_BELOW_BYPASS" = [
+  PARENT  = "IMBALANCE_BELOW"
+  NAME    = "Non-participation"
+  DOCNAME = "Computational load imbalance heuristic (non-participation)"
+  CLASS   = "PatternImbalBelowBypass"
+  INFO    = "Computational load imbalance heuristic (non-participation)"
+  DESCR   = {
+    This heuristic distinguishes the execution time for call-paths not executed
+    by a subset of processes/threads that potentially could be used with
+    perfect parallelization using all available processes/threads.
+    </dd><p><dd>
+    It is the @ref(IMBALANCE_BELOW) time for call-paths which have zero
+    @ref(VISITS) and were therefore not executed by this process/thread.
+    </dd><p><dd>
+    @img(Imbal_Bypass.png)
+  }
+  UNIT    = "sec"
+  DIAGNOSIS = {
+    The CPU time used for call-paths where not all processes or threads
+    are exploited typically presents an ineffective parallelization that
+    limits scalability, if the unused processes/threads wait idling for
+    the result of this computation to become available.  With perfect
+    partitioning and (zero-overhead) parallel execution of the computation,
+    it would be possible to recover this time.
+  }
+  HIDDEN
+]
+
+
+PATTERN "IMBALANCE_BELOW_SINGULARITY" = [
+  PARENT  = "IMBALANCE_BELOW_BYPASS"
+  NAME    = "Singularity"
+  DOCNAME = "Computational load imbalance heuristic (non-participation in singularity)"
+  CLASS   = "PatternImbalBelowSingularity"
+  INFO    = "Computational load imbalance heuristic (non-participation in singularity)"
+  DESCR   = {
+    This heuristic distinguishes the execution time for call-paths not executed
+    by all but a single process/thread that potentially could be recovered with
+    perfect parallelization using all available processes/threads.
+    </dd><p><dd>
+    It is the @ref(IMBALANCE_BELOW) time for call paths that only have
+    non-zero @ref(VISITS) for one process/thread, and complements
+    @ref(IMBALANCE_ABOVE_SINGLE).
+    </dd><p><dd>
+    @img(Imbal_Singularity.png)
+  }
+  UNIT    = "sec"
+  DIAGNOSIS = {
+    The CPU time for singular execution of the particular call-path
+    typically presents a serial bottleneck impeding scalability as none of
+    the other processes/threads that are available are being used, and
+    they may well wait idling until the result of this computation becomes
+    available.  With perfect partitioning and (zero-overhead) parallel
+    execution of the computation, it would be possible to recover this time.
+  }
+  HIDDEN
+]

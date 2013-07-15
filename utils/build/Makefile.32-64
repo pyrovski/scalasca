@@ -1,0 +1,203 @@
+TOPDIR = ..
+
+include Makefile.defs
+include $(TOPDIR)/mf/common.defs
+
+all: all32 all64
+
+install: install32 install64 combine kinst
+
+clean: clean32 clean64
+
+relink: setup32 mklinks32 chklinks32 setup64 mklinks64 chklinks64
+
+setup: setup32 setup64
+
+setup32: 
+	@if test ! -d build32; then $(MAKE) setup32-real; fi
+
+setup32-real: mk-build-dir32 build32/lndir mklinks32
+
+mk-build-dir32:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Initializing Shadow 32-bit Build Directories      +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	-mkdir build32
+
+mklinks32:
+	cd build32; ./lndir ../..
+	cd build32; rm -f RealMakefile; ln -s ../../utils/build/RealMakefile .
+	cd build32; rm -f GNUmakefile; ln -s RealMakefile GNUmakefile
+	cd build32; rm -f Makefile; \
+		ln -s ../../utils/build/Makefile.redirect Makefile
+	cd build32; rm -f Makefile.defs; \
+		echo "PREC=32"  > Makefile.defs; \
+		echo "DSUF=/32" >> Makefile.defs; \
+		echo 'include $$(TOPDIR)/../Makefile.defs' >> Makefile.defs
+	cd build32; rm -f qt.pro.defs; ln -s ../qt.pro.defs qt.pro.defs
+	cd build32; rm -f mpi-support.defs; ln -s ../mpi-support.defs
+
+chklinks32:
+	$(TOPDIR)/utils/build/cleanlinks.sh build32
+
+setup64:
+	@if test ! -d build64; then $(MAKE) setup64-real; fi
+
+setup64-real: mk-build-dir64 build32/lndir mklinks64
+
+mk-build-dir64:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Initializing Shadow 64-bit Build Directories      +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	-mkdir build64
+
+mklinks64:
+	cd build64; ../build32/lndir ../..
+	cd build64; rm -f RealMakefile; ln -s ../../utils/build/RealMakefile .
+	cd build64; rm -f GNUmakefile; ln -s RealMakefile GNUmakefile
+	cd build64; rm -f Makefile; \
+		ln -s ../../utils/build/Makefile.redirect Makefile
+	cd build64; rm -f Makefile.defs; \
+		echo "PREC=64"  > Makefile.defs; \
+		echo "DSUF=/64" >> Makefile.defs; \
+		echo 'include $$(TOPDIR)/../Makefile.defs' >> Makefile.defs
+	cd build64; rm -f qt.pro.defs; ln -s ../qt.pro.defs qt.pro.defs
+	cd build64; rm -f mpi-support.defs; ln -s ../mpi-support.defs
+
+chklinks64:
+	$(TOPDIR)/utils/build/cleanlinks.sh build64
+
+build32/lndir: $(TOPDIR)/utils/build/lndir.c
+	$(CC) $(TOPDIR)/utils/build/lndir.c -o build32/lndir
+
+realclean:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Removing Shadow Build Directories                 +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	rm -rf build32 build64
+	
+all32: setup32
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Building 32bit Version                            +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd build32; $(MAKE) -f RealMakefile all PREC=32
+
+install32: all32
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Installing 32bit Version                          +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd build32; $(MAKE) -f RealMakefile install PREC=32 DSUF="/32"
+
+clean32:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Cleaning 32bit Version                            +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd build32; $(MAKE) -f RealMakefile clean PREC=32
+
+all64: setup64
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Building 64bit Version                            +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd build64; $(MAKE) -f RealMakefile all-64 PREC=64
+
+install64: all64
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Installing 64bit Version                          +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd build64; $(MAKE) -f RealMakefile install-64 PREC=64 DSUF="/64"
+
+clean64:
+	@echo ""
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo "+  Cleaning 64bit Version                            +"
+	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	@echo ""
+	cd build64; $(MAKE) -f RealMakefile clean PREC=64
+
+combine:
+	$(MKDIR) -m 755 $(BINDIR)
+	-( cd $(BINDIR); test -f 32/opari2               && ln -f -s 32/opari2 . )
+	-( cd $(BINDIR); test -f 32/opari2-config        && ln -f -s 32/opari2-config . )
+	-( cd $(BINDIR); test -f 32/pomp2_parse_init_regions.awk && ln -f -s 32/pomp2_parse_init_regions.awk . )
+	-( cd $(BINDIR); test -f 32/expert               && ln -f -s 32/expert . )
+	-( cd $(BINDIR); test -f 32/kanal                && ln -f -s 32/kanal . )
+	-( cd $(BINDIR); test -f 64/cube3_clean          && ln -f -s 64/cube3_clean . )
+	-( cd $(BINDIR); test -f 64/cube3_cmp            && ln -f -s 64/cube3_cmp . )
+	-( cd $(BINDIR); test -f 64/cube3_cut            && ln -f -s 64/cube3_cut . )
+	-( cd $(BINDIR); test -f 64/cube3_diff           && ln -f -s 64/cube3_diff . )
+	-( cd $(BINDIR); test -f 64/cube3_mean           && ln -f -s 64/cube3_mean . )
+	-( cd $(BINDIR); test -f 64/cube3_merge          && ln -f -s 64/cube3_merge . )
+	-( cd $(BINDIR); test -f 64/cube3_remap          && ln -f -s 64/cube3_remap . )
+	-( cd $(BINDIR); test -f 64/cube3_score          && ln -f -s 64/cube3_score . )
+	-( cd $(BINDIR); test -f 64/cube3_stat           && ln -f -s 64/cube3_stat . )
+	-( cd $(BINDIR); test -f 64/tau2cube3            && ln -f -s 64/tau2cube3 . )
+	-( cd $(BINDIR); test -f 32/skin                 && ln -f -s 32/skin . )
+	-( cd $(BINDIR); test -f 32/scan                 && ln -f -s 32/scan . )
+	-( cd $(BINDIR); test -f 32/square               && ln -f -s 32/square . )
+	-( cd $(BINDIR); test -f 32/scalasca             && ln -f -s 32/scalasca . )
+	-( cd $(BINDIR); test -f 64/elg2vtf              && ln -f -s 64/elg2vtf . )
+	-( cd $(BINDIR); test -f 64/elg_merge            && ln -f -s 64/elg_merge . )
+	-( cd $(BINDIR); test -f 64/elg_msgord           && ln -f -s 64/elg_msgord . )
+	-( cd $(BINDIR); test -f 64/elg_print            && ln -f -s 64/elg_print . )
+	-( cd $(BINDIR); test -f 64/elg_stat             && ln -f -s 64/elg_stat . )
+	-( cd $(BINDIR); test -f 64/elg_vtf3             && ln -f -s 64/elg_vtf3 . )
+	-( cd $(BINDIR); test -f 64/elg2otf              && ln -f -s 64/elg2otf . )
+	-( cd $(BINDIR); test -f 64/vtotf2elg            && ln -f -s 64/vtotf2elg . )
+	-( cd $(BINDIR); test -f 64/elg_otfunify         && ln -f -s 64/elg_otfunify . )
+	-( cd $(BINDIR); test -f 64/elg_otfunify.omp     && ln -f -s 64/elg_otfunify.omp . )
+	-( cd $(BINDIR); test -f 64/elg_paraver          && ln -f -s 64/elg_paraver . )
+	-( cd $(BINDIR); test -f 64/elg2prv              && ln -f -s 64/elg2prv . )
+	-( cd $(BINDIR); test -f 64/elg_filter           && ln -f -s 64/elg_filter . )
+	-( cd $(BINDIR); test -f 64/elg_timecorrect      && ln -f -s 64/elg_timecorrect . )
+	-( cd $(BINDIR); test -f 64/vptmerge             && ln -f -s 64/vptmerge . )
+	-( cd $(BINDIR); test -f 64/epik_conf            && ln -f -s 64/epik_conf . )
+	-( cd $(BINDIR); test -f 64/scout.ser            && ln -f -s 64/scout.ser . )
+	-( cd $(BINDIR); test -f 64/scout.omp            && ln -f -s 64/scout.omp . )
+	-( cd $(BINDIR); test -f 64/scout.mpi            && ln -f -s 64/scout.mpi . )
+	-( cd $(BINDIR); test -f 64/scout.hyb            && ln -f -s 64/scout.hyb . )
+	-( cd $(BINDIR); test -f 64/salsa                && ln -f -s 64/salsa . )
+	-( cd $(BINDIR); test -f 64/clc_synchronize.mpi  && ln -f -s 64/clc_synchronize.mpi . )
+	-( cd $(BINDIR); test -f 64/clc_synchronize.hyb  && ln -f -s 64/clc_synchronize.hyb . )
+	-( cd $(BINDIR); if test -f 64/cube3-qt; then ln -f -s 64/cube3-qt; elif test -f 32/cube3-qt; then ln -f -s 32/cube3-qt; fi )
+	-( cd $(BINDIR); if test -f 64/cube3;    then ln -f -s 64/cube3;    elif test -f 32/cube3;    then ln -f -s 32/cube3;    fi )
+
+kinst: $(KINST_EXTRA)
+	@grep '#COPY#' $(BINDIR)/32/kinst-pomp > /tmp/kinst-sed-fix
+	sed -e '/^  echo.*SCALASCA"$$/d' -e '/  exit 32/r /tmp/kinst-sed-fix' \
+		-e '/  exit 32$$/d' \
+		-e 's/^PREC=.*$$/PREC=$${OBJECT_MODE:-'$(DEFAULTPREC)'}/' \
+		$(BINDIR)/64/kinst-pomp > $(BINDIR)/kinst-pomp
+	chmod 755 $(BINDIR)/kinst-pomp
+	@grep '#COPY#' $(BINDIR)/32/kconfig > /tmp/kinst-sed-fix
+	sed -e '/^  echo.*SCALASCA"$$/d' -e '/  exit 32/r /tmp/kinst-sed-fix' \
+		-e '/  exit 32$$/d' \
+		-e 's/^PREC=.*$$/PREC=$${OBJECT_MODE:-'$(DEFAULTPREC)'}/' \
+		$(BINDIR)/64/kconfig > $(BINDIR)/kconfig
+	chmod 755 $(BINDIR)/kconfig
+	@rm /tmp/kinst-sed-fix
+
+kinst-hitachi kinst-pgi kinst-phat kinst-ftrace kinst-xl kinst-gnu kinst-sicortex:
+	@grep '#COPY#' $(BINDIR)/32/kinst > /tmp/kinst-sed-fix
+	sed -e '/^  echo.*SCALASCA"$$/d' -e '/  exit 32/r /tmp/kinst-sed-fix' \
+		-e '/  exit 32$$/d' \
+		-e 's/^PREC=.*$$/PREC=$${OBJECT_MODE:-'$(DEFAULTPREC)'}/' \
+		$(BINDIR)/64/kinst > $(BINDIR)/kinst
+	@rm /tmp/kinst-sed-fix
+	chmod 755 $(BINDIR)/kinst
+

@@ -1,0 +1,722 @@
+#****************************************************************************
+#*  SCALASCA    http://www.scalasca.org/                                   **
+#****************************************************************************
+#*  Copyright (c) 1998-2013                                                **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#***************************************************************************/
+
+PROLOG {
+  #include <algorithm>
+  #include <cfloat>
+  #include <cstring>
+  #include <iostream>
+  #include <sstream>
+
+  #include <set>
+
+  #if defined(_MPI)
+    #include <MpiWindow.h>
+    #include <MpiGroup.h>
+    #include "MpiOperators.h"
+  #endif
+
+namespace {
+  /* offsets to individual entries in the window. As the window has an
+   * internal displacement of 1 (i.e. sizeof(unsigned char)) the offset
+   * for the timestamps need to be calculated with sizeof(timestamp_t).
+   */
+  const int LOCAL_POST      = 0;
+  const int LATEST_POST     = 1 * sizeof(timestamp_t);
+  const int LATEST_COMPLETE = 2 * sizeof(timestamp_t);
+  const int LATEST_RMA_OP   = 3 * sizeof(timestamp_t);
+  const int BITFIELD_START  = 4 * sizeof(timestamp_t);
+}
+}
+
+PATTERN "MPI_RMA_SYNCHRONIZATION" = [
+  PARENT  = "MPI_SYNCHRONIZATION"
+  NAME    = "Remote Memory Access"
+  DOCNAME = "Remote Memory Access Synchronization Time"
+  TYPE    = "MPI_RMA"
+  CLASS   = "PatternMPI_RmaSync"
+  INFO    = "Time spent in MPI RMA synchonization calls"
+  DESCR   = {
+    This pattern refers to the time spent in MPI remote memory access
+    synchronization calls.
+  }
+  UNIT    = "sec"
+  HIDDEN
+  DATA    = {
+    /**
+     * @brief  Lookup table for bit count. 
+     *
+     * The lookup table includes the number of bits set in each possible
+     * value of a byte. It could be algorithmically initialised with:
+     *
+     * @code
+     * BitSetTable[0] = 0;
+     * for (int i = 0; i < 256; i++)
+     * {
+     *   BitSetTable[i] = (i & 1) + BitSetTable[i / 2];
+     * }
+     * @endcode
+     */
+    unsigned char BitSetTable[256];
+    
+    typedef struct {
+      timestamp_t op;
+      timestamp_t post;
+    } op_pair_t;
+
+    typedef struct {
+      MPI_Win                  win;               /* window for data exchange */
+      uint32_t                 epoch_ctr;         /* counter for current epoch */
+      bool                     pending_complete;  /* indicator whether complete needs to be done later */
+      unsigned char*           buf;               /* buffer for data exchange */
+      map<uint32_t, op_pair_t> op_time;           /* remote rma operation timestamp */
+      timestamp_t              post_enter;        /* enter timestamp of the post call */
+      timestamp_t              complete_enter;    /* enter timestamp of the complete call */
+      EventSet                 events;            /* local event set for exchanging data */
+      int                      bitfield_size;     /* size of the bitfield in the buffer */
+      set<uint32_t>            remote_processes;  /* list of targets in an epoch */
+      MPI_Aint                 rank_offset;       /* byte offset in window for my rank_mask */
+      unsigned char            rank_mask;         /* mask with 1 bit set corresponding to my rank */
+    } win_t;
+
+    map<MpiWindow*, win_t> m_windows;             /* map of all windows used */
+  }
+  CALLBACKS = [
+    "PREPARE" = {
+      /* Initialize BitSetTable for population count */
+      BitSetTable[0] = 0;
+      for (int i = 0; i < 256; i++)
+      {
+        BitSetTable[i] = (i & 1) + BitSetTable[i / 2];
+      }
+    
+      /* get memory to store completion start times for each window */
+      uint32_t num_windows = data->m_defs->num_windows();
+
+      /* initialize internal windows for data exchange */
+      for (uint32_t i=0; i < num_windows; ++i)
+      {
+        MpiWindow* win =
+            dynamic_cast<MpiWindow*>(data->m_defs->get_window(i));
+        MpiComm* comm =
+            dynamic_cast<MpiComm*>(win->get_comm());
+
+        if (comm->get_comm() != MPI_COMM_NULL)
+        {
+          int    myrank    = -1;
+          int    comm_size =  0;
+          win_t& entry     = m_windows[win];
+
+          /* get rank in and size of current communicator */
+          MPI_Comm_rank(comm->get_comm(), &myrank);
+          MPI_Comm_size(comm->get_comm(), &comm_size);
+
+          /* determine size of bitfield */
+          entry.bitfield_size = ((comm_size % 8) ? 1 : 0 ) +
+                                (comm_size / 8);
+
+          /* get memory buffer for window */
+          entry.buf = new unsigned char[BITFIELD_START + entry.bitfield_size];
+
+          /* initialize epoch tracking values */
+          entry.epoch_ctr                = 0;
+          entry.pending_complete         = false;
+          
+          MPI_Win_create(entry.buf, 
+                         (MPI_Aint) (BITFIELD_START + entry.bitfield_size),
+                         sizeof(unsigned char), MPI_INFO_NULL, 
+                         comm->get_comm(), 
+                         &entry.win);
+
+          /* setting bitfield mask and offset */
+          entry.rank_mask   = 1 << (myrank % 8);
+          entry.rank_offset = BITFIELD_START + (myrank / 8);
+        }
+      }
+    }
+    "FINISHED" = {
+      /* free all windows */
+      uint32_t num_windows = data->m_defs->num_windows();
+      for (uint32_t i = 0; i < num_windows; ++i)
+      {
+        MpiWindow* win = dynamic_cast<MpiWindow*>(data->m_defs->get_window(i));
+
+        map<MpiWindow*, win_t>::iterator it = m_windows.find(win);
+        if (it != m_windows.end())
+        {
+            MPI_Win_free(&(it->second.win));
+            delete[] it->second.buf;
+        }
+      }
+    }
+    "MPI_RMA_PUT_START" = {
+      MpiWindow* win          = event->get_window();
+      uint32_t   m_remote_loc = event->get_remote();
+      win_t&     entry        = m_windows[win];
+
+      entry.remote_processes.insert(m_remote_loc);
+    }
+    "MPI_RMA_GET_START" = {
+      MpiWindow* win          = event->get_window();
+      uint32_t   m_remote_loc = event->get_remote();
+      win_t&     entry        = m_windows[win];
+      
+      entry.remote_processes.insert(m_remote_loc);
+    }
+    "MPI_RMA_PUT_END" = {
+      /* TODO: the use of prev() is not save in the presence of FLUSH events */
+      MpiWindow* win          = event.prev()->get_window();
+      MpiComm*   comm         = dynamic_cast<MpiComm*>(win->get_comm());
+      uint32_t   m_remote_loc = event.prev()->get_remote();
+      win_t&     entry        = m_windows[win];
+
+      entry.op_time[comm->get_group()->get_global_rank(m_remote_loc)].op = event->get_time();
+    }
+    "MPI_RMA_GET_END" = {
+      /* TODO: the use of prev() is not save in the presence of FLUSH events */
+      MpiWindow* win          = event.prev()->get_window();
+      MpiComm*   comm         = dynamic_cast<MpiComm*>(win->get_comm());
+      uint32_t   m_remote_loc = event.prev()->get_remote();
+      win_t&     entry        = m_windows[win];
+
+      entry.op_time[comm->get_group()->get_global_rank(m_remote_loc)].op = event->get_time();
+    }
+    "MPI_RMAEXIT" = {
+      Event        enter     = event.enterptr();
+      MpiWindow*   win       = event->get_window();
+      Region*      region    = enter->get_region();
+      MpiGroup*    group     = event->get_group();
+      MpiComm*     comm      = dynamic_cast<MpiComm*>(event->get_window()->get_comm());
+      win_t&       entry     = m_windows[win];
+      int          myrank    = -1;
+      timestamp_t* timestamp = reinterpret_cast<timestamp_t*>(entry.buf);
+
+
+      /* analyze paiwise sync pattern */
+      MPI_Comm_rank(comm->get_comm(), &myrank);
+
+      if (is_mpi_rma_post(region))
+      {
+        /* initialise window buffer */
+        timestamp[LATEST_COMPLETE / sizeof (timestamp_t)] = -DBL_MAX;
+        timestamp[LATEST_RMA_OP   / sizeof (timestamp_t)] = -DBL_MAX;
+        timestamp[LATEST_POST     / sizeof (timestamp_t)] = -DBL_MAX;
+        timestamp[LOCAL_POST      / sizeof (timestamp_t)] = enter->get_time();
+
+        /* clear bitfield */
+        memset(entry.buf + BITFIELD_START, 0, entry.bitfield_size);
+
+        /* start exposure epoch to exchange timestamps */
+        MPI_Win_post(group->get_group(), 0, entry.win);
+      }
+      else if (is_mpi_rma_wait(region))
+      {
+        int group_size;
+        
+        MPI_Win_wait(entry.win);
+
+        /* analyze pairwise sync pattern */
+        MPI_Group_size(group->get_group(), &group_size);
+        data->m_count = group_size;
+        cbmanager.notify(MPI_RMA_PWS_COUNT, event, data);
+        
+        data->m_count = group_size;
+        for (int i = BITFIELD_START; i < BITFIELD_START + entry.bitfield_size; ++i)
+        {
+          data->m_count -= BitSetTable[entry.buf[i] & 0xff];
+        }
+        cbmanager.notify(MPI_RMA_PWS_UNNEEDED_COUNT, event, data);
+
+        /* analyse other patterns */
+        data->m_tmptime  = timestamp[LATEST_COMPLETE / sizeof(timestamp_t)];
+        data->m_tmptime2 = timestamp[LATEST_RMA_OP   / sizeof(timestamp_t)];
+
+        cbmanager.notify(MPI_RMA_POST_WAIT, event, data);
+      }
+      else if (is_mpi_rma_start(region))
+      {
+        entry.events.add_event(enter, ROLE_RMA_START_ENTER);
+        entry.events.add_event(event, ROLE_RMA_START_EXIT);
+
+        /* start access epoch to exchange timestamps */
+        MPI_Win_start(group->get_group(), 0, entry.win);
+
+        /* get post enter-time from each exposure epoch */
+        for (uint32_t i=0; i < group->num_ranks(); ++i)
+        {
+          /* create entry for location */
+          op_pair_t& op_pair = 
+              entry.op_time[group->get_global_rank(i)];
+          /* 
+           * initializing op time with start timestamp. This is needed
+           * to have a sane value, in case no RMA op follows in this
+           * access epoch.
+           */
+          op_pair.op = event->get_time();
+
+          MPI_Get(&(op_pair.post), 1, MPI_DOUBLE,
+                  comm->get_group()->get_local_rank(group->get_global_rank(i)), LOCAL_POST,
+                  1, MPI_DOUBLE, entry.win);
+        }
+      }
+      else if (is_mpi_rma_complete(region))
+      {
+        timestamp_t max_post_time = -DBL_MAX;
+        int         group_size    = 0;
+
+        cbmanager.notify(MPI_RMA_SET_REMOTE_BIT, event, data);
+
+        cbmanager.notify(MPI_RMA_PUT_LATEST_OP, event, data);
+
+        /* send complete timestamp to remote processes */
+        entry.complete_enter = enter->get_time();
+        for (uint32_t i=0; i < group->num_ranks(); ++i)
+        {
+          MPI_Accumulate(&entry.complete_enter, 1, MPI_DOUBLE, 
+                         comm->get_group()->get_local_rank(group->get_global_rank(i)),
+                         LATEST_COMPLETE, 1, MPI_DOUBLE, MPI_MAX,
+                         entry.win);
+        }
+
+        /* complete access epoch on window */
+        MPI_Win_complete(entry.win);
+
+        /* search maximum post timestamp */
+        map<uint32_t, op_pair_t>::iterator it = 
+            entry.op_time.begin();
+        while (it != entry.op_time.end())
+        {
+          max_post_time = max(max_post_time, it->second.post);
+          ++it;
+        }
+            
+        data->m_tmptime = max_post_time;
+        *data->m_local  = entry.events;
+       
+        cbmanager.notify(MPI_RMA_POST_COMPLETE, event, data);
+
+        /* clear map of latest op times */
+        entry.op_time.clear();
+
+        /* analyze paiwise sync pattern */
+        MPI_Comm_rank(comm->get_comm(), &myrank);
+        
+        MPI_Group_size(group->get_group(), &group_size);
+        data->m_count = group_size;
+        cbmanager.notify(MPI_RMA_PWS_COUNT, event, data);
+
+        data->m_count = group_size - entry.remote_processes.size();
+        cbmanager.notify(MPI_RMA_PWS_UNNEEDED_COUNT, event, data);
+        entry.remote_processes.clear();
+      }
+    }
+    "MPI_RMA_POST_COMPLETE" = {
+      MpiWindow* win         = event->get_window();
+      Event      evt_it      = event.prev().prev();
+      bool       start_found = false;
+      win_t&     entry       = m_windows[win];
+      
+      while (!start_found)
+      {
+        if (((evt_it->get_type() == MPI_RMA_PUT_START) ||
+             (evt_it->get_type() == MPI_RMA_GET_START)) &&
+            (evt_it->get_window() == win))
+        {
+          uint32_t remote = evt_it->get_remote();
+          op_pair_t& op_time = entry.op_time[remote];
+          if (op_time.post > evt_it->get_time() &&
+              op_time.post < evt_it.exitptr()->get_time())
+          {
+            data->m_idle = op_time.post - evt_it->get_time();
+
+            cbmanager.notify(MPI_RMA_EARLY_TRANSFER, evt_it, data);
+          }
+        }
+
+        if (evt_it->get_type() == ENTER &&
+            is_mpi_rma_start(evt_it->get_region()) &&
+            evt_it.exitptr()->get_window() == win)
+        {
+          start_found = true;
+        }
+        
+        /* check previous event */
+        evt_it--;
+      }
+    }
+    "MPI_RMA_SET_REMOTE_BIT" = {
+      MpiWindow* win    = event->get_window();
+      win_t&     entry  = m_windows[win];
+
+      /* set bit corresponding to my rank on every remote location */
+      for (set<uint32_t>::iterator it = entry.remote_processes.begin();
+           it != entry.remote_processes.end(); ++it)
+      {
+        MPI_Accumulate(&entry.rank_mask, 1, MPI_BYTE, static_cast<int>(*it),
+                       entry.rank_offset, 1, MPI_BYTE,
+                       MPI_BOR, entry.win); 
+      }
+
+    }
+    "MPI_RMA_PUT_LATEST_OP" = {
+      MpiWindow* win    = event->get_window();
+      MpiComm*   comm   = dynamic_cast<MpiComm*>(event->get_window()->get_comm());
+      win_t&     entry  = m_windows[win];
+
+      /* send latest rma op times to remote processes */
+      map<uint32_t, op_pair_t>::iterator it =
+          entry.op_time.begin();
+      while (it != entry.op_time.end())
+      {
+          MPI_Accumulate(&(it->second.op), 1, MPI_DOUBLE, 
+                         comm->get_group()->get_local_rank(it->first), LATEST_RMA_OP, 
+                         1, MPI_DOUBLE, MPI_MAX, entry.win);
+          ++it;
+      }
+    }
+    "MPI_RMACOLLEXIT" = {
+      /* TODO: Possible assertions may lead to early exits here. As we
+       *       currently do not trace the assertion itself, the first
+       *       heuristic will be, to check whether any early exits
+       *       occur before later enters, if not, it is assumed that 
+       *       MPI_MODE_NOPRECEEDE was NOT given.
+       */
+      /* NOTE: future heuristic may be to check whether NO RMA calls
+       *       occured in the last epoch
+       */
+      Event      enter  = event.enterptr();
+      Region*    region = enter->get_region();
+
+      if (is_mpi_rma_fence(region))
+      {
+        MpiWindow*  win           = event->get_window();
+        MPI_Comm    comm          = dynamic_cast<MpiComm*>(win->get_comm())->get_comm();
+        win_t&      entry         = m_windows[win];
+        timestamp_t local_enter   = enter->get_time();
+        timestamp_t latest_enter  = -DBL_MAX;
+        timestamp_t earliest_exit =  DBL_MAX;
+        timestamp_t latest_rma_op = -DBL_MAX;
+        int         myrank        = -1;
+        int         comm_size     = 0;
+        TimeVec2    local_times;
+
+        local_times.value[1] = enter->get_time();
+        local_times.value[0] = event->get_time();
+
+        MPI_Allreduce(&local_times, &data->m_timevec, 1, TIMEVEC2,
+                      MINMAX_TIMEVEC2, comm);
+
+        latest_enter  = data->m_timevec.value[1];
+        earliest_exit = data->m_timevec.value[0];
+        
+        if ((earliest_exit > latest_enter) &&
+            (local_enter   < latest_enter))
+        {
+          data->m_idle = latest_enter - local_enter;
+          cbmanager.notify(MPI_RMA_WAIT_AT_FENCE, event, data);
+        }
+        
+        /* clear bitfield */
+        memset(entry.buf + BITFIELD_START, 0, entry.bitfield_size);
+
+        /* get latest rma op to this location */
+        MPI_Win_fence(MPI_MODE_NOPRECEDE, entry.win);
+        cbmanager.notify(MPI_RMA_SET_REMOTE_BIT, event, data);
+        cbmanager.notify(MPI_RMA_PUT_LATEST_OP, event, data);
+        MPI_Win_fence(MPI_MODE_NOPUT | MPI_MODE_NOSUCCEED | MPI_MODE_NOSTORE, entry.win);
+
+        map<uint32_t, op_pair_t>::iterator it =
+            entry.op_time.begin();
+        while (it != entry.op_time.end())
+        {
+          if (it->second.op > latest_rma_op)
+          {
+            latest_rma_op = it->second.op;
+          }
+          ++it;
+        }
+
+        if (latest_rma_op > local_enter)
+        {
+          data->m_idle = latest_rma_op - local_enter;
+          cbmanager.notify(MPI_RMA_WAIT_AT_FENCE, event, data);
+          cbmanager.notify(MPI_RMA_EARLY_FENCE, event, data);
+        }
+
+        /* analyze pairwise sync pattern */
+        MPI_Comm_rank(comm, &myrank);
+        MPI_Comm_size(comm, &comm_size);
+
+        data->m_count = 2 * comm_size;
+        cbmanager.notify(MPI_RMA_PWS_COUNT, event, data);
+
+        /* calculate unneeded synchronizations as origin */
+        data->m_count = 2 * comm_size - entry.remote_processes.size();
+        entry.remote_processes.clear();
+
+        /* calculate unneeded synchronizations as target */
+        for (int i = BITFIELD_START; i < BITFIELD_START + entry.bitfield_size; ++i)
+        {
+          data->m_count -= BitSetTable[entry.buf[i] & 0xff];
+        }
+        
+        cbmanager.notify(MPI_RMA_PWS_UNNEEDED_COUNT, event, data);
+      }
+    }
+  ]
+]
+
+
+PATTERN "MPI_RMA_COMMUNICATION" = [
+  PARENT  = "MPI_COMMUNICATION"
+  NAME    = "Remote Memory Access"
+  DOCNAME = "Remote Memory Access Communication Time"
+  TYPE    = "MPI_RMA"
+  CLASS   = "PatternMPI_RmaComm"
+  INFO    = "Time spent in MPI RMA communication calls"
+  DESCR   = {
+    This pattern refers to the time spent in MPI remote memory access
+    communication calls, i.e. MPI_Accumulate, MPI_Put, and MPI_Get.
+  }
+  UNIT    = "sec"
+  HIDDEN
+]
+
+PATTERN "MPI_RMA_LATE_POST" = [
+  PARENT    = "MPI_RMA_SYNCHRONIZATION"
+  NAME      = "Late Post"
+  DOCNAME   = "Late Post Time"
+  TYPE      = "MPI_RMA"
+  CLASS     = "PatternMPI_RmaLatePost"
+  INFO      = "Time spent in MPI RMA Late Post inefficiency pattern"
+  DESCR     = {
+    This pattern refers to the time spent in the MPI remote memory
+    access 'Late Post' inefficiency pattern.
+    </dd><p><dd>
+    @img(RmaLatePost.png)
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_RMA_POST_COMPLETE" = {
+      Event       enter      = event.enterptr();
+      timestamp_t enter_time = enter->get_time();
+      Event       start_enter = 
+                      data->m_local->get_event(ROLE_RMA_START_ENTER);
+      Event       start_exit = 
+                      data->m_local->get_event(ROLE_RMA_START_EXIT);
+
+      if ((data->m_tmptime > enter_time) &&
+          (data->m_tmptime < event->get_time()))
+      {
+        /* non-blocking start and post concurrent to complete */
+        m_severity[enter.get_cnode()] += 
+            (data->m_tmptime - enter_time);
+      }
+      else if ((data->m_tmptime < start_exit->get_time()) &&
+               (data->m_tmptime > start_enter->get_time()))
+      {
+        /* blocking start */
+        m_severity[start_enter.get_cnode()] += 
+            (data->m_tmptime - start_enter->get_time());
+      }
+    }
+  ]
+]
+
+PATTERN "MPI_RMA_EARLY_WAIT" = [
+  PARENT    = "MPI_RMA_SYNCHRONIZATION"
+  NAME      = "Early Wait"
+  DOCNAME   = "Early Wait Time"
+  TYPE      = "MPI_RMA"
+  CLASS     = "PatternMPI_RmaEarlyWait"
+  INFO      = "Time spent in MPI_Win_wait waiting for last MPI_Win_complete."
+  DESCR     = {
+    This pattern refers to idle time in MPI_Win_wait, due to an early
+    call to this function, as it will block, until all pending completes
+    have arrived.
+    </dd><p><dd>
+    @img(RmaEarlyWait.png)
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_RMA_POST_WAIT" = {
+      Event       enter      = event.enterptr();
+      timestamp_t enter_time = enter->get_time();
+      
+      if (data->m_tmptime > enter_time)
+      {
+        m_severity[enter.get_cnode()] += 
+            (data->m_tmptime - enter_time);
+      }
+    }
+  ]
+]
+
+PATTERN "MPI_RMA_LATE_COMPLETE" = [
+  PARENT    = "MPI_RMA_EARLY_WAIT"
+  NAME      = "Late Complete"
+  DOCNAME   = "Late Complete Time"
+  TYPE      = "MPI_RMA"
+  CLASS     = "PatternMPI_RmaLateComplete"
+  INFO      = "Time spent in MPI_Win_wait waiting between last rma access and last MPI_Win_complete."
+  DESCR     = {
+    This pattern refers to the time spent in the 'Early Wait' pattern,
+    due to a late complete call.
+    </dd><p><dd>
+    @img(RmaLateComplete.png)
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_RMA_POST_WAIT" = {
+      Event       enter      = event.enterptr();
+      timestamp_t enter_time = enter->get_time();
+      timestamp_t max_ts     = max(data->m_tmptime2, enter_time);
+      std::ostringstream out;
+
+      if (data->m_tmptime > max_ts)
+      {
+        m_severity[enter.get_cnode()] += 
+            (data->m_tmptime - max_ts);
+      }
+    }
+  ]
+]
+
+PATTERN "MPI_RMA_EARLY_TRANSFER" = [
+  PARENT    = "MPI_RMA_COMMUNICATION"
+  NAME      = "Early Transfer"
+  DOCNAME   = "Early Transfer Time"
+  TYPE      = "MPI_RMA"
+  CLASS     = "PatternMPI_RmaEarlyTransfer"
+  INFO      = "Time spent in MPI RMA Early Transfer inefficiency pattern"
+  DESCR     = {
+    This pattern refers to the time spent waiting in MPI remote memory access 
+    communication routines, i.e. MPI_Accumulate, MPI_Put, and MPI_Get, due to
+    an access before the exposure epoch is opened at the target.
+    </dd><p><dd>
+    @img(RmaEarlyTransfer.png)
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "MPI_RMA_EARLY_TRANSFER" = {
+        m_severity[event.get_cnode()] += data->m_idle;
+    }
+  ]
+]
+
+
+PATTERN "MPI_RMA_WAIT_AT_FENCE" = [
+  PARENT    = "MPI_RMA_SYNCHRONIZATION"
+  NAME      = "Wait at Fence"
+  DOCNAME   = "Wait at Fence Time"
+  TYPE      = "MPI_RMA"
+  CLASS     = "PatternMPI_RmaWaitAtFence"
+  INFO      = "Time spent in MPI_Win_fence, waiting for other processes"
+  DESCR     = {
+    This pattern refers to the time spent waiting in MPI fence
+    synchronization calls for other participating processes.
+    </dd><p><dd>
+    @img(RmaWaitAtFence.png)
+  }
+  UNIT      = "sec"
+  DATA      = {
+    pearl::timestamp_t local_enter;
+    pearl::timestamp_t latest_enter;
+    pearl::timestamp_t local_exit;
+    pearl::timestamp_t earliest_exit;
+  }
+  CALLBACKS = [
+    "MPI_RMA_WAIT_AT_FENCE" = {
+      m_severity[event.get_cnode()] += data->m_idle;
+    }
+  ]
+]
+
+PATTERN "MPI_RMA_EARLY_FENCE" = [
+  PARENT     = "MPI_RMA_WAIT_AT_FENCE"
+  NAME       = "Early Fence"
+  DOCNAME    = "Early Fence Time"
+  TYPE       = "MPI_RMA"
+  CLASS      = "PatternMPI_RmaEarlyFence"
+  INFO       = "Time spent in MPI_Win_fence while waiting for pending RMA ops"
+  DESCR      = {
+    This pattern refers to the time spent in MPI_Win_fence waiting for
+    outstanding remote memory access operations to this location to
+    finish.
+    </dd><p><dd>
+    @img(RmaEarlyFence.png)
+  }
+  UNIT       = "sec"
+  CALLBACKS  = [
+    "MPI_RMA_EARLY_FENCE" = {
+      m_severity[event.get_cnode()] += data->m_idle;
+    }
+  ]
+]
+
+PATTERN "MPI_RMA_PAIRSYNC_COUNT" = [
+  NAME      = "MPI RMA Pairwise Synchronizations"
+  DOCNAME   = "MPI RMA Pairwise Synchronizations"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_RmaPairsyncCount"
+  INFO      = "Number of pairwise synchronizations in MPI RMA synchronizations"
+  DESCR     = {
+  }
+  UNIT      = "occ"
+  DATA      = {
+  }
+  CALLBACKS = [
+    "MPI_RMA_PWS_COUNT" = {
+        m_severity[event.get_cnode()] += data->m_count;
+    }
+  ]
+]
+
+PATTERN "MPI_RMA_PAIRSYNC_UNNEEDED_COUNT" = [
+  PARENT    = "MPI_RMA_PAIRSYNC_COUNT"
+  NAME      = "MPI RMA Unneeded Pairwise Synchronizations"
+  DOCNAME   = "MPI RMA Unneeded Pairwise Synchronizations"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_RmaPairsyncUnneededCount"
+  INFO      = "Number of unneeded pairwise synchronizations in MPI RMA synchronizations"
+  DESCR     = {
+    This pattern refers to the number of pairwise synchronizations done
+    with MPI RMA active target synchronization mechanisms that do not
+    complete rma operations.
+  }
+  UNIT      = "occ"
+  DATA      = {
+  }
+  CALLBACKS = [
+    "MPI_RMA_PWS_UNNEEDED_COUNT" = {
+        m_severity[event.get_cnode()] += data->m_count;
+    }
+  ]
+]
+
+#{
+#PATTERN "MPI_RMA_LOCK_COMPETITION" = [
+#  PARENT    = "MPI_RMA_SYNCHRONIZATION"
+#  NAME      = "Lock Competition"
+#  DOCNAME   = "Lock Competition Time"
+#  TYPE      = "MPI_RMA"
+#  CLASS     = "PatternMPI_RmaLockCompetition"
+#  INFO      = "Time spent waiting acquiring a lock for a window."
+#  DESCR     = {
+#    This pattern refers to the time spent waiting in MPI_Win_lock or 
+#    MPI_Win_unlock, before the lock on a window can be acquired.
+#  }
+#  UNIT      = "sec"
+#  DATA      = {
+#  }
+#  CALLBACKS = [
+#  ]
+#]
+
+#}

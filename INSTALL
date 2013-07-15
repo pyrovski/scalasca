@@ -1,0 +1,803 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  Copyright (c) 2009-2013                                                **
+**  German Research School for Simulation Sciences GmbH                    **
+**                                                                         **
+**  Copyright (c) 2003-2008                                                **
+**  University of Tennessee, Innovative Computing Laboratory               **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+                        SCALASCA v1.4 INSTALL GUIDE
+                        ===========================
+
+This file describes how to configure, compile, and install the SCALASCA
+performance toolset consisting of
+
+* SKIN   (Scalasca instrumenter)
+* SCAN   (Scalasca measurement collection & analysis nexus)
+* SQUARE (Scalasca analysis report explorer)
+
+including the components
+
+* OPARI2 (OpenMP and user region instrumentation tool)
+* EPIK   (measurement library for summarization & tracing)
+* EARL   (serial event-trace analysis library)
+* EXPERT (serial automatic performance analyzer)
+* PEARL  (parallel event-trace analysis library)
+* SCOUT  (parallel automatic performance analyzer)
+* CUBE3  (analysis report presentation component & utilities)
+
+KOJAK v3, CUBE v3, etc., are incorporated in this release and installation
+as fully functional components, with their own set of commands, etc.
+
+GNU make is required to build the toolset.
+
+GNU binutils 2.18 (or similar) is required for libiberty on all platforms
+and libbfd when GCC, Intel, PathScale or CCE compilers are to be supported.
+Note that older versions of libiberty may have an implementation of
+getopt_long_only which can result in problems parsing commandline flags.
+
+GCC is generally not required, however, various components (such as the
+Qt4-based  GUI) are often more easily built with up-to-date versions of GCC. 
+Note that GCC compilers prior to version 4.3 are not recommended when support
+for OpenMP and/or PDT+Fortran are desired.
+
+To enable support for the SIONlib scalable file I/O library, the following
+software package (installed with support for the same MPI libraries and
+compilers as for your Scalasca installations) is needed:
+
+* SIONlib >= 1.3p5        (http://www.fz-juelich.de/jsc/sionlib)
+
+To enable support for the TAU source-code instrumentor based on the
+Program Databese Toolkit (PDT), the following software package is needed:
+
+* PDT     >= 3.14.1       (http://www.cs.uoregon.edu/research/pdt)
+
+SCALASCA comes with the CUBE3 graphical user interface based on the Qt
+application framework. To build the user interface, the following software
+package is required:
+
+* Qt      >= 4.3          (http://qt.nokia.com)
+
+After installation the following command should be found on your search path,
+and the version can be verified by running it with the "--version" flag:
+
+* qmake
+
+If this command can not be found on your path, some functionality of
+SQUARE/CUBE3 is disabled during configuration, i.e., the GUI display
+component will be unavailable. However, the CUBE3 libraries and the CUBE3
+algebra utilities will still be built.
+
+NOTE: The Qt4 "qmake -v" will report something like
+      "Using Qt version 4.5.0",
+      and not
+      "GNU Make version 3.78-distributed make"
+      which would indicate a parallel distributed make with batch queue
+      scheduling that is not a suitable alternative.  The Qt qmake can be
+      specified with "./configure --with-qmake=PATH_TO_QT4_BIN/qmake"
+
+For more detailed information on how to configure and install Qt to be used
+with CUBE3 as well as some platform-specific notes, please also read
+Appendix A of the CUBE3 Installation Guide (cube-3.0/doc/CubeInstall.pdf).
+
+Build and installation may be as simple as running
+"./configure --prefix=<installdir>; make; make install".
+
+For more complex builds, where there are multiple modes (e.g., 32- & 64-bit)
+or cross-compilation is required, additional customization of Makefile.defs
+and the build/installation process are also discussed. Additionally, some
+notes for building SCALASCA on Cray XT, NEC SX, SGI Altix and SiCortex systems
+are provided.
+
+NOTE: The directory where SCALASCA is installed should be visible (i.e.,
+      readable) from compute nodes where parallel programs will run, as that's
+      where executables and runtime configuration files are located.  SCALASCA
+      components are built with compiled-in paths to the directory specified
+      for installation during configuration, therefore after installation to
+      this directory they should not be moved to another location!
+
+NOTE: When using the AMD x86 Open64 compiler, the '--nodecl' option specified
+      in line 26 of the 'kinst' and 'kinst-pomp' scripts installed to the
+      'bin' directory can be safely removed. It is only required for the
+      community version of Open64 available from http://www.open64.net
+
+
+STEP 0:  Basic configuration
+----------------------------
+
+In the package root directory, run "./configure [options]".
+The following options are available:
+
+  --prefix=DIR                 Specify full pathname of the directory, where
+                               the toolset package should be installed.
+                               Default: /opt/scalasca
+
+  --with-binutils=DIR          If Binutils (bfd & liberty) are required
+                               to support your system's compiler, and not
+                               located in /usr, specify the directory
+                               where Binutils is installed on your system.
+
+  --with-papi=DIR              If you want to have EPIK hardware-counter
+                               measurement support, specify the directory
+                               where PAPI is installed on your system.
+
+  --with-vtf3=DIR              If you want to have Vampir Trace Format 3
+                               (VTF3) converter support, specify the directory
+                               where VTF3 is installed on your system.
+
+  --with-sionconfig=PATH       If you want to have support for SIONlib files,
+                               specify the absolute path to sionconfig where
+                               SIONlib >= 1.3p5.
+
+  --with-pdt=DIR               If you want to have support for the TAU source-
+                               code instrumentor based on the Program Database
+                               Toolkit (PDT), specify the directory where
+                               PDT >= 3.14.1 is installed on your system.
+
+  --with-qmake=PATH            Specifies an alternative name for Qt's qmake
+                               (e.g., "qmake-qt4") or the absolute path of the
+                               qmake executable in case it is not in your
+                               search path (e.g., "/opt/qt4/bin/qmake").
+
+  --enable-all-mpi-wrappers    Specifies that wrappers for all possible MPI
+                               functions should be provided.
+
+  --disable-mpi-wrappers=[<group>[,<group>[,...]]]
+                               <group> := (CG|COLL|ENV|ERR|EXT|EXTRA|IO|
+                                          MINI|MISC|P2P|RMA|SPAWN|TOPO|TYPE)
+                               Specifies that the specified groups of MPI
+                               functions should not have wrappers provided.
+
+  --disable-fortran            Disables support for instrumentation and
+                               measurement of Fortran.
+
+  --disable-gui                Disables building of the graphical user
+                               interface CUBE.
+
+On systems where multiple MPI libraries and compilers might be available,
+it might be necessary to specify which of the MPI libraries or compilers
+to use. In this case, configure will tell you which versions it found and
+how to specify the desired choice: configure currently can only do this
+on Linux systems.
+
+Depending on the functionality provided by the MPI library, associated MPI
+wrappers are created.  By default, only the wrapper set provided by earlier
+versions of Scalasca is enabled.  All wrappers can be explicitly requested
+via --enable-all-mpi-wrappers.  Particular groups of MPI wrappers can be
+disabled via --disable-mpi-wrappers=<group>, e.g., where MPICH1 provides
+MPI File I/O functionality that is not MPI standard conformant, the
+associated wrappers must be disabled by --disable-mpi-wrappers=IO.
+
+Note that the MPI wrapper set enabled/determined by SCALASCA configure will
+result in dependency on MPI libraries providing those MPI routines.  If
+configured with MPI-2.2, wrappers may be created requiring MPI-2.2 routines,
+which would prevent that installation of SCALASCA being usable with
+earlier versions of MPI without those routines.
+
+Each installation of the toolset typically only supports a single MPI library
+and set of compilers, in which case separate installations can be made for
+each required configuration into separate installation directories.  (Both
+32-bit and 64-bit versions can be installed in a single location when
+appropriately configured.)
+
+NOTE: For the IBM XL compilers, two incompatible instrumentation interfaces
+      are available. When Scalasca is compiled using XLC/XLF < 11/13, the
+      old interface is selected which works with any XLC/XLF > 7.1.1/9.1.1.
+      If Scalasca is compiled using XLC/XLF >= 11/13, a new interface with
+      significantly lower runtime overhead is used, but which is incompatible
+      with older compiler versions.
+
+When you need multiple installations of SCALASCA for measurement and analysis,
+it may be preferable to have a single shared installation of the SCALASCA GUI
+(CUBE3) rather than a copy in each SCALASCA installation.  This is simplest by
+downloading the corresponding CUBE3 distribution from www.scalasca.org,
+installing it to a shared location, and ensuring that it is found on the PATH
+when one of the SCALASCA installations is used.  Each SCALASCA installation
+can then be configured with '--disable-gui'.
+
+configure creates a "build configuration" for each unique platform and stores
+it in a subdirectory "build-###" where ### describes the attributes needed
+(e.g., operating system, MPI version, compiler) to define the platform.
+See the output of "configure" for the name of your build configuration.
+
+Next, change your current working directory to the build configuration
+subdirectory
+
+    % cd build-###
+
+as all of the following text is referring to files and commands executed
+inside the build configuration subdirectory.
+
+
+STEP 1:  Modify Makefile Definition File (Makefile.defs)
+--------------------------------------------------------
+
+The Makefile Definition File template (generated by configure inside the
+build configuration subdirectory) contains reasonable defaults for the
+specific computer platforms.  In some cases, if you have a customized
+environment, it might be necessary to change some variables in the
+Makefile.defs file to adapt it to your local system configuration.
+
+In the following, the major parts of Makefile.defs are described and the
+meaning of variables that can be changed. Variables not listed here should
+NOT be changed because the package main Makefile depends on them.
+
+  #--------------------------------------------------------------------------
+  # Platform Settings
+  #--------------------------------------------------------------------------
+
+    PREFIX         Full pathname of the directory, where the toolset package
+                   should be installed (e.g., /opt/scalasca)
+
+    PLAT_LDIR   = -DPFORM_LDIR=\"/tmp\"	  Name of (SMP) node-local directory
+                                          that can be used to store temporary
+                                          trace files
+
+    CC             Name of C compiler (e.g. cc)
+    CFLAGS         Flags for C compiler (e.g. -O)
+    CXX            Name of C++ compiler (e.g. CC)
+    CXXFLAGS       Flags for C++ compiler
+
+    PFLAG          Precision flag for C/C++ compiler (e.g. -32)
+    AFLAG          Precision flag for ar command
+
+  On systems where you want to make measurements, you also need to have
+  Fortran compilers available. In this case, you should set the following
+  variables:
+
+    F77            Name of Fortran77 compiler with fixed form, file suffix .f
+    F90            Name of Fortran90 compiler with free form, file suffix .f90
+    FFLAGS         General flags for Fortran compilers
+    FPP            Flag to invoke CPP-style Fortran preprocessor
+    FDOPT          Flag to define preprocessor variable on command line
+                   (typically "-D" or "-WF,-D")
+
+  Also, when you have Fortran compilers, uncomment the following line
+  (but do not change it):
+  
+    #FOBASE   = pomp2_fwrapper_base.o
+
+  #--------------------------------------------------------------------------
+  # MPI Settings
+  #--------------------------------------------------------------------------
+
+  If your system supports MPI and you want to have EPIK MPI measurement
+  support, uncomment ALL variables in this section, but only set the
+  following 7 variables:
+
+    MPICC        Name of the MPI C Compiler (typically mpicc)
+    MPICXX       Name of the MPI C++ Compiler (typically mpiCC or mpicxx)
+    MPIF90       Name of the MPI Fortran90 Compiler (typically mpif90)
+    MPILIB       MPI library if explicitly needed (typically -lmpi)
+    PMPILIB      Libraries needed to allow the use of the
+                 MPI profiling interface PMPI (typically -lpmpi)
+    FMPILIB      Name of the MPI Fortran support library (typically -lfmpi)
+                 If your system does not have this, set
+
+                     FMPILIB   = -lepk.ad.fmpi
+                     FMPIOBJ   = libepk.ad.fmpi.a
+
+    MPIEXTRA     Optional MPI features. Currently recognized options:
+
+                     -DMPICH_IGNORE_CXX_SEEK  Required when using MPICH (1&2)
+                                              or derived MPI implementations
+                                              to avoid compile errors
+
+                     -DHAS_MPI2_1SIDED        Include analysis support
+                                              for MPI2 remote memory accesses
+
+  #--------------------------------------------------------------------------
+  # OpenMP Settings
+  #--------------------------------------------------------------------------
+
+  If your system supports OpenMP and you want to have EPIK OpenMP
+  measurement support, uncomment ALL variables in this section, but only
+  set the following variables:
+
+    OMPCC          Name of the OpenMP C compiler
+    OMPCXX         Name of the OpenMP C++ compiler
+    OMPF90         Name of the OpenMP Fortran compiler
+    OMPFLAG        Flag which activates OpenMP compilation (e.g., "-openmp")
+
+  If your system does NOT support OpenMP, only uncomment the following two
+  variables and set them to the following values
+
+    OMPCC   = $(CC)
+    OMPFLAG = -OpenMPnotAvailable
+
+  #--------------------------------------------------------------------------
+  # Hybrid MPI/OpenMP Settings
+  #--------------------------------------------------------------------------
+
+  If your system supports MPI and OpenMP and you additionally want to have
+  EPIK hybrid MPI/OpenMP measurement support, uncomment ALL variables in this
+  section, but only set the following 2 variables:
+
+    HYBCC          Name of the C compiler for MPI/OpenMP
+    HYBF90         Name of the Fortran90 compiler for MPI/OpenMP
+
+  To have the hybrid MPI/OpenMP trace analyzer, you also need
+    HYBCXX         Name of the C++ compiler for MPI/OpenMP
+
+  You can also leave HYBCXX undefined, in which case hybrid MPI/OpenMP traces
+  can still be analyzed with the MPI or EXPERT trace analyzer, if available.
+
+  #--------------------------------------------------------------------------
+  # Hardware Counter Settings
+  #--------------------------------------------------------------------------
+
+  NOTE: You need a working PAPI installation (version 3 or higher)
+        (download from http://icl.cs.utk.edu/projects/papi/)
+        
+  If you want to have EPIK hardware-counter measurement support,
+  uncomment ALL variables in this section, but only set the following
+  variable:
+
+    METRDIR        Directory where PAPI is installed on your system.
+
+  If you have a non-standard PAPI installation, it also might be necessary
+  to change the default settings of the following 2 variables:
+
+    METRINC        Compiler option to include directory where the file
+                   "papi.h" can be found (e.g. "-I$(METRDIR)/include")
+    METRLIB        Linker options to link in the PAPI library
+                   (e.g. "-L$(METRDIR)/lib -R$(METRDIR)/lib -lpapi$(PREC)")
+
+  NOTE: The default metric module supports Component-PAPI (version 4 and above)
+        with multiple components. If only PAPI version 3 is available on your
+        machine or only one component is required, you can change the variable
+        METR from papi to papi_1component. 
+
+  #--------------------------------------------------------------------------
+  # Compression Support
+  #--------------------------------------------------------------------------
+
+  If you want to disable trace file compression support, comment out ALL
+  variables in this section.
+
+  If you want to enable support for compressed CUBE files, add the compiler
+  flag "-DCUBE_COMPRESSED" to the variable SZLIB_CFLAGS. This is currently
+  only enabled by default on architectures where this feature has already
+  been tested.
+
+  #--------------------------------------------------------------------------
+  # Alternative compiler for SCAN, EARL, EXPERT, and CUBE3
+  #--------------------------------------------------------------------------
+
+  This is only needed if
+  a) you want to build the SCAN measurement collector/analyzer and CUBE3 tools
+     and/or EARL library and EXPERT analyzer
+
+  AND
+  b) the default C++ compiler CXX is unable to compile these sources.
+  When building CUBE3, ECXX typically has to be the same compiler which was
+  used to build the wxWidgets or Qt library, respectively.
+
+    ECXX           Alternative C++ compiler (e.g., g++)
+    ECXXLIBS       Additional C++ libraries if necessary
+
+    BINUTILS       Location of Binutils (bfd & liberty) if necessary
+    LIBERTY        "-liberty" with LIBPATH if necessary (for getopt_long_only)
+
+  #--------------------------------------------------------------------------
+  # CUBE configuration (wxWidgets & Qt support)
+  #--------------------------------------------------------------------------
+
+  NOTE: You need a working installation of Qt >= 4.3
+        (download from http://qt.nokia.com)
+
+  If you want the graphical CUBE3 analysis result browser and have an
+  appropriate version of Qt available, you need to uncomment ALL variables
+  starting with "QT_" in this section.
+
+  #--------------------------------------------------------------------------
+  # Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+  #--------------------------------------------------------------------------
+
+  Special compiler interfaces are used for automatic function instrumentation.
+  A maximum of one compiler interface is supported by each installation, and
+  if no supported interface is available (or "generic" is specified),
+  automatic function instrumentation is not possible.
+
+  If C++ function name demangling is desired and a suitable demangling
+  function (such as cplus_demangle) is available, this can be specified here
+  along with necessary compilation arguments. It can be omitted if C++
+  function instrumentation or C++ function name demangling is not required.
+
+  DEMANGLE = -DGNU_DEMANGLE
+
+  Some special compiler interfaces support filtering (via EPK_FILTER) via
+  the BFD library which is part of binutils. If C++ function name demangling
+  is enabled via an external library, such as liberty, it can also be
+  specified here, e.g.,
+
+  DEMANGLE = -DGNU_DEMANGLE -I$(BINUTILS)/include
+  BFDLIB   = -L$(BINUTILS)/lib -lbfd $(LIBERTY)
+
+  If libbfd has a dependence on "libz", you may need to add "-lz".
+
+  Newer versions of the BFD library (2.22.52 and later) need additional
+  definitions which can be added to DEMANGLE, e.g.,
+
+  DEMANGLE = -DGNU_DEMANGLE -DPACKAGE -DPACKAGE_VERSION
+
+  #--------------------------------------------------------------------------
+  # VTF3 Support
+  #--------------------------------------------------------------------------
+
+  NOTE: You need a working VTF3 binary package (download from
+        http://www.cs.uoregon.edu/research/paracomp/tau/vtf3-1.43.tar.gz)
+
+  If you want to build the EPILOG to Vampir trace format (VTF3) converter,
+  uncomment ALL variables in this section, but only set the following
+  variable:
+
+    VTF3DIR        Name of directory where you unpacked the VTF3 package
+                   (e.g., /usr/packages/vtf3-1.33)
+
+
+STEP 2:  Compilation and Installation
+-------------------------------------
+
+Execute the following commands to build and install the toolset:
+
+    % cd build-###
+
+       Change current working directory to the build configuration
+       subdirectory (if you have not done it already in Step 0).
+
+    % make
+
+       Builds all of the tools and libraries. Make sure to have Qt's qmake
+       on your PATH (or configured an absolute path using "--with-qmake=")
+       if building the graphical user interface was enabled during
+       configuration.
+
+    % make install
+
+       Installs tools, libraries, include files, documentation and examples
+       in $(PREFIX).
+
+If compilation fails, it is typically a sign that some settings in
+the Makefile Definition File ("Makefile.defs") are wrong. It is almost
+never necessary to change anything in the package distribution source files.
+
+
+STEP 3:  Environment configuration and installation testing
+-----------------------------------------------------------
+
+After installation, it is recommended to define environment variables
+for convenience in using the toolset, e.g., "SCALASCA_DIR=<prefix>"
+and add $SCALASCA_DIR/bin to the PATH environment variable.
+$SCALASCA_DIR/doc contains toolset documentation (User Guide, etc.), while
+$SCALASCA_DIR/examples contains example applications and experiments.
+
+On cross-compilation systems, it is recommended to define an additional
+environment variable with the location of the compute node tools, e.g.,
+"SCALASCA_RTS=<prefix>/bin/be" so that SCOUT runs as $SCALASCA_RTS/scout.
+
+On systems with multiple compute nodes without synchronized clocks, it is
+recommended to set SCAN_ANALYZE_OPTS=-s when doing MPI trace analysis.
+
+Examples are provided as part of the package installation, which can be
+copied and built, run to collect measurements, and analyzed, to verify
+that everything in the toolset is configured and installed correctly.
+See the file "$SCALASCA_DIR/example/README.example" for further information.
+
+
+Installation on Systems with Multiple Execution Modes (e.g., 32/64bit)
+----------------------------------------------------------------------
+
+If your system (like AIX, Solaris or IRIX) supports multiple different ways
+of building executables, e.g., a 32-bit and a 64-bit mode, the EPIK
+measurement system must be built and installed for each mode. Normally
+configure (in STEP 0) should recognize this automatically.
+
+If this fails, you can perform the same tasks by using the following steps:
+
+  a) Put together a "Makefile.defs" file which can be used for installing
+     - everything in default mode and
+     - the EPIK measurement system in each mode.
+     IMPORTANT: Building in the different execution modes can be done by
+     only changing the Makefile.defs variable "PREC", i.e., all execution
+     mode dependent definitions are based on using the "$(PREC)" variable.
+
+  b) Then execute
+
+     % ln -s -f ../utils/build/Makefile.32-64 Makefile
+     % make 
+     % make install
+
+     This builds and installs both modes in one step and generates
+     new versions of the kinst and kinst-pomp scripts which automatically
+     select the right measurement system.
+
+If you are not able to put together a "Makefile.defs" specification which
+supports building all execution modes at the same time, you can do the
+following:
+
+  a) Setup "Makefile.defs" for the default mode (e.g. 32-bit).
+     Then execute
+
+     % make all32
+     % make install32
+
+  b) Change "Makefile.defs" for the secondary mode (e.g., 64-bit).
+     Then execute
+       
+     % make all64
+     % make install64 combine
+
+  c) See any kinst and kinst-pomp scripts in $(PREFIX)/bin32 and
+     $(PREFIX)/bin64 and see whether you can combine them to "generic"
+     versions and store these in $(PREFIX)/bin.
+
+
+Installation on Systems with Front-Ends and Cross-Compilation
+-------------------------------------------------------------
+
+If your system (IBM Blue Gene, Cray XT, etc.) is used through extra compilation
+front-end nodes and building executables is done by cross-compilation,
+you need to build and install a cross-instrumentation version of the toolset.
+Normally configure (in STEP 0) should recognize this automatically.
+
+If this fails, you can perform the same tasks by using the following steps:
+
+  a) Select one of the provided Front-End Makefile Definition Files (*-fe)
+     (in directory "mf") which matches your front-end system best, and copy
+     it to "Makefile.defs.fe" in the build configuration root directory.
+     Otherwise, use "mf/Makefile.defs.generic" and adapt it to your front-end
+     system.
+
+  b) Select one of the provided Back-End Makefile Definition Files (*-be)
+     (in directory "mf") which matches your back-end system best, and copy
+     it to "Makefile.defs.be" in the build configuration root directory.
+
+  c) Follow the directions of section "Step 1:" to modify both files.
+     Set the PREFIX variable in both files to the (same) directory
+     where the toolset should be installed.
+
+  d) If porting to an as yet unsupported system (i.e., a new platform PLAT),
+     some basic configuration settings need to be determined by running a
+     test program on a back-end compute node.  In the epik/config directory
+     build the "gen_headers" executable, create a new directory files-$PLAT,
+     and inside this directory run "gen_headers" on a compute node, to
+     create a number of header file ("elg_types.h", "epk_fwrapper_def.h",
+     "elg_fmpi_defs.h").  If interactive execution is not possible, you can
+     specify a command or script to run the test program with the REMEXEC
+     variable in the Makefile.  REMEXEC should take the name of an executable
+     to run as its sole argument, run the executable on a compute node, and
+     wait for its completion.  It also assumes that the build directory is
+     cross-mounted, i.e., files written by the executable end up in the
+     directory where it is run from.
+
+  e) Execute
+
+     % ln -s -f ../utils/build/Makefile.cross Makefile
+     % make
+     % make install
+
+     which builds and installs back-end measurement and analysis components
+     along with front-end instrumentation and presentation components.
+
+
+Installation on Cray XT systems
+-------------------------------
+
+Cray XT systems may offer a variety of programming environments customized
+for different compilers, e.g., PrgEnv-pgi for the Portland Group compiler
+suite (which is typically the default), and associated compiler wrappers
+(cc, CC & ftn).  Each programming environment (or compiler suite) is
+typically incompatible with others, and as a result, separate
+configurations and installations of SCALASCA are required for each.
+
+Generally there is no need for separate installations for distinct
+versions of a programming environment, but this is not guaranteed:
+e.g., PrgEnv-cray is known to have incompatibility between versions
+7.2 and 7.3 requiring separate Scalasca installations for each.
+
+The following have been tested and verified to work with CNL:
+  PrgEnv-pgi (pgi/7.2 & higher), 
+  PrgEnv-gnu (gcc/4.2 & higher), 
+  PrgEnv-pathscale (pathscale/3.2 & higher), 
+  PrgEnv-intel (intel/10 & higher), and 
+  PrgEnv-cray (cce/7.1 & higher).
+
+SCALASCA's configure command attempts to determine the current
+programming environment and create a build configuration accordingly. 
+For example, in the PrgEnv-pgi environment, the "crayxt-pgi"
+configuration is created in the build-crayxt-pgi directory, and the
+PrgEnv-pgi environment must be active when building and installing.
+
+By switching to other programming environments, and re-running configure,
+additional configurations can be created, built and installed.  Take
+care to provide a distinct installation directory (i.e., PREFIX) for each,
+and ensure that the corresponding programming environment is used when
+doing SCALASCA instrumentation.
+
+Each SCALASCA configuration will build and install an identical GUI,
+therefore it is typically preferable to download, configure and install
+the CUBE3 GUI into a shared location, and add this to the PATH when
+SCALASCA is used.
+
+Since clocks are typically not sufficiently synchronized between nodes
+to support trace analysis of MPI (or hybrid OpenMP/MPI) applications,
+it is recommended to set SCAN_ANALYZE_OPTS=-s.
+
+Support for hybrid OpenMP/MPI measurement and analysis is configured by
+default, however, not all combinations of compilers and MPI libraries
+provide complete support.  In particular, Catamount support for hybrid
+OpenMP/MPI has not been determined.  For hybrid trace analysis, it is
+recommended to set MPICH_MAX_THREAD_SAFETY=funneled (or serialized for
+summary measurements, but note that MPI_THREAD_MULTIPLE is not supported
+by SCALASCA).
+
+The SCALASCA automatic trace analyzer (SCOUT) either can't be built in
+various PrgEnvs (pgi & pathscale), may fail when executed (pathscale &
+cray/cce) or may produce incorrect analysis reports (cray/cce).  If
+PrgEnv-cray, -pathscale & -pgi modules are used for SCALASCA, it is
+therefore recommended to set SCAN_TRACE_ANALYZER=none in these modules.
+
+While a SCALASCA installation matching the current PrgEnv compiler is
+required when instrumenting applications (SKIN), any version of SCALASCA
+can be used for measurement collection & analysis (SCAN).  It is therefore
+recommended to use either PrgEnv-gnu or PrgEnv-intel versions of SCALASCA
+(which have working versions of the SCOUT trace analyzer) in batch scripts.
+
+If PAPI measurement support is configured (using --with-papi), then the "papi"
+or "xt-papi" module should be loaded when building and installing SCALASCA.
+It may be desirable, but generally not necessary, to also have this module
+loaded when using SCALASCA.
+
+
+Installation on NEC SX systems
+------------------------------
+
+For NEC SX systems, a version of "libiberty" compiled for the compute nodes
+is required to successfully build SCALASCA.  Unfortunately, there is no
+separate distribution of only "libiberty" available.  It is currently only
+available as part of various GNU tools, e.g., GNU binutils.  To compile
+libiberty, follow the guidelines given below:
+
+  - Extract the GNU binutils archive
+  - 'cd' into the libiberty subdirectory of the binutils sources
+  - Configure libiberty:
+
+        ./configure --prefix=<DIR> --host=sx9-nec-superux \
+                    CC=sxcc AR=sxar RANLIB=echo
+
+    (Depending on your NEC SX system, adjust the parameter of '--host'
+     accordingly, e.g., "sx8-nec-superux".)
+  - Build & install libiberty:
+
+        make
+        make install
+
+After configuration, but before building SCALASCA, ensure that the "LIBERTY"
+variable in the generated "Makefile.defs.be" is pointing to the correct version
+of "libiberty".
+
+
+Installation on SiCortex systems
+--------------------------------
+
+Currently, only native builds are supported on SiCortex systems, i.e., you
+have to configure, compile and install SCALASCA on a 'head' node.
+
+As there is typically no X Window environment available on the 'head' node,
+only the measurement and trace analysis components of SCALASCA will be built. 
+However, you can build a stripped-down version of SCALASCA including the
+GUI components but without MPI/OpenMP measurement support on your front-end
+node or workstation using
+
+      % ./configure --disable-ompi <additional_configure_options>
+      % make
+      % make install
+
+
+Installation on Intel Xeon Phi systems
+--------------------------------------
+
+When support for Intel Xeon Phi (MIC) coprocessors is recognized, SCALASCA
+configures a front-end/back-end combined installation based on Intel MPI and
+Intel (OpenMP) compilers.  In addition to back-end measurement libraries,
+trace analyzers and SCAN cross-compiled for the MIC architecture, a
+full-featured installation of measurement libraries, trace analyzers, SKIN
+instrumenters, SCAN collection and analysis nexus and SQUARE analysis report
+exploration and examination tools are built for the Xeon front-end host.  Via
+smart adaptation this combined installation supports instrumenting on the host
+(for both host and coprocessor device), measurements exclusively using hosts,
+measurements exclusively using one or more coprocessor devices, and symmetric
+measurements from constellations of hosts and devices.
+
+When configuring third-party components, appropriate versions may be required
+for host and coprocessor device.  Instrumenters such as PDToolkit and Qt4 for
+the CUBE GUI are only required for the host where these execute.  Whereas
+SIONlib 1.3p7 supports a combined installation for host and coprocessor
+device, with appropriate configurations selected automatically, separate PAPI
+libraries in compatible versions must be specified for host and coprocessor.
+(Use of PAPI on Xeon Phi coprocessors may require patching the kernel.)
+
+The BFD library (part of binutils) is similarly required in separate versions
+for host and coprocessor.  While current Linux distributions typically
+provide libbfd for the Xeon host, you may need to prepare a copy for the Xeon
+Phi coprocessor.  For native measurements directly on coprocessor devices,
+the "nm" utility is also required.
+
+
+SLOG2 Support
+-------------
+
+To additionally build a (not very well tested) EPILOG to SLOG2 trace
+converter, the following steps need to be performed:
+
+a) Get the SLOG2 software development kit (SDK) from
+   http://www-unix.mcs.anl.gov/perfvis/download/index.htm
+
+b) Unpack (unzip and untar) the SLOG2 SDK into a (temporary) directory
+   for configuring and building the SDK
+
+     % cd <slog2-build-directory>
+     % tar zxvf slog2sdk.tar.gz
+
+   Do NOT configure or build the SDK at this point!
+
+c) Configure, build, and install Scalasca the usual way with the additional
+   option --with-slog2=<slogdirectory> where <slogdirectory> is
+   the full pathname of the unpacked SLOG2 SDK
+   (e.g. <slog2-build-directory>/slog2sdk-1.2.6 )
+
+     % cd <scalasca-build-directory>
+     % ./configure ... --with-slog2=<slogdirectory> ...
+     % make
+     % make install
+
+d) Add the Scalasca binaries directory to your command path
+
+e) Then, go back to the SLOG2 build directory and configure, build, and
+   install the SLOG2 package (the configure command must be typed as a
+   single command line).
+
+     % cd <slog2-build-directory>
+     % ./configure --prefix=<slog2-install-dir>
+             --with-java=<java-base-dir>
+             --with-trace-libdir=`scalasca --config --prefix`/lib
+             --with-trace-name=elg
+             --disable-build
+             CC=`scalasca --config --cc`
+     % make
+     % make install
+
+   where
+
+     <slog2-install-dir>  Installation directory for SLOG2 package
+
+     <java-base-dir>      The path of the top-level directory of
+                          the Java installation,
+                          e.g. /usr/lib64/jvm/java-1.6.0-sun
+
+
+To use the EPILOG to SLOG2 converter, use the following procedure:
+
+a) Perform a Scalasca trace experiment:
+
+     % scan -q -t ...
+
+b) Create a merged global EPILOG trace:
+
+     % elg_merge epik_###
+
+c) Convert EPILOG trace to SLOG2 format
+
+     % elgTOslog2 epik_###/epik.elg
+
+d) use jumpshot for trace visualisation and analysis
+
+     % jumpshot epik_###/epik.elg.slog2

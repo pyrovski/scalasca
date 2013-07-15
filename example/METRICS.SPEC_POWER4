@@ -1,0 +1,104 @@
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+#### POWER4-specific extract ####
+
+# Kojak metrics specification for Epilog (measurement) and Expert (analysis)
+
+# POWER4-specific groupings (max 8 in group, restricted)
+aggroup POWER4_DC  = PM_DATA_FROM_L2 PM_DATA_FROM_L25_SHR PM_DATA_FROM_L25_MOD PM_DATA_FROM_L275_SHR PM_DATA_FROM_L275_MOD PM_DATA_FROM_L3 PM_DATA_FROM_L35 PM_DATA_FROM_MEM # 5
+aggroup POWER4_IC  = PM_INST_FROM_PREF PM_INST_FROM_L1 PM_INST_FROM_L2 PM_INST_FROM_L25_L275 PM_INST_FROM_L3 PM_INST_FROM_L35 PM_INST_FROM_MEM # 6
+aggroup POWER4_L1  = PM_LD_REF_L1 PM_LD_MISS_L1 PM_ST_REF_L1 PM_ST_MISS_L1 # 56
+aggroup POWER4_TLB = PM_ITLB_MISS PM_DTLB_MISS
+#aggroup POWER4_LX  = POWER4_L1 POWER4_TLB # 56
+aggroup POWER4_LX  = PM_ITLB_MISS PM_DTLB_MISS PM_LD_REF_L1 PM_LD_MISS_L1 PM_ST_REF_L1 PM_ST_MISS_L1 # 56
+aggroup POWER4_BR  = PM_BR_ISSUED PM_BR_MPRED_CR PM_BR_MPRED_TA # 3,55,61
+aggroup POWER4_BRT = PM_BR_ISSUED PM_BR_MPRED_CR PM_BR_MPRED_TA PM_BIQ_IDU_FULL_CYC PM_BRQ_FULL_CYC PM_L1_WRITE_CYC PM_INST_CMPL PM_CYC # 55
+aggroup POWER4_LSF = PM_FPU_STF PM_LSU_LDF # 15,54,60
+aggroup POWER4_STL = PM_CYC PM_FPU_FULL_CYC PM_FPU_STALL3 # 54
+aggroup POWER4_LST = PM_INST_CMPL PM_FPU_STF PM_LSU_LDF PM_CYC PM_FPU_FULL_CYC PM_FPU_STALL3 # 54
+aggroup POWER4_FP  = PM_FPU_FIN PM_FPU_FMA PM_FPU_FDIV PM_FPU_FSQRT PM_FPU_FMOV_FEST # 53
+aggroup POWER4_IFP = PM_FXU_FIN PM_FPU_FIN PM_FPU_FMA PM_FPU_FDIV PM_FPU_FSQRT PM_FPU_FMOV_FEST PM_INST_CMPL # 53
+aggroup POWER4_II  = PM_INST_DISP PM_INST_CMPL # 1,2,18,20
+
+### compositions are derived by combining measurements and create hierarchies
+### **** POWER4-specific hierarchy ****
+
+### cycles (including stalls)
+compose CYCLES = BUSY + PM_FPU_FULL_CYC + PM_FPU_STALL3 + PM_BIQ_IDU_FULL_CYC + PM_BRQ_FULL_CYC + PM_L1_WRITE_CYC # power4
+measure CYCLES = PM_CYC # power4
+
+### instructions
+compose INSTRUCTION = BRANCH + INTEGER + FLOATING_POINT + MEMORY
+measure INSTRUCTION = PM_INST_CMPL # power4
+
+compose BRANCH = BRANCH_PRED + BRANCH_MISP
+measure BRANCH = PM_BR_ISSUED # power4
+#compose BRANCH_PRED = BRANCH_PRED_TAKEN + BRANCH_PRED_UNTAKEN
+compute BRANCH_PRED = PM_BR_ISSUED - PM_BR_MPRED_CR - PM_BR_MPRED_TA # power4
+#compose BRANCH_MISP = BRANCH_MISP_TAKEN + BRANCH_MISP_UNTAKEN
+compose BRANCH_MISP = PM_BR_MPRED_CR + PM_BR_MPRED_TA # power4
+
+compose INTEGER = PM_FXU_FIN # power4
+##measure INTEGER = PM_FXU_FIN # power4
+
+compose FLOATING_POINT = PM_FPU_ALL + PM_FPU_DENORM + PM_FPU_FDIV + PM_FPU_FMA + PM_FPU_FMOV_FEST + PM_FPU_FRSP_FCONV + PM_FPU_FSQRT # power4
+#compose FLOATING_POINT = PM_FPU_FMA + PM_FPU_FDIV + PM_FPU_FSQRT + PM_FPU_STF + PM_FPU_FMOV_FEST # power4
+#measure FLOATING_POINT = PM_FPU_FIN # power4
+
+compose MEMORY = PM_FPU_STF + PM_LSU_LDF + SYNCH
+#compose MEMORY = LOADS + STORES + SYNCH
+#compose LOADS = LOAD_INT + LOAD_FLOAT
+#compose LOAD_FLOAT = PM_LSU_LDF # power4
+#compose STORES = STORE_INT + STORE_FLOAT
+#compose STORE_FLOAT = PM_FPU_STF # power4
+
+### data accesses (to cache hierarchy & memory)
+compose DATA_ACCESS = DATA_HIT_L1$ + DATA_HIT_L2$ + DATA_HIT_L3$ + DATA_HIT_MEM
+#compute DATA_ACCESS = PM_LD_REF_L1 + PM_ST_REF_L1
+
+## level 1 data cache
+compose DATA_HIT_L1$ = DATA_LOAD_FROM_L1$ + DATA_STORE_INTO_L1$
+
+compute DATA_STORE_INTO_L1$ = PM_ST_REF_L1 - PM_ST_MISS_L1 # power4
+compute DATA_LOAD_FROM_L1$ = PM_LD_REF_L1 - PM_LD_MISS_L1 # power4
+
+## level 2 data cache
+#compose DATA_HIT_L2$ = DATA_LOAD_FROM_L2$ + DATA_STORE_INTO_L2$
+compose DATA_HIT_L2$ = DATA_LOAD_FROM_L2$ # power4
+
+compose DATA_LOAD_FROM_L2$ = PM_DATA_FROM_L2 + PM_DATA_FROM_L25_MOD + PM_DATA_FROM_L25_SHR + PM_DATA_FROM_L275_MOD + PM_DATA_FROM_L275_SHR # power4
+
+## level 3 data cache
+#compose DATA_HIT_L3$ = DATA_LOAD_FROM_L3$ + DATA_STORE_INTO_L3$
+compose DATA_HIT_L3$ = DATA_LOAD_FROM_L3$ # power4
+
+compose DATA_LOAD_FROM_L3$ = PM_DATA_FROM_L3 + PM_DATA_FROM_L35 # power4
+
+## memory/system data
+#compose DATA_HIT_MEM = DATA_LOAD_FROM_MEM + DATA_STORE_INTO_MEM
+compose DATA_HIT_MEM = DATA_LOAD_FROM_MEM # power4
+
+compose DATA_LOAD_FROM_MEM = PM_DATA_FROM_MEM # power4
+
+### instruction accesses (to cache hierarchy & memory)
+compose INST_ACCESS = INST_PREFETCH + INST_HIT_L1$ + INST_HIT_L2$ + INST_HIT_L3$ + INST_HIT_MEM
+compose INST_PREFETCH = PM_INST_FROM_PREF # power4
+compose INST_HIT_L1$ = PM_INST_FROM_L1 # power4
+compose INST_HIT_L2$ = PM_INST_FROM_L2 + PM_INST_FROM_L25_L275 # power4
+compose INST_HIT_L3$ = PM_INST_FROM_L3 + PM_INST_FROM_L35 # power4
+compose INST_HIT_MEM = PM_INST_FROM_MEM # power4
+
+### TLB accesses (instructions & data)
+compose TLB_ACCESS = DATA_TLB_ACCESS + INST_TLB_ACCESS
+compose DATA_TLB_ACCESS = DATA_TLB_HIT + DATA_TLB_MISS
+compute DATA_TLB_MISS = PM_DTLB_MISS # power4
+compose INST_TLB_ACCESS = INST_TLB_HIT + INST_TLB_MISS
+compute INST_TLB_MISS = PM_ITLB_MISS # power4
+

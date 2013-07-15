@@ -1,0 +1,269 @@
+/* -- Attributes -- */
+
+void elg_attr_ui1(elg_ui1 type, elg_ui1 val)
+{
+    ElgGen_write_ATTR_UI1(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]), type, val);
+}
+
+void elg_attr_ui4(elg_ui1 type, elg_ui4 val)
+{
+    ElgGen_write_ATTR_UI4(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]), type, val);
+}
+
+/* -- manually modified -- not automatically generated version -------------- */
+/* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
+
+/* -- EPILOG Internal -- */
+
+void elg_log_off (void)
+{
+    ElgGen_write_LOG_OFF(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+void elg_log_on (void)
+{
+    ElgGen_write_LOG_ON(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+void elg_enter_tracing (void)
+{
+    ElgGen_write_ENTER_TRACING(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+void elg_exit_tracing (void)
+{
+    ElgGen_write_EXIT_TRACING(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+/* -- Region -- */
+
+void elg_enter (elg_ui4 rid)
+{
+    ElgGen_write_ENTER(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]), rid,
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+void elg_enter_cs (elg_ui4 csid)
+{
+    ElgGen_write_ENTER_CS(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]), csid,
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+void elg_exit (/*elg_ui4 rid*/)
+{
+    ElgGen_write_EXIT(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+/* -- MPI-1 -- */
+
+void elg_mpi_send (elg_ui4 dpid, elg_ui4 cid, elg_ui4 tag, elg_ui4 sent)
+{
+    ElgGen_write_MPI_SEND(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                dpid, cid, tag, sent);
+}
+
+void elg_mpi_recv (elg_ui4 spid, elg_ui4 cid, elg_ui4 tag, elg_ui4 recvd)
+{
+    ElgGen_write_MPI_RECV(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                spid, cid, tag, recvd);
+}
+
+void elg_mpi_collexit (elg_ui4 rid,
+                       elg_ui4 rpid, elg_ui4 cid, elg_ui4 sent, elg_ui4 recvd)
+{
+    ElgGen_write_MPI_COLLEXIT(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                rid, rpid, cid, sent, recvd);
+}
+
+/* -- MPI-1 Non-blocking -- */
+
+void elg_mpi_send_complete(elg_ui4 reqid) 
+{
+  ElgGen_write_MPI_SEND_COMPLETE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                reqid);       
+}
+
+void elg_mpi_recv_request(elg_ui4 reqid) 
+{
+  ElgGen_write_MPI_RECV_REQUEST(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]), 
+                reqid);
+}
+
+void elg_mpi_request_tested(elg_ui4 reqid) 
+{
+  ElgGen_write_MPI_REQUEST_TESTED(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                reqid);
+}
+
+void elg_mpi_cancelled(elg_ui4 reqid) 
+{
+  ElgGen_write_MPI_CANCELLED(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                reqid);
+}
+
+/* -- MPI-2 One-sided Operations -- */
+
+void elg_mpi_put_1ts(elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes)
+{
+    ElgGen_write_MPI_PUT_1TS(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, wid, rmaid, nbytes);
+}
+
+void elg_mpi_put_1te(elg_ui4 spid, elg_ui4 wid, elg_ui4 rmaid)
+{
+    ElgGen_write_MPI_PUT_1TE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]), 
+                spid, wid, rmaid);
+}
+
+void elg_mpi_put_1te_remote (elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid)
+{
+    ElgGen_write_MPI_PUT_1TE_REMOTE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, wid, rmaid);
+}
+
+void elg_mpi_get_1ts (elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes)
+{
+    ElgGen_write_MPI_GET_1TS(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, wid, rmaid, nbytes);
+}
+
+void elg_mpi_get_1ts_remote (
+                elg_ui4 dpid, elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes)
+{
+    ElgGen_write_MPI_GET_1TS_REMOTE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, wid, rmaid, nbytes);
+}
+
+void elg_mpi_get_1te (elg_ui4 spid, elg_ui4 wid, elg_ui4 rmaid)
+{
+    ElgGen_write_MPI_GET_1TE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                spid, wid, rmaid);
+}
+
+void elg_mpi_winexit (/*elg_ui4 rid,*/ elg_ui4 wid, elg_ui4 cid, elg_ui1 synex)
+{
+    ElgGen_write_MPI_WINEXIT(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                wid, cid, synex);
+}
+
+void elg_mpi_wincollexit (/*elg_ui4 rid,*/ elg_ui4 wid)
+{
+    ElgGen_write_MPI_WINCOLLEXIT(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                wid);
+}
+
+void elg_mpi_win_lock (elg_ui4 lpid, elg_ui4 wid, elg_ui1 ltype)
+{
+    ElgGen_write_MPI_WIN_LOCK(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                lpid, wid, ltype);
+}
+
+void elg_mpi_win_unlock (elg_ui4 lpid, elg_ui4 wid)
+{
+    ElgGen_write_MPI_WIN_UNLOCK(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                lpid, wid);
+}
+
+/* -- Generic One-sided Operations -- */
+
+void elg_put_1ts (elg_ui4 dpid, elg_ui4 rmaid, elg_ui4 nbytes) 
+{
+    ElgGen_write_PUT_1TS(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, rmaid, nbytes);
+}
+
+void elg_put_1te (elg_ui4 spid, elg_ui4 rmaid)
+{
+    ElgGen_write_PUT_1TE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                spid, rmaid);
+}
+
+void elg_put_1te_remote (elg_ui4 dpid, elg_ui4 rmaid)
+{
+    ElgGen_write_PUT_1TE_REMOTE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, rmaid);
+}
+
+void elg_get_1ts (elg_ui4 dpid, elg_ui4 rmaid, elg_ui4 nbytes)
+{
+    ElgGen_write_GET_1TS(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, rmaid, nbytes);
+}
+
+void elg_get_1ts_remote (elg_ui4 dpid, elg_ui4 rmaid, elg_ui4 nbytes)
+{
+    ElgGen_write_GET_1TS_REMOTE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                dpid, rmaid, nbytes);
+}
+
+void elg_get_1te (elg_ui4 spid, elg_ui4 rmaid)
+{
+    ElgGen_write_GET_1TE(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                spid, rmaid);
+}
+
+void elg_collexit (/*elg_ui4 rid,*/
+                   elg_ui4 rpid, elg_ui4 cid, elg_ui4 sent, elg_ui4 recvd)
+{
+    ElgGen_write_COLLEXIT(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]),
+                rpid, cid, sent, recvd);
+}
+
+void elg_alock (elg_ui4 lkid)
+{
+    ElgGen_write_ALOCK(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]), 
+                lkid);
+}
+
+void elg_rlock (elg_ui4 lkid)
+{
+    ElgGen_write_RLOCK(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                lkid);
+}
+
+/* -- OpenMP -- */
+
+void elg_omp_fork (void)
+{
+    ElgGen_write_OMP_FORK(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+void elg_omp_join (void)
+{
+    ElgGen_write_OMP_JOIN(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}
+
+void elg_omp_alock (elg_ui4 lkid) 
+{
+    ElgGen_write_OMP_ALOCK(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                lkid);
+}
+
+void elg_omp_rlock (elg_ui4 lkid)
+{
+    ElgGen_write_OMP_RLOCK(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                lkid);
+}
+
+void elg_omp_collexit (/* elg_ui4 rid*/)
+{
+    ElgGen_write_OMP_COLLEXIT(ESDTHRD_GEN(thrdv[ESD_MY_THREAD]),
+                esd_num_metrics, ESDTHRD_VALV(thrdv[ESD_MY_THREAD]));
+}

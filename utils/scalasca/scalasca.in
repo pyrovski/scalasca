@@ -1,0 +1,192 @@
+#!/bin/sh
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+
+VERSION="1.4.3"
+
+CONFIG="@CONFIG@"
+
+BINDIR=`dirname $0` # installation directory
+EXENAM=`basename $0` # executable name
+
+# report usage
+usage () {
+  echo "Scalasca $VERSION"
+  echo "Toolset for scalable performance analysis of large-scale parallel applications"
+  echo "usage: $EXENAM [-v][-n] {action}"
+  echo "    1. prepare application objects and executable for measurement:"
+  echo "       $EXENAM -instrument <compile-or-link-command> # skin"
+  echo "    2. run application under control of measurement system:"
+  echo "       $EXENAM -analyze <application-launch-command> # scan"
+  echo "    3. interactively explore measurement analysis report:"
+  echo "       $EXENAM -examine <experiment-archive|report>  # square"
+  echo ""
+  echo "   -v: enable verbose commentary"
+  echo "   -n: show actions without taking them"
+  echo "   -h: show quick reference guide (only)"
+  echo ""
+}
+
+# report installed configuration
+config () {
+  SYSTEM=`uname -a`
+  echo "Config: $CONFIG"
+  echo "System: $SYSTEM"
+}
+
+# report location and try to present quick reference guide
+quickref () {
+  REFLOC=manuals/QuickReference.pdf
+  REFPDF=@DOCDIR@/$REFLOC
+  echo "Scalasca $VERSION - quick reference guide:"
+  if [ ! -f "$REFPDF" ]
+  then
+    echo "Unable to find PDF file, please check $REFLOC in the"
+    echo "Scalasca installation directory."
+    exit 2
+  fi
+  if [ -z "$DISPLAY" ]
+  then
+    echo "DISPLAY variable not set, unable to start PDF viewer."
+    echo "Quick reference guide is located here:"
+    echo "$REFPDF"
+    exit 2
+  fi
+  ACROREAD=`which acroread 2>/dev/null`
+  case "$ACROREAD" in
+    */acroread)
+        echo $ACROREAD $REFPDF
+        exec $ACROREAD $REFPDF &
+        exit 0
+        ;;
+  esac
+  XPDF=`which xpdf 2>/dev/null`
+  case "$XPDF" in
+    */xpdf)
+        echo $XPDF $REFPDF
+        exec $XPDF $REFPDF &
+        exit 0
+        ;;
+  esac
+  GV=`which gv 2>/dev/null`
+  case "$GV" in
+    */gv)
+        echo $GV $REFPDF
+        exec $GV $REFPDF &
+        exit 0
+        ;;
+  esac
+  # no display possible
+  echo "No supported PDF viewer detected. Quick reference guide"
+  echo "is located here:"
+  echo "$REFPDF"
+}
+
+
+# Process options
+unset ACTION
+unset NO_EXEC
+unset VERBOSE
+while [ $# -ne 0 ]; do
+  # allow --long_option (by removing leading "-")
+  case $1 in
+    --[a-z][a-z]*) arg1=`echo $1 | sed -e 's/^-//'`;;
+    *) arg1=$1;;
+  esac
+  case $arg1 in
+    -i|-inst|-instrument)
+      shift
+      ACTION="$BINDIR/skin"
+      if [ ! -x "$ACTION" ]; then
+          echo "Instrumentation not supported by this installation!"
+          exit 2
+      fi
+      ;;
+    -a|-anal|-analyze|-analyse) # measure, collect
+      shift
+      ACTION="$BINDIR/scan"
+      if [ ! -x "$ACTION" ]; then
+          echo "Measurement collection & analysis not supported by this installation!"
+          exit 2
+      fi
+      ;;
+    -e|-exam|-examine|-explore)
+      shift
+      ACTION="$BINDIR/square"
+      if [ ! -x "$ACTION" ]; then
+          echo "Analysis report examination not supported by this installation!"
+          exit 2
+      fi
+      ;;
+    -c|-conf|-config)
+      shift
+      ACTION="$BINDIR/kconfig"
+      if [ ! -x "$ACTION" ]; then
+          echo "Configuration reporting not supported by this installation!"
+          exit 2
+      fi
+      ;;
+    -n)
+      NO_EXEC=1
+      VERBOSE=1
+      shift
+      ;;
+    -v)
+      VERBOSE=1
+      shift
+      ;;
+    -h|-help|-q|-quickref|-quickreference)
+      quickref
+      exit 0
+      ;;
+    -u|-usage|-?)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unexpected argument: $1"
+      usage
+      exit 1
+      ;;
+  esac
+
+  if [ -n "$ACTION" ]; then
+     # Preprocess arguments to retain quotes, spaces, etc.
+     ARGS=""
+     for origarg in "$@"; do
+        # Escape special characters in arguments
+        #   -e 's/^x//'              Removes the 'x' at the beginning
+        #   -e 's/\\\\/\\\\\\\\/g'   Replaces '\' by '\\'
+        #   -e 's/"/\\\"/g'          Replaces '"' by '\"'
+        #   -e 's/'\''/\\\'\''/g'    Replaces ''' by '\''
+        #   -e 's/ /\\\ /g'          Replaces ' ' by '\ '
+        #   -e 's/(/\\\(/g'          Replaces '(' by '\('
+        #   -e 's/)/\\\)/g'          Replaces ')' by '\)'
+        arg=`echo "x$origarg" | sed -e 's/^x//' \
+                                    -e 's/\\\\/\\\\\\\\/g' \
+                                    -e 's/"/\\\"/g' \
+                                    -e 's/'\''/\\\'\''/g' \
+                                    -e 's/ /\\\ /g' \
+                                    -e 's/(/\\\(/g' \
+                                    -e 's/)/\\\)/g'`
+        ARGS="${ARGS} ${arg}"
+     done
+
+     [ -n "$VERBOSE" ] && echo $ACTION $ARGS
+     [ -z "$NO_EXEC" ] && eval $ACTION $ARGS
+     exit $?
+  fi
+done
+
+[ -n "$NO_EXEC" ] && echo "Action not specified!"
+usage
+[ -n "$VERBOSE" ] && [ -z "$NO_EXEC" ] && config
+exit 1
+

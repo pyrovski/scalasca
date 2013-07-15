@@ -1,0 +1,173 @@
+#!/bin/sh
+#
+# SCalasca ARchiving scriptLET
+#
+# Author: Marc-Andre Hermanns <m.a.hermanns@grs-sim.de>
+#
+######################################################################
+
+echo "SCARLET -- Scalasca Archiving Scriptlet"
+
+usage () {
+  cat > /dev/tty <<[[EOT]]
+usage  : $0 [options]
+options: [--archive=DIR]                  # Directory of epik archive
+         [-c | --cube]                    # Archive lightweight data
+         [--compress=PROG]                # Compressor for lightweight tarball
+         [-h | --help]                    # This help message
+         [-f | --force]                   # Force overwriting existing files
+         [--other=FILE[,FILE[,...]]]      # Other non-epik data
+         [--prefix=STRING]                # Prefix for tarballs
+         [--root=DIR]                     # Root directory for tarballs
+         [-t | --trace]                   # Archive complete epik archive
+         [-v | --verbose]                 # Verbose output
+[[EOT]]
+}
+
+SCARLET_COMPRESSOR=gzip
+SCARLET_COMPRESSOR_EXT=gz
+SCARLET_CUBES=0
+SCARLET_DIR=
+SCARLET_FILES_OTHER=
+SCARLET_FORCE=0
+SCARLET_GZIP_OPTS=
+SCARLET_PREFIX=
+SCARLET_ROOT=.
+SCARLET_TAR_OPTS=cSf
+SCARLET_TRACE=0
+SCARLET_VERBOSE=0
+
+for opt in "$@"
+do
+  case ${opt} in
+    --archive=*) 
+        SCARLET_DIR=`echo $opt | sed -e 's/--archive=//' -e 's,/$,,'`
+        echo "Archive: $SCARLET_DIR"
+        ;;
+    --compress=*) 
+        SCARLET_COMPRESSOR=`echo $opt | sed -e 's/--compress=//'`
+        # let's find out the correct extension
+        touch scarlet-$$.tmp
+        $SCARLET_COMPRESSOR scarlet-$$.tmp
+        SCARLET_COMPRESSOR_EXT=`ls scarlet-$$.tmp* | sed -e "s/scarlet-$$.tmp\.//"`
+        rm -f scarlet-$$.tmp.$SCARLET_COMPRESSOR_EXT
+        ;;
+    -c|--cube) 
+        SCARLET_CUBES=1
+        ;;
+    -f|--force)
+        SCARLET_FORCE=1
+        SCARLET_GZIP_OPTS=-f
+        ;;
+    -h|--help)
+        usage
+        exit 0
+        ;;
+    --other=*)
+        SCARLET_FILES_OTHER=`echo $opt | sed -e 's/--other=//' -e 's/,/ /g'`
+        ;;
+    --prefix=*) 
+        SCARLET_PREFIX=`echo $opt | sed -e 's/--prefix=//'`
+        ;;
+    --root=*)
+        SCARLET_ROOT=`echo $opt | sed -e 's/--root=//'`
+        ;;
+    -t|--trace) 
+        SCARLET_TRACE=1
+        ;;
+    -v|--verbose) 
+        SCARLET_VERBOSE=1
+        SCARLET_TAR_OPTS=cvf
+        ;;
+    *)
+        echo "Unknown option: $opt"
+        exit 1
+        ;;
+  esac
+done
+
+SCARLET_PWD=$PWD
+
+cd $SCARLET_ROOT
+
+if [ -z "$SCARLET_DIR" ]; then
+  echo "No archive specified. Exiting."
+  exit 1
+fi
+
+if [ -z "$SCARLET_PREFIX" ]; then
+  SCARLET_PREFIX=`echo $SCARLET_DIR | sed -e "s/\(.*\)_[a-z]*$/\1/"` 
+fi
+
+
+if [ ! -e $SCARLET_DIR/epik.conf ]; then
+  echo "Unable to find EPIK configuration in $SCARLET_DIR."
+fi
+
+if [ "$SCARLET_CUBES" == "1" ]; then
+
+    # compress uncompressed cube files
+    SCARLET_UNCOMPRESSED=`find $SCARLET_DIR -name "*.cube"`
+    for cube in $SCARLET_UNCOMPRESSED
+    do
+      echo "Compressing $cube"
+      gzip $cube
+    done
+
+    echo Archiving light-weight data
+    SCARLET_LW_EPIK=`ls $SCARLET_DIR/epik.* 2> /dev/null`
+    SCARLET_LW_SCOUT=`ls $SCARLET_DIR/scout.* 2> /dev/null`
+    SCARLET_LW_CUBE=`ls $SCARLET_DIR/*.cube.gz 2> /dev/null`
+
+    SCARLET_LW_FILES=`echo $SCARLET_LW_EPIK $SCARLET_LW_SCOUT $SCARLET_LW_CUBE | xargs -n 1 echo | sort -u`
+    if [ \( -e ${SCARLET_PREFIX}_cube.tar -o -e ${SCARLET_PREFIX}_cube.tar.${SCARLET_COMPRESSOR_EXT} \) -a "$SCARLET_FORCE" == "0" ]; then
+      echo Skipping tarball creation. File already exists.
+    else
+      tar $SCARLET_TAR_OPTS ${SCARLET_PREFIX}_cube.tar $SCARLET_LW_FILES
+      if [ -n "$SCARLET_COMPRESSOR" ]; then
+        if [ -e ${SCARLET_PREFIX}_cube.tar.$SCARLET_COMPRESSOR_EXT -a "$SCARLET_FORCE" == "0" ]; then
+          echo Skipping tarball compression. File already exists.
+        else
+          $SCARLET_COMPRESSOR $SCARLET_GZIP_OPTS ${SCARLET_PREFIX}_cube.tar
+        fi
+      fi
+    fi
+fi 
+
+if [ "$SCARLET_TRACE" == "1" ]; then
+  if [ -d "$SCARLET_DIR/ELG" ]; then 
+    echo Archiving complete trace
+    if [ \( -e ${SCARLET_PREFIX}_trace.tar -o -e ${SCARLET_PREFIX}_trace.tar.$SCARLET_COMPRESSOR_EXT \) -a "$SCARLET_FORCE" == "0" ]; then
+      echo Skipping tarball creation. File already exists.
+    else
+      tar $SCARLET_TAR_OPTS ${SCARLET_PREFIX}_trace.tar $SCARLET_DIR
+      if [ -e "$SCARLET_DIR/ELG/epik.sion" ]; then
+        if [ -e ${SCARLET_PREFIX}_trace.tar.$SCARLET_COMPRESSOR_EXT -a "$SCARLET_FORCE" == "0" ]; then
+          echo Skipping tarball compression. File already exists.
+        else
+          $SCARLET_COMPRESSOR $SCARLET_GZIP_OPTS ${SCARLET_PREFIX}_trace.tar
+        fi
+      fi
+    fi
+  else
+    echo No trace data in archive.
+  fi
+fi
+
+if [ -n "$SCARLET_FILES_OTHER" ]; then
+  echo Archiving other data
+  if [ \( -e ${SCARLET_PREFIX}_other.tar -o -e ${SCARLET_PREFIX}_other.tar.${SCARLET_COMPRESSOR_EXT} \) -a "$SCARLET_FORCE" == "0" ]; then
+    echo Skipping tarball creation. File already exists.
+  else
+    tar $SCARLET_TAR_OPTS ${SCARLET_PREFIX}_other.tar $SCARLET_FILES_OTHER
+    if [ -n "$SCARLET_COMPRESSOR" ]; then
+      if [ -e ${SCARLET_PREFIX}_other.tar.$SCARLET_COMPRESSOR_EXT -a "$SCARLET_FORCE" == "0" ]; then
+        echo Skipping tarball compression. File already exists.
+      else
+        $SCARLET_COMPRESSOR $SCARLET_GZIP_OPTS ${SCARLET_PREFIX}_other.tar
+      fi
+    fi
+  fi
+fi
+
+cd $SCARLET_PWD

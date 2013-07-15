@@ -1,0 +1,47 @@
+#------------------------------------------------------------------------------
+# Dependencies
+# (automatically generated using 'make depend')
+#------------------------------------------------------------------------------
+
+Event.o: \
+	../Buffer.h \
+	../CNode.h \
+	../Enter_rep.h \
+	../Error.h \
+	../Event_rep.h \
+	../Flow_rep.h \
+	../GlobalDefs.h \
+	../IdObject.h \
+	../Location.h \
+	../SmallObject.h \
+	../pearl_padding.h \
+	../pearl_types.h \
+	Event.cpp \
+	Event.h \
+	LocalTrace.h
+LocalTrace.o: \
+	$(CFG_DIR)/elg_types.h \
+	$(ELG_DIR)/elg_readcb.h \
+	$(ESD_DIR)/elg_defs.h \
+	$(ESD_DIR)/elg_impl.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(EPK_DIR)/epk_idmap.h \
+	../CNode.h \
+	../Calltree.h \
+	../Enter_rep.h \
+	../Error.h \
+	../Event_rep.h \
+	../Flow_rep.h \
+	../GlobalDefs.h \
+	../IdObject.h \
+	../MappingTable.h \
+	../NamedObject.h \
+	../Region.h \
+	../SmallObject.h \
+	../pearl_padding.h \
+	../pearl_types.h \
+	../readcb.h \
+	Event.h \
+	LocalTrace.cpp \
+	LocalTrace.h

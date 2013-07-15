@@ -1,0 +1,130 @@
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+#### Opteron-specific extract ####
+
+# Kojak metrics specification for Epilog (measurement) and Expert (analysis)
+
+# Opteron groupings (max 4 in group, unrestricted)
+aggroup OPTERON_TLB = DC_L1_DTLB_MISS_AND_L2_DTLB_MISS DC_L1_DTLB_MISS_AND_L2_DTLB_HIT IC_L1ITLB_MISS_AND_L2ITLB_MISS IC_L1ITLB_MISS_AND_L2ITLB_HIT
+aggroup OPTERON_DC1 = DC_ACCESS DC_MISS DC_L2_REFILL_I DC_SYS_REFILL_I
+aggroup OPTERON_DC2 = DC_L2_REFILL_M DC_L2_REFILL_O DC_L2_REFILL_E DC_L2_REFILL_S
+aggroup OPTERON_DC3 = DC_SYS_REFILL_M DC_SYS_REFILL_O DC_SYS_REFILL_E DC_SYS_REFILL_S
+aggroup OPTERON_IC  = IC_FETCH IC_MISS IC_L2_REFILL IC_SYS_REFILL
+
+aggroup OPTERON_FP  = FP_ADD_PIPE FP_MULT_PIPE FP_ST_PIPE FP_FAST_FLAG
+aggroup OPTERON_FPU = FR_FPU_X87 FR_FPU_MMX_3D FR_FPU_SSE_SSE2_PACKED FR_FPU_SSE_SSE2_SCALAR
+
+aggroup OPTERON_BR  = FR_BR FR_BR_MIS FR_BR_TAKEN FR_BR_TAKEN_MIS
+aggroup OPTERON_MMX = HT_LL_MEM_XFR HT_LR_MEM_XFR HT_RL_MEM_XFR
+aggroup OPTERON_IOX = HT_LL_IO_XFR HT_LR_IO_XFR HT_RL_IO_XFR
+aggroup OPTERON_STL = IC_FETCH_STALL FP_NONE_RET FR_DISPATCH_STALLS FR_DECODER_EMPTY
+aggroup OPTERON_ETC = FR_X86_INS CPU_CLK_UNHALTED FR_HW_INTS
+
+aggroup OPTERON_ST1 = IC_FETCH_STALL FR_DECODER_EMPTY FR_DISPATCH_STALLS_QUIET FP_NONE_RET
+aggroup OPTERON_ST2 = FR_DISPATCH_STALLS_FULL_FPU FR_DISPATCH_STALLS_FULL_LS FR_DISPATCH_STALLS_FULL_REORDER FR_DISPATCH_STALLS_FULL_RESERVATION
+aggroup OPTERON_ST3 = FR_DISPATCH_STALLS_BR FR_DISPATCH_STALLS_SER FR_DISPATCH_STALLS_SEG FR_DISPATCH_STALLS_FAR
+
+### compositions are derived by combining measurements and create hierarchies
+### **** OPTERON-specific hierarchy ****
+
+### cycles (including stalls)
+compose CYCLES = BUSY + IC_FETCH_STALL + FP_NONE_RET
+measure CYCLES = CPU_CLK_UNHALTED
+compose IC_FETCH_STALL = FR_DECODER_EMPTY + FR_DISPATCH_STALLS
+compose FR_DISPATCH_STALLS = FR_DISPATCH_STALLS_BR + FR_DISPATCH_STALLS_FAR + FR_DISPATCH_STALLS_FULL_FPU + FR_DISPATCH_STALLS_FULL_LS + FR_DISPATCH_STALLS_FULL_REORDER + FR_DISPATCH_STALLS_FULL_RESERVATION + FR_DISPATCH_STALLS_SER + FR_DISPATCH_STALLS_SEG + FR_DISPATCH_STALLS_QUIET
+
+### instructions
+compose INSTRUCTION = BRANCH + INTEGER + FLOATING_POINT + MEMORY
+measure INSTRUCTION = FR_X86_INS # opteron
+
+compose BRANCH = BRANCH_PRED + BRANCH_MISP
+measure BRANCH = FR_BR # opteron
+compose BRANCH_PRED = BRANCH_PRED_TAKEN + BRANCH_PRED_UNTAKEN
+compute BRANCH_PRED_TAKEN = FR_BR_TAKEN - FR_BR_TAKEN_MIS # opteron
+compute BRANCH_PRED_UNTAKEN = FR_BR - FR_BR_MIS - FR_BR_TAKEN + FR_BR_TAKEN_MIS # opteron
+compose BRANCH_MISP = BRANCH_MISP_TAKEN + BRANCH_MISP_UNTAKEN
+#measure BRANCH_MISP = FR_BR_MIS # opteron
+compute BRANCH_MISP_TAKEN = FR_BR_TAKEN_MIS # opteron
+compute BRANCH_MISP_UNTAKEN = FR_BR_MIS - FR_BR_TAKEN_MIS # opteron
+
+#compose FLOATING_POINT = FP_ADD + FP_MUL + FP_FMA + FP_DIV + FP_INV + FP_SQRT + FP_STORE + FP_MISC
+compose FLOATING_POINT = FP_ADD_PIPE + FP_MULT_PIPE + FP_ST_PIPE + FP_FAST_FLAG # opteron
+#compute FP_ADD = FP_ADD_PIPE
+#compute FP_MUL = FP_MULT_PIPE
+#compute FP_MISC = FP_ST_PIPE
+#compose FP_MISC = FP_ST_PIPE + FP_FAST_FLAG
+
+compose MEMORY = LOAD + STORE + SYNCH
+
+#compose BRANCH = BRANCH_TAKEN + BRANCH_UNTAKEN
+#measure BRANCH = FR_BR # Opteron
+#compose BRANCH_TAKEN = BRANCH_TAKEN_PRED + BRANCH_TAKEN_MISP
+#measure BRANCH_TAKEN = FR_BR_TAKEN # Opteron
+#compute BRANCH_TAKEN_PRED = FR_BR_TAKEN - FR_BR_TAKEN_MIS # Opteron
+#compute BRANCH_TAKEN_MISP = FR_BR_TAKEN_MIS # Opteron
+#compose BRANCH_UNTAKEN = BRANCH_UNTAKEN_PRED + BRANCH_UNTAKEN_MISP
+###compute BRANCH_UNTAKEN = FR_BR - FR_BR_TAKEN # Opteron
+#compute BRANCH_UNTAKEN_PRED = FR_BR - FR_BR_TAKEN - FR_BR_MIS + FR_BR_TAKEN_MIS # Opteron
+#compute BRANCH_UNTAKEN_MISP = FR_BR_MIS - FR_BR_TAKEN_MIS # Opteron
+
+### data accesses (to cache hierarchy & memory)
+compose DATA_ACCESS = DATA_HIT_L1$ + DATA_HIT_L2$ + DATA_HIT_L3$ + DATA_HIT_MEM
+measure DATA_ACCESS = DC_ACCESS # opteron
+
+## level 1 data cache
+#compose DATA_HIT_L1$ = DATA_STORE_INTO_L1$ + DATA_LOAD_FROM_L1$
+compute DATA_HIT_L1$ = DC_ACCESS - DC_MISS # opteron
+
+## no L1$ load/store alias definitions possible for opteron
+#compose DATA_STORE_INTO_L1$ = NA_OPTERON
+#compose DATA_LOAD_FROM_L1$ = NA_OPTERON
+
+## level 2 data cache
+compose DATA_HIT_L2$ = DATA_STORE_INTO_L2$ + DATA_LOAD_FROM_L2$
+compose DATA_STORE_INTO_L2$ = DC_L2_REFILL_M
+compose DATA_LOAD_FROM_L2$ = DC_L2_REFILL_O + DC_L2_REFILL_E + DC_L2_REFILL_S
+
+## no L3$ data cache alias definitions appropriate for opteron
+compose DATA_HIT_L3$ = DATA_STORE_INTO_L3$ + DATA_LOAD_FROM_L3$
+compose DATA_STORE_INTO_L3$ = NA_OPTERON
+compose DATA_LOAD_FROM_L3$ = NA_OPTERON
+
+### memory/system data
+compose DATA_HIT_MEM = DATA_STORE_INTO_MEM + DATA_LOAD_FROM_MEM
+compose DATA_STORE_INTO_MEM = DC_SYS_REFILL_M
+compose DATA_LOAD_FROM_MEM = DC_SYS_REFILL_O + DC_SYS_REFILL_E + DC_SYS_REFILL_S
+
+### instruction accesses (to cache hierarchy & memory)
+#compose INST_ACCESS = INST_HIT_L1$ + INST_HIT_L2$ + INST_HIT_L3$ + INST_HIT_MEM
+compose INST_ACCESS = INST_HIT_L1$ + INST_HIT_L2$ + INST_HIT_MEM
+#measure INST_ACCESS = IC_FETCH
+
+compute INST_HIT_L1$ = IC_FETCH - IC_L2_REFILL - IC_SYS_REFILL
+
+compose INST_HIT_L2$ = IC_L2_REFILL
+#compose INST_HIT_L3$ = NA_OPTERON
+compose INST_HIT_MEM = IC_SYS_REFILL
+
+### TLB accesses (instructions & data)
+compose TLB_ACCESS = DATA_TLB_ACCESS + INST_TLB_ACCESS
+compose DATA_TLB_ACCESS = DATA_TLB_HIT + DATA_TLB_MISS
+compute DATA_TLB_HIT = DC_L1_DTLB_MISS_AND_L2_DTLB_HIT
+compute DATA_TLB_MISS = DC_L1_DTLB_MISS_AND_L2_DTLB_MISS
+compose INST_TLB_ACCESS = INST_TLB_HIT + INST_TLB_MISS
+compute INST_TLB_HIT = IC_L1ITLB_MISS_AND_L2ITLB_HIT
+compute INST_TLB_MISS = IC_L1ITLB_MISS_AND_L2ITLB_MISS
+
+### HyperTransport memory & I/O transfers
+compose HT_TRANSFER = HT_MEM_XFER + HT_I/O_XFER
+compose HT_MEM_XFER = HT_LL_MEM_XFR + HT_LR_MEM_XFR + HT_RL_MEM_XFR
+compose HT_I/O_XFER = HT_LL_IO_XFR + HT_LR_IO_XFR + HT_RL_IO_XFR
+
+### doesn't fit in Instruction hierarchy
+compose SIMD = FR_FPU_MMX_3D + FR_FPU_SSE_SSE2_PACKED + FR_FPU_SSE_SSE2_SCALAR

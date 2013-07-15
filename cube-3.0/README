@@ -1,0 +1,46 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  Copyright (c) 2009-2013                                                **
+**  German Research School for Simulation Sciences GmbH                    **
+**                                                                         **
+**  Copyright (c) 2003-2008                                                **
+**  University of Tennessee, Innovative Computing Laboratory               **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+CUBE (CUBE Uniform Behavioral Encoding) is a generic presentation component
+suitable for displaying a wide variety of performance metrics for parallel
+programs including MPI and OpenMP applications. CUBE allows interactive
+exploration of a multidimensional performance space in a scalable fashion.
+Scalability is achieved in two ways: hierarchical decomposition of individual
+dimensions and aggregation across different dimensions. All performance
+metrics are uniformly accommodated in the same display and thus provide the
+ability to easily compare the effects of different kinds of performance
+behavior.
+
+* For copyright and license information please see the files "COPYRIGHT"
+  and "LICENSE"
+
+* For instructions to configure, compile, install CUBE please read the
+  Installation Guide:
+     doc/CubeInstall.pdf
+
+* For instructions to use the graphical user interfaces as well as a brief
+  intriduction to the CUBE libraries, please see the user manuals:
+     doc/CubeGuide.pdf
+     doc/cube3-wx.pdf     (for the deprecated wxWidgets-based GUI)
+
+* For further more detailed information on CUBE as well as the KOJAK
+  and Scalasca see the project webpages
+
+     http://www.scalasca.org
+
+* For help, reporting bugs, and making comments or suggestions send e-mail
+
+     mailto:scalasca@fz-juelich.de
+     mailto:kojak@fz-juelich.de

@@ -1,0 +1,153 @@
+#!/bin/sh
+
+# Installation directories
+INCDIR="@INCDIR@"
+LIBDIR="@LIBDIR@"
+
+# Libraries
+PB_LIB="-lpearl.base"
+PO_LIB="@PO_LIB@"
+PM_LIB="@PM_LIB@"
+PH_LIB="@PH_LIB@"
+PR_LIB="-lpearl.replay"
+PW_LIB="@PW_LIB@"
+UT_LIB="-lelg.base -lepk.util @SZ_LIB@"
+
+
+# Print usage information
+usage()
+{
+    cat <<[[EOT]]
+Usage: pearl-config [OPTION]
+
+Known values for OPTION are:
+
+  --cxxflags		print preprocessor and compiler flags for PEARL
+  --libs[=COMPONENT]	print library linking information for PEARL
+
+The optional COMPONENT argument of the '--libs' option is used to select the
+PEARL components to be used (comma-separated list). The 'base' component is
+always preselected. Recognized component names for this installation of PEARL
+are:
+  base       (preselected)
+  replay
+[[EOT]]
+    if test -n "${PO_LIB}"; then
+      echo "  omp"
+    fi
+    if test -n "${PM_LIB}"; then
+      echo "  mpi"
+    fi
+    if test -n "${PH_LIB}"; then
+      echo "  hybrid     (implicitly selects 'omp' and 'mpi')"
+    fi
+    if test -n "${PW_LIB}"; then
+      echo "  writer"
+    fi
+    echo
+    exit 1
+}
+
+
+# Print help message if no arguments are given
+if test $# -eq 0; then
+    usage
+fi
+
+# Process arguments
+USE_PB="yes"
+unset USE_PH
+unset USE_PM
+unset USE_PO
+unset USE_PR
+unset USE_PW
+while test $# -gt 0; do
+    case "$1" in
+    --cxxflags)
+	echo "-I${INCDIR}"
+       	;;
+
+    --libs*)
+        if test "$1" != "--libs"; then
+    	    LIBS=`echo $1 | sed -e 's/--libs=//'`
+            IFS=","
+            for lib in ${LIBS}; do
+                case "${lib}" in
+                base)
+                    USE_PB="yes"
+                    ;;
+
+                hybrid)
+                    if test -z "${PH_LIB}"; then
+                        usage
+                    fi
+                    USE_PO="yes"
+                    USE_PM="yes"
+                    USE_PH="yes"
+                    ;;
+
+                mpi)
+                    if test -z "${PM_LIB}"; then
+                        usage
+                    fi
+                    USE_PM="yes"
+                    ;;
+
+                omp)
+                    if test -z "${PO_LIB}"; then
+                        usage
+                    fi
+                    USE_PO="yes"
+                    ;;
+
+                replay)
+                    USE_PR="yes"
+                    ;;
+
+                writer)
+                    USE_PW="yes"
+                    ;;
+
+                *)
+                    usage
+                    ;;
+                esac
+            done
+        fi
+        unset PLIBS
+        if test -n "${USE_PW}"; then
+            if test -n "${USE_PH}"; then
+                PLIBS="${PLIBS} ${PW_LIB}.hyb"
+            elif test -n "${USE_PM}"; then
+                PLIBS="${PLIBS} ${PW_LIB}.mpi"
+            else
+                echo "PEARL writer currently only available for MPI or hybrid."
+                exit 1
+            fi
+        fi
+        if test -n "${USE_PR}"; then
+            PLIBS="${PLIBS} ${PR_LIB}"
+        fi
+        if test -n "${USE_PH}"; then
+            PLIBS="${PLIBS} ${PH_LIB}"
+        fi
+        if test -n "${USE_PM}"; then
+            PLIBS="${PLIBS} ${PM_LIB}"
+        fi
+        if test -n "${USE_PO}"; then
+            PLIBS="${PLIBS} ${PO_LIB}"
+        fi
+        if test -n "${USE_PB}"; then
+            PLIBS="${PLIBS} ${PB_LIB}"
+        fi
+        echo "-L${LIBDIR} ${PLIBS} ${UT_LIB}"
+       	;;
+
+    *)
+	usage
+	;;
+    esac
+    shift
+done
+
+exit 0

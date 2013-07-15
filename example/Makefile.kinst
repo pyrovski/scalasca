@@ -1,0 +1,116 @@
+include Makefile.defs
+
+# -- NO instrumentation
+KINSTP    =
+KINST     =
+KCONFFLG  =
+KCONFLIB  =
+FKCONFFLG =
+FKCONFLIB =
+ 
+# -- Manual POMP instrumentation
+KINSTP  = kinst-pomp
+# -- Automatic instrumentation (Only for PGI, Hitachi, SUN F90, NEC compiler)
+KINST  = kinst
+# -- Support for manual instrumentation
+KCONFFLG  = -DEPILOG -DVT_INST
+KCONFLIB  = `kconfig --mpi --$(PREC) --libs`
+FKCONFFLG  = $(FDOPT)EPILOG $(FDOPT)VT_INST
+FKCONFLIB  = `kconfig --for --mpi --$(PREC) --libs`
+
+# -- Uncomment if you want to test just MPI case
+MCC = $(MPICC) $(PFLAG)
+MF90 = $(MPIF90) $(PFLAG) $(FPP)
+
+# -- Uncomment if you want to test hybrid case (MPI/OpenMP)
+HCC = $(HYBCC) $(PFLAG) $(OMPFLAG) -DOPENMP
+HF90 = $(HYBF90) $(PFLAG) $(OMPFLAG) $(FPP) $(FDOPT)OPENMP 
+
+# -- Required with and without instrumentation
+KCONFINC  = `kconfig --$(PREC) --cflags`
+FKCONFINC  = `kconfig --for --$(PREC) --cflags`
+
+CPROGS = ctest-mpi ftest-mpi ctest-hyb ftest-hyb
+PPROGS = ctest-pomp-mpi ftest-pomp-mpi ctest-pomp-hyb ftest-pomp-hyb
+MPROGS = ctest-elg-mpi ftest-elg-mpi ctest-elg-hyb ftest-elg-hyb
+VPROGS = ctest-vt-mpi ftest-vt-mpi
+
+all: pomp-progs man-progs vt-progs progs
+
+progs: $(CPROGS)
+pomp-progs: $(PPROGS)
+man-progs: $(MPROGS)
+vt-progs: $(VPROGS)
+
+mpi-progs: ctest-pomp-mpi ftest-pomp-mpi ctest-elg-mpi ftest-elg-mpi \
+	ctest-vt-mpi ftest-vt-mpi ctest-mpi ftest-mpi
+hyb-progs: ctest-pomp-hyb ftest-pomp-hyb ctest-elg-hyb ftest-elg-hyb \
+	ctest-hyb ftest-hyb
+
+c-progs: ctest-pomp-mpi ctest-pomp-hyb ctest-elg-mpi ctest-elg-hyb \
+	ctest-vt-mpi ctest-mpi ctest-hyb
+f-progs: ftest-pomp-mpi ftest-pomp-hyb ftest-elg-mpi ftest-elg-hyb \
+	ftest-vt-mpi ftest-mpi ftest-hyb
+
+
+ctest-mpi: ctest.c
+	rm -f opari.rc
+	$(KINST) $(MCC) ctest.c -o ctest-mpi $(MPILIB) 
+
+ctest-hyb: ctest.c
+	rm -f opari.rc
+	$(KINST) $(HCC) ctest.c -o ctest-hyb $(MPILIB) 
+
+ctest-pomp-mpi: ctest-pomp.c
+	rm -f opari.rc
+	$(KINSTP) $(MCC) ctest-pomp.c -o ctest-pomp-mpi $(MPILIB) 
+
+ctest-pomp-hyb: ctest-pomp.c
+	rm -f opari.rc
+	$(KINSTP) $(HCC) ctest-pomp.c -o ctest-pomp-hyb $(MPILIB) 
+
+ctest-elg-mpi: ctest-elg.c
+	$(MCC) $(KCONFFLG) $(KCONFINC) ctest-elg.c \
+		-o ctest-elg-mpi $(KCONFLIB)
+
+ctest-elg-hyb: ctest-elg.c
+	rm -f opari.rc
+	$(KINSTP) $(HCC) $(KCONFFLG) $(KCONFINC) ctest-elg.c \
+		-o ctest-elg-hyb $(MPILIB)
+
+ctest-vt-mpi: ctest-vt.c
+	$(MCC) $(KCONFFLG) $(KCONFINC) ctest-vt.c \
+		-o ctest-vt-mpi $(KCONFLIB)
+
+ftest-mpi: ftest.F90
+	$(KINST) $(MF90) ftest.F90 -o ftest-mpi $(MPILIB) 
+
+ftest-hyb: ftest.F90
+	rm -f opari.rc
+	$(KINST) $(HF90) ftest.F90 -o ftest-hyb $(MPILIB) 
+
+ftest-pomp-mpi: ftest-pomp.F90
+	rm -f opari.rc
+	$(KINSTP) $(MF90) ftest-pomp.F90 -o ftest-pomp-mpi $(MPILIB) 
+
+ftest-pomp-hyb: ftest-pomp.F90
+	rm -f opari.rc
+	$(KINSTP) $(HF90) ftest-pomp.F90 -o ftest-pomp-hyb $(MPILIB) 
+
+ftest-elg-mpi: ftest-elg.F90
+	$(MF90) $(FKCONFFLG) $(FKCONFINC) ftest-elg.F90 \
+		-o ftest-elg-mpi $(FKCONFLIB)
+
+ftest-elg-hyb: ftest-elg.F90
+	rm -f opari.rc
+	$(KINSTP) $(HF90) $(FKCONFFLG) $(FKCONFINC) ftest-elg.F90 \
+		-o ftest-elg-hyb $(MPILIB)
+
+ftest-vt-mpi: ftest-vt.F90
+	$(MF90) $(FKCONFFLG) $(FKCONFINC) ftest-vt.F90 \
+		-o ftest-vt-mpi $(FKCONFLIB)
+
+clean:
+	rm -rf a.out core a.* *.o
+	rm -f *.inc *.mod.* opari.*
+	rm -f $(CPROGS) $(MPROGS) $(PPROGS) $(VPROGS)

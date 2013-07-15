@@ -1,0 +1,14 @@
+#------------------------------------------------------------------------------
+# CUBE configuration (Qt support)
+#------------------------------------------------------------------------------
+
+#QT_QMAKE            = qmake
+#QT_MKSPEC           = default
+#QT_BUILD_TARGETS    = all-cube3-guiqt
+#QT_INSTALL_TARGETS  = install-cube3-guiqt
+
+CUBE_BUILD_TARGETS     = 
+CUBE_INSTALL_TARGETS   = 
+
+CUBE_BUILD_TARGETS64   = 
+CUBE_INSTALL_TARGETS64 = 

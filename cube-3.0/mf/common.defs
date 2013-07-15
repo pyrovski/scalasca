@@ -1,0 +1,44 @@
+# This file exists for easy integration with the KOJAK/SCALASCA software.
+# Do not edit the definitions below.
+
+#------------------------------------------------------------------------------
+# General Settings
+#------------------------------------------------------------------------------
+
+BINDIR = ${PREFIX}/bin
+LIBDIR = ${PREFIX}/lib
+INCDIR = ${PREFIX}/include
+DOCDIR = ${PREFIX}/doc
+
+# CUBE library version
+CUBEVER = 3.4.3
+
+#------------------------------------------------------------------------------
+# Programs
+#------------------------------------------------------------------------------
+
+MKDIR   = $(TOPDIR)/utils/build/mkinstalldirs
+INSTALL = $(TOPDIR)/utils/build/install-sh
+
+#------------------------------------------------------------------------------
+# Compiler, Linker & Archiver Settings
+#------------------------------------------------------------------------------
+
+CCC       = $(ECC)
+CFLAGS    = $(ECFLAGS)
+CCFLAGS   = $(ECFLAGS)
+CCXX      = $(ECXX)
+CXXFLAGS  = $(ECXXFLAGS)
+CCXXFLAGS = $(ECXXFLAGS)
+CLDFLAGS  = $(LDFLAGS)
+CCXXLIBS  = $(ECXXLIBS)
+
+AR        = $(ECXX_AR)
+ARFLAGS   = $(ECXX_ARFLAGS)
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB_CFLAGS   = -DCUBE_COMPRESSED
+SZLIB_LIB      = -lz

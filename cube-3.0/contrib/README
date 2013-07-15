@@ -1,0 +1,3 @@
+This directory contains a patch file required to compile Qt 4.5.1 with
+IBM's xl compilers version 10. Please read the CUBE3 Installation Guide
+provided in the "doc" directory for details and further instructions.

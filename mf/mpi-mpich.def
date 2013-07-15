@@ -1,0 +1,13 @@
+MPICC     = mpicc -cc="$(CC)"
+MPICXX    = mpicxx -CC="$(CXX)"
+MPIF90    = mpif90 -f90="$(F90)"
+MPILIB    = -lmpich
+PMPILIB   = -lpmpich
+FMPILIB   = -lfmpich
+FMPIOBJ   =
+MPIEXTRA  = -DMPICH_IGNORE_CXX_SEEK
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers

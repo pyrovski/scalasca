@@ -1,0 +1,737 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  Copyright (c) 2009-2013                                                **
+**  German Research School for Simulation Sciences GmbH                    **
+**                                                                         **
+**  Copyright (c) 2003-2008                                                **
+**  University of Tennessee, Innovative Computing Laboratory               **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+                        SCALASCA v1.4.3 OPEN ISSUES
+                        ===========================
+
+                                                           Status: March 2013
+
+This file lists known limitations and unimplemented features of various
+SCALASCA and KOJAK components.
+
+--------------------------------------------------------------------------------
+
+* Platform support
+
+  - SCALASCA has been tested on the following platforms:
+    + IBM Blue Gene/P & Blue Gene/Q
+    + IBM SP & BladeCenter clusters
+    + Cray XT series (including XE & XK)
+    + SGI Altix/ICE
+    + NEC SX-9
+    + Fujitsu FX10 & K computer
+    + various Linux/Intel (x86/x64) clusters (including Intel Xeon Phi)
+    The supplied Makefile definition files may provide a good basis for
+    building and testing the toolset on other systems.
+
+  - The following platforms have not been tested recently:
+    + IBM Blue Gene/L
+    + Cray XT3/4
+    + Sun Solaris/SPARC-based clusters
+    + SiCortex systems
+    + other NEC SX systems
+    However the supplied makefile definition files might still work on
+    these systems.
+
+  - Only the IBM XL compilers are currently supported on Blue Gene systems.
+    Using the GCC compilers is not supported on this platform.
+
+  - CCE/Cray Fortran compiler (crayftn) limitations may preclude using OPARI2
+    to instrument OpenMP (and POMP-annotated) sources.  In such cases,
+    measurement of OpenMP and hybrid OpenMP/MPI applications is not possible.
+
+  - Automatic hardware topology recording is currently only implemented
+    for IBM Blue Gene and Cray XT systems.
+
+  - Each toolset installation can only support one MPI implementation
+    (because MPI is only source-code but not binary compatible). If your
+    systems support more than one MPI implementation (e.g. Linux clusters
+    often do), separate builds for each MPI implementation have to be
+    installed.
+
+  - The same is true if your system features more than one compiler
+    supporting automatic function instrumentation. (see also next section)
+
+  - When using IBM XL Fortran compilers (on AIX or Linux PPC): As the IBM XL
+    Fortran compilers encode subroutine names in lower case without additional 
+    underscores, SCALASCA/KOJAK measurement (which is implemented in C)
+    of Fortran applications will fail if this application uses Fortran
+    subroutine names which are the same as common C standard routines
+    (e.g., open, close, fopen, fclose, mkdir, rename).
+
+  - On platforms where we need to generate wrappers for MPI Fortran routines,
+    such as IBM POE, SGI MPT and Intel MPI, the wrappers may result in value 
+    corruption when using LOGICAL parameters.
+
+  - SCALASCA provides only static measurement libraries, and instrumentation
+    or measurement may fail, be incomplete or otherwise unreliable if used
+    with shared objects or dynamically-linked application libraries.  Static
+    linking improves efficiency and reliability of performance measurements
+    in general, and is therefore highly recommended.
+
+--------------------------------------------------------------------------------
+
+* SKIN application executable instrumenter
+
+  Automatic instrumentation via "skin" or "kinst" is based on (often undocumented)
+  compiler switches
+
+  - GNU  : tested with GCC 3 and higher
+  - PGI  : on Cray XT, cannot handle compiling and linking in one step
+  - CCE  : on Cray XT, tested with version 7.1 and higher
+  - Sun  : only works for Fortran (not C/C++)
+  - IBM  : only works for xlc/xlC version 7.0 and xlf version 9.1 and higher
+           and corresponding bgxl compilers on BlueGene systems
+  - Intel: only works with Intel icc/ifort version 10 and higher compilers
+  - NEC  : tested on NEC SX-8/9
+  - Fujitsu: tested on Fujitsu FX10 & K computer
+  - Pathscale: works as for GCC4
+
+  Support for Intel 10+ and PGI 8+ compilers is based on (older) vendor-specific
+  interfaces, which are configured by default.  These newer compilers also support
+  the GNU instrumentation interface which can be configured manually by copying the
+  compiler interface configuration section of mf/Makefile.defs.linux-gnu into the
+  generated Makefile.defs.  (Intel 9 compilers may be able to use the Intel interface,
+  but would be restricted to a single compilation unit.)
+
+  IBM XL compilers have two incompatible instrumentation interfaces.  When
+  Scalasca is configured using XLC/XLF < 11/13, the old undocumented interface
+  is selected which works with any XLC/XLF > 7.1.1/9.1.1 but has significantly
+  higher overhead.  If Scalasca is configured & installed using XLC/XLF >= 11/13
+  a new interface with significanly lower runtime overhead is used, however, it
+  is incompatible and can't be used with older versions of the compilers.
+  Measurements of instrumented C++ applications will show decorated/mangled
+  rather than demangled routine names if demangling with libiberty is disabled.
+
+  Measurement filtering can only be applied to functions instrumented by the
+  CCE, Fujitsu, IBM, GNU/Pathscale, Intel and PGI compilers.  (Filtering of MPI
+  functions, OpenMP and user-instrumented regions is always ineffective,
+  however, EPK_MPI_ENABLED can be set to desired categories of MPI operations.)
+
+  Function instrumentation based on using the GNU interface has the limitation
+  that instrumented functions in dynamically loaded (shared) libraries are not
+  measured (i.e., implicitly filtered).  When using the Intel interface,
+  instrumented functions that are in dynamically loaded (shared) libraries are
+  measured, however, they cannot be filtered (i.e., filters for them are ineffective).
+
+  The GNU Fortran compiler versions 4.6.0 and 4.6.1 have a bug which leads
+  to an internal compiler error when using automatic function instrumentation.
+  It is therefore recommended to either use an older/newer version of the
+  compiler or to work around this issue by using manual instrumentation or
+  automatic source-code instrumentation based on PDToolkit.
+
+  Because not all compilers support function instrumentation, and most of them
+  have various limitations, an alternative is to use "skin -pomp" together with
+  "POMP directives" for function instrumentation (see Scalasca User Guide,
+  instrumentation section) which portably works on most supported platforms.
+
+  "skin -pomp" (or "skin -comp=none") can also be used when automatic function
+  instrumentation is not desired, such as for measurement of only MPI routines.
+  (In this case, only the final link command needs to be prefixed.)
+
+  For MPI+OpenMP codes, link-only instrumentation will result in measurements
+  containing only MPI routines: the OpenMP threads are included without
+  any measurement data.  Generally, it will be preferable to ignore the
+  OpenMP threads entirely by explicitly using "skin -comp=none -mode=MPI".
+
+  The instrumenter utilities ("skin", "kinst" & "kinst-pomp") attempt to
+  determine the appropriate EPIK measurement library to link by parsing the
+  compilation/link commands.
+
+  If the compiler/linker is not recognised as an MPI compiler front-end
+  and no MPI library is explicitly linked, an EPIK measurement library
+  without MPI support is used, and measurement will appear to consist of
+  independent (non-MPI) processes.  A workaround in this case may be to
+  explicitly specify a redundant "-lmpi" or "-lmpich" when linking
+  (which needs to be specified in such a location on the link line that
+  it comes before a second one implicitly inserted by the linker).
+
+  This workaround is not required on Cray XT systems, as these are explicitly
+  configured to *always* link an EPIK measurement library with MPI support.
+  For pure OpenMP (without MPI) on Cray systems it may therefore be necessary
+  to explicitly specify "-mode=omp".  
+
+  For compilers which enable OpenMP by default (such as CCE compilers), it is
+  necessary to explicitly include the appropriate OpenMP activation switch
+  (e.g., -homp) so that the instrumenter also enables OpenMP instrumentation.
+
+  During installation, a default build mode (32- or 64-bit) is determined,
+  and this is then implied when a build mode is not explicitly specified
+  during compilation and linking.  On systems with different defaults for
+  MPI and non-MPI builds, the build mode determined by the instrumenter
+  may be wrong and linking will fail with incompatible object formats.
+  A workaround in this case is to explicitly specify the build mode when
+  linking to ensure that the correct measurement library version is chosen.
+
+  Using SKIN as a compiler/linker preposition is sometimes not supported
+  by application build systems, e.g., CMake.  In such cases, it may be 
+  appropriate to create scripts which invoke the compiler/linker with the
+  SKIN preposition defined.  For example, specify skin_ftn as the compiler
+  and linker during application configuration, where this is a script
+  executing your Fortran compiler as "skin ftn $*".
+
+--------------------------------------------------------------------------------
+
+* SCAN collection & analysis launcher
+
+  This utility attempts to parse MPI launcher commands to be able to launch
+  measurement collection along with subsequent trace analysis when appropriate.
+  It also attempts to determine whether measurement and analysis are likely
+  to be blocked by various configuration issues, before performing the actual
+  launch(es).  Such basic checks might be invalid in certain circumstances,
+  and inhibit legitimate measurement and analysis launches.
+
+  While it has been tested with a selection of MPI launchers (on different
+  systems, interactively and via batch systems), it is not possible to test
+  all versions, combinations and configuration/launch arguments, and if the
+  current support is inadequate for a particular setup, details should be
+  sent to the developers for investigation.  In general, launcher flags that
+  require one or more arguments can be ignored by SCAN if they are quoted,
+  e.g., $MPIEXEC -np 32 "-ignore arg1 arg2" target arglist
+  would ignore the "-ignore arg1 arg2" flag and arguments.
+  
+  Although SCAN parses launcher arguments from the given command-line (and
+  in certain cases also launcher environment variables), it does not parse
+  launcher configurations from command-files (regardless of whether they are
+  specified on the command-line or otherwise).  Since the part of the
+  launcher configuration specified in this way is ignored by SCAN, but will
+  be used for the measurement and analysis steps launched, this may lead to
+  undesirable discrepancies.  If command-files are used for launcher
+  configuration, it may therefore be necessary or desirable to repeat some of
+  their specifications on the command-line to make it visible to SCAN.
+
+  SCAN only parses the command-line as far as the target executable, assuming
+  that subsequent flags/parameters are intended solely for the target itself.
+  Unfortunately, some launchers (notably POE) allow MPI configuration options
+  after the target executable, where SCAN won't find them and therefore won't
+  use them when launching the parallel trace analyzer.  A workaround is to
+  specify POE configuration options via environment variables instead, e.g.,
+  specify MP_PROCS instead of -procs.
+
+  SCAN uses getopt_long_only typically from "liberty" to parse launcher options.
+  Older versions seem to have a bug that fails to stop parsing when the first
+  non-option (typically the target executable) is encountered: a workaround in
+  such cases is to insert "-- " in the commandline before the target executable,
+  e.g., scan -t mpirun -np 4 -- target.exe arglist.
+
+  If an MPI launcher is used that is not recognised by SCAN, such as one
+  that has been locally customized, it can be specified via an environment
+  variable, e.g., SCAN_MPI_LAUNCHER=mympirun, to have SCAN accept it.
+  Warning: In such a case, SCAN's parsing of the launcher's arguments may fail.
+
+  Some MPI launchers result in some or all program output being buffered
+  until execution terminates.  In such cases, SCAN_MPI_REDIRECT can be set
+  to redirect program standard and error output to separate files in the
+  experiment archive.
+
+  If necessary, or preferred, measurement and analysis launches can be performed
+  without using SCAN, resulting in "default" measurement collection or explicit
+  trace analysis (based on the effective EPIK configuration).  If environment
+  variables are neither automatically nor explicitly exported to MPI processes,
+  the EPIK.CONF configuration file needs to be used.
+
+--------------------------------------------------------------------------------
+
+* EPIK measurement system
+
+  - The EPIK runtime measurement system produces experiment archives that
+    can only be analyzed with the SCOUT parallel analyzer (by default).
+    For sequential analysis with EXPERT, the generated per-process traces
+    have to merged first using the "elg_merge" utility.
+
+  - The EPK_GDIR configuration variable specifies the directory containing
+    the EPIK measurement archive (epik_<EPK_TITLE>).  An additional variable,
+    EPK_LDIR, allows a temporary location to be used as intermediate storage,
+    before the data is finally archived in EPK_GDIR.  Generally, the file I/O
+    overhead of transfering data from the intermediate storage location
+    is best avoided by leaving EPK_LDIR set to the same location as EPK_GDIR,
+    so that files are written directly into the experiment archive.
+
+  - The buffers used by EPIK for definitions records are sized according to
+    the configuration variable ESD_BUFFER_SIZE.  If any of these buffers fill
+    during measurement, the resulting experiment archive will not be
+    analyzable: in such cases, it will be necessary to repeat measurement
+    having configured a larger ESD_BUFFER_SIZE as indicated by the associated
+    EPIK message during measurement finalization.  (In some cases, even this
+    larger ESD_BUFFER_SIZE may need to be increased a second time.)
+
+  - The storage capacity for call-path tracking and associated summary
+    measurement data is controlled via the configuation variable ESD_PATHS.
+    If additional call-paths are encountered during measurement, these are
+    distinguished with an "unknown" marker, however, the precise number of such
+    call-paths cannot be determined.  If unknown call-paths are reported at
+    measurement finalization or appear in the resulting analysis report,
+    it is advisable to increase (e.g., double) ESD_PATHS and re-measure.
+    After a successful measurement (with no unknown call-paths), ESD_PATHS
+    can be reduced to the actual number of unique call-paths to reduce memory
+    requirements for subsequent measurements.
+
+  - Note that function filtering (where supported) or selective function
+    instrumentation often significantly reduces the number of unique call-paths.
+    It is therefore often advisable to examine measurements reports containing
+    unknown callpaths for undesirable functions.  Highly-recursive functions are
+    particularly undesirable since they result in significant measurement bloat.
+
+  - If call-path tracking inconsistencies are reported during measurement,
+    these may need careful examination by one of the toolset developers,
+    as they can indicate problems with the compiler-generated instrumentation.
+    On the other hand, applications which abort or explicitly exit prematurely
+    (without returning from "main") will also result in measurement warnings
+    which can often be ignored.
+
+  - No measurement is possible for MPI applications which abort or otherwise
+    fail to call MPI_Finalize on all processes.
+
+  - Measurement of MPI application processes which do not call MPI_Init
+    (or MPI_Init_thread) or where the EPIK library linkage has not allowed
+    interposition on MPI calls will abort with the message
+    "MPI_Init interposition unsuccessful!"
+
+  - The C++ compilers on Cray XT systems fork additional processes
+    which also result in the above abort messages (which can be ignored if
+    the measurement otherwise appears complete).
+
+  - The EPIK MPI adapter does not support the MPI C++ language bindings
+    (deprecated since MPI 2.2) directly. Measurement of applications using
+    the MPI C++ bindings will only work if the MPI library implements the
+    C++ bindings as a lightweight wrapper on top of the MPI C bindings.
+    Failure is often reported as "MPI_Init interposition unsuccessful!"
+
+  - The EPIK MPI adapter can only handle precompiled numbers of simultaneous
+    communicators, windows and window accesses (set to 50 in the sources),
+    and measurement will be aborted if this limit is exceeded.
+
+  - The EPIK MPI adapter does not distinguish time in MPI_Wait*/Test*
+    operations for non-blocking file I/O from communication requests.
+    In summary and trace analysis reports, all such time is attributed to 
+    MPI Point-to-point Communication time (and none to MPI File I/O time).
+
+  - The EPIK MPI adapter is not able to disable the MINI routines at
+    runtime, if they were enabled during Scalasca configuration: they are
+    not enabled unless --enable-all-mpi-wrappers is used when configuring,
+    and can then only be disabled adding --disable-mpi-wrappers=MINI.
+
+  - PAPI native counter names which include colon characters need to be
+    escaped ("\:") to distinguish them from the colons used to separate
+    counter names in EPIK metric specifications.
+
+  - EPIK and EPILOG library interfaces and file/directory formats
+    are *UNSTABLE* and very likely to change.
+
+--------------------------------------------------------------------------------
+
+* EPILOG trace library and tools
+
+  - The EPILOG trace tools (e.g., elg_print, elg_stat, elg_timecorrect,
+    elg_merge, etc.) don't yet support EPIK experiment archives. KOJAK
+    components (i.e., EARL and EXPERT) also lack this support.
+
+  - Care is required when selecting an appropriate buffer size for tracing.
+    The default trace buffer size (ELG_BUFFER_SIZE) for each process is
+    rather small and typically only adequate for very short traces. It is
+    therefore recommended to set the trace buffer size as large as available
+    memory permits: if too large a size is specified, the application will
+    be unable to run or fail to acquire memory.
+
+  - Whenever a process fills its trace buffer, the buffer contents are
+    automatically flushed to file and the buffer emptied to allow tracing to
+    continue.  While this flushing is marked as Overhead in subsequent
+    analysis, generally all other processes will block at their next
+    synchronisation and this is not distinguished in analysis.  Furthermore,
+    processes typically don't all fill their trace buffers simultaneously,
+    but their behaviour is often sufficiently similar that immediately
+    following one flush, a chain reaction of (sequential) flushes occurs as
+    each process in turn fills, flushes and empties its trace buffer, yet
+    must subsequently block on a synchronisation with a process that is
+    flushing.  This exponential perturbation typically compromises all
+    timings in the resulting measurement/analysis, though it may still help
+    to identify excessively visited callpaths and/or a more appropriate
+    buffer size for subsequent instrumentation/measurement configuration. 
+
+  - elg_timecorrect attempts to correct logical time inconsistencies in
+    EPILOG trace fles, however, it currently only recognizes point-to-point
+    communication.  Traces containing collective communication and/or
+    (OpenMP) multithreading may therefore be corrupted by elg_timecorrect.
+    Measurements made on systems with accurately synchronised high resolution
+    timers should not need post-measurement time correction.
+
+  - By default, separate trace files are created for every thread and process,
+    Even with a SIONlib-enabled version of Scalasca, separate files are used
+    equivalent to ELG_SION_FILES=0.  ELG_SION_FILES should be set to specify
+    the number of SION files to be used.  If more SION files are requested
+    than MPI processes, it is reduced to the total number of MPI processes.
+    If -1 is specified, an appropriate number of SION files may be determined
+    automatically (e.g., one file per IONode or bridge on BlueGene systems,
+    or one file per MPI process for MPI+OpenMP executions).
+
+  - SIONlib is not used by Scalasca for serial (non-OpenMP, non-MPI) traces.
+    Event trace data for several MPI processes is typically also stored in
+    separate SION files.  For OpenMP and hybrid OpenMP+MPI traces, SIONlib
+    stores trace data for each OpenMP thread (of an MPI process) in a single
+    SION file:  in such cases, merging of events from each thread and
+    re-writing trace files is avoided when using SIONlib, resulting in much
+    better scalability and I/O efficiency even at small scale.
+
+  - EPILOG utilities (elg_print, elg_merge, etc.) do not work with SION files.
+    As a consequence, EXPERT can also not be used to analyze SION traces.
+
+  - The Vampir interactive trace visualizer [www.vampir.eu] is not yet able to
+    handle event traces in SION files.  When desired, SION files can be unpacked
+    using sionsplit for analysis with recent versions of Vampir.
+
+--------------------------------------------------------------------------------
+
+* SCOUT parallel trace analysis
+
+  - The OpenMP and hybrid MPI/OpenMP versions of the SCOUT parallel trace
+    analyzer (and its associated libraries) have been found not to build with
+    PGI pgCC versions 10.5 and later, and while earlier versions can be used
+    to build SCOUT they are unlikely to execute correctly.  Consequently,
+    OMPCXX and HYBCXX are commented out in Makefile.defs and the corresponding
+    scout.omp and scout.hyb executables are not built.  Pathscale and other
+    compilers may have similar problems and also need the same treatment.
+
+  - If it is not possible to build the required versions of SCOUT, or it fails
+    to run reliably, it may be possible to substitute a version built with a
+    different compiler (such as GCC) when doing measurement collection & analysis
+    (e.g., in a batch job).
+
+  - The MPI and hybrid MPI/OpenMP versions of the SCOUT parallel analyzer must
+    be run as an MPI program with exactly the same number of processes as
+    contained in the experiment to analyse: typically it will be convenient to
+    launch SCOUT immediately following the measurement in a single batch script
+    so that the MPI launch command can be configured similarly for both steps.
+    The SCAN nexus executes SCOUT with the appropriate launch configuration
+    when automatic trace analysis is specified.
+
+  - If the appropriate variant of SCOUT (e.g., scout.hyb for hybrid OpenMP/MPI)
+    is not located by SCAN, it attempts to substitute an alternative variant
+    which will generally result in only partial trace analysis (e.g., scout.mpi
+    will ignore OpenMP events in hybrid traces).
+
+  - SCOUT is unable to analyze hybrid OpenMP/MPI traces of applications using
+    MPI_THREAD_MULTIPLE and generally unable to handle MPI_THREAD_SERIALIZED,
+    therefore it is typically necessary to enforce use of MPI_THREAD_FUNNELED.
+
+  - SCOUT is unable to analyse incomplete traces or traces that it is unable
+    to load entirely into memory.  Experiment archives are portable to other
+    systems where sufficient processors with additional memory are available
+    and a compatible version of SCOUT is installed, however, the size of
+    such experiment archives typically prohibits this.
+
+  - SCOUT requires user-specified instrumentation blocks to correctly nest
+    and match for it to be able to analyse resulting measurement traces.
+    Similarly, collective operations must be recorded by all participating
+    processes and messages recorded as sent (or received) by one process must
+    be recorded as received (or sent) by another process, otherwise SCOUT
+    can be expected to deadlock during trace analysis.
+
+  - SCOUT ignores hardware counter measurements recorded in traces.
+    If measurement included simultaneous runtime summarization and tracing,
+    the two reports are automatically combined during experiment post-processing.
+
+  - SCOUT does not calculate "MPI File Bytes Transferred" metrics: these are
+    only available in runtime summary measurements.
+
+  - SCOUT may deadlock and be unable to analyse measurement experiments:
+    should you suspect this to be the case, please save the experiment
+    archive and contact the Scalasca development team for it to be investigated.
+
+  - SCOUT can only handle SION files in the same mode (OpenMP, OpenMP+MPI or
+    MPI): in particular, scout.mpi is unable to handle OpenMP+MPI SION files.
+    Traces from OpenMP+MPI applications with only MPI (linking) instrumentation
+    are also not handled and may result in scout.hyb crashes or deadlocks.   
+    Other utilities (e.g., clc_synchronize) are similarly limited to handling
+    only MPI SION files in MPI mode.  (Where there is a separate SION file for
+    each MPI process, hybrid OpenMP+MPI is also expected to work.)
+
+  - Scalasca traces that SCOUT is unable to analyse may still be visualized and
+    interactively analyzed by 3rd-party tools such as VAMPIR (7.3 or later).
+
+--------------------------------------------------------------------------------
+
+* CUBE3 analysis report explorer
+
+  - CUBE3 consists of libraries for producing analysis reports (cubefiles)
+    and an (optional) GUI for analysis report browsing.  These library APIs
+    and the resulting cubefiles are incompatible with previous CUBE versions,
+    i.e., earlier versions of the GUI and tools cannot read the cubefiles
+    produced by the CUBE3-based tools in this release. However, the CUBE3 GUI
+    and algebra tools provided in this release are able to process cubefiles
+    produced by the previous version CUBE2.
+
+  - It may be necessary to explicity set a locale (e.g., LANG=C) and/or
+    run "dbus-launch" when using the Qt-based GUI.
+
+  - Only one topology can be visible at a time: to switch to another topology
+    in the WX-based GUI return to the System Tree and then select Topology View again.
+
+  - On Cray XT systems, the physical machine topology is generated during the
+    remapping of intermediate cube reports.  The number of cores per node is
+    automatically determined, but can be modified by setting environment
+    variable XT_NODE_CORES as appropriate.
+
+  - CUBE4 is able to read CUBE3 files (albeit much more slowly than CUBE3),
+    however, CUBE4 files are incompatible with CUBE3.  Library interfaces and
+    file formats are *UNSTABLE* and likely to change.
+
+--------------------------------------------------------------------------------
+
+* Multi-executable MPMD analysis
+
+  - Measurement and analysis of applications consisting of multiple executables
+    is possible but typically requires following a few rules and providing
+    additional assistance to Scalasca.  Symmetric executions on Intel Xeon
+    hosts and Xeon Phi coprocessors are a special case of heterogeneous
+    multi-executable measurements.
+
+  - If MPI is not used to launch the executables, separate experiments will be
+    produced for each instrumented executable.  If they produce experiments in
+    the same directory, they will need to have unique experiment titles.
+    
+  - If executables are launched on hosts that don't share a common filesystem,
+    trace experiments require that appropriate paths to the experiment archive
+    (or working) directory are provided for each MPI process.
+
+  - If MPI is used to launch and connect a set of executables, then each must
+    be instrumented by (the same version of) Scalasca.  If any of the
+    executables additionally uses OpenMP, then all of the executables should
+    be instrumented specifying MPI+OMP mode when linking.  (If the executable
+    that provides MPI rank 0 uses OpenMP+MPI it may be sufficient.)
+
+  - While each executable may be provided with a distinct EPIK measurement
+    configuration, they must all be configured for the same type of experiment,
+    i.e., runtime summarization and/or tracing.  If hardware counter metrics
+    are specified, EPK_METRICS should be identical for all processes.
+
+  - EPIK reports of routines filtered and required buffer sizes may not be
+    accurate (as they are likely to differ for each executable).
+
+  - The SCAN measurement collection and analysis nexus typically only considers
+    the first executable when checking for Scalasca instrumentation and setting
+    the default experiment title.  The total number of processes in the title
+    may not be accurate: SCAN_MPI_RANKS can be set to specify the actual number
+    when performing a measurement experiment.
+
+  - When a command file is used to specify the executables to be launched
+    (e.g., POE -cmdfile) its contents are not examined by SCAN.  It may be
+    therefore be necessary to specify one of the instrumented executables
+    (which will title the experiment) on the command line after a double-dash,
+    e.g.,
+
+    % poe -pgmmodel mpmd -cmdfile exe.lst 
+    % scalasca -analyze  poe -pgmmodel mpmd -cmdfile exe.lst -- master.exe
+
+  - Scalasca analysis reports containing parts from multiple executables can be
+    partitioned using the cube3_part utility.
+
+--------------------------------------------------------------------------------
+
+* SHMEM communication analysis
+
+  - Support for SHMEM communication analysis is based on the serial EXPERT
+    trace analyzer.
+  - SHMEM is currently only supported with IBM TurboSHMEM. Especially
+    Cray SHMEM support is NOT implemented yet.
+  - Due to the lack of freely available applications using the one-sided
+    communication paradigm, these toolset components tend to be less well
+    tested than others.
+
+  It is planned to address these limitations in future releases.
+
+--------------------------------------------------------------------------------
+
+* OpenMP analysis
+
+  - The measurement and analysis components cannot handle OpenMP programs which
+    use nested or task parallelism. Even disabling nesting may not help.
+
+  - The same team of threads are expected to be used throughout execution,
+    i.e., OMP_NUM_THREADS threads.  If a larger number is used for any parallel
+    region (e.g., via the "num_threads(#)" clause or "set_num_threads(#)"
+    intrinsic function) these are not included in the measurement by default.
+    In such cases, ESD_MAX_THREADS may be used to specify the maximum number of
+    threads (on each process) for which measurements will be recorded. 
+    Automatic trace analysis will not be possible even in this case, nor if
+    smaller teams are used or regions are not executed in parallel due to an
+    "if" clause.
+
+  - SCAN automatic trace analysis of hybrid MPI/OpenMP applications primarily
+    is done with an MPI/OpenMP version of the SCOUT trace analyzer (scout.hyb).
+    When this is not available, or when the MPI-only version of the trace
+    analyzer (scout.mpi) is specified, analysis results are provided for the
+    master threads only.  Alternatively, if the trace files can be merged
+    (via elg_merge), the EXPERT trace analyzer may be used, and its report
+    includes analysis results for all threads and additional OpenMP-specific
+    performance metrics.
+
+  - OpenMP 3.0 is only partially supported. TASK directives in the
+    code lead to an error during instrumentation and/or measurement.
+
+  - The OPARI2 preprocessor is used for instrumenting OpenMP
+    applications.  OPARI2, being a simple source-to-source
+    transformation tool, has several OpenMP related restrictions. See
+    next section.
+
+    It is planned to address these limitations in future releases.
+
+--------------------------------------------------------------------------------
+
+* OPARI2
+
+  This section provides some background on how OPARI2 works, so you can
+  better understand how to use it for instrumenting "real" applications.
+  Unfortunately, in its current state, it does not always work as
+  automatically as would be desirable, and various workarounds are required.
+
+  NOTE: In the following description "kinst" is used as a synonym for
+        "scalasca -instrument" or "skin" and "kinst-pomp" as a synonym
+        for "scalasca -instrument -pomp" or "skin -pomp".
+
+  OPARI2 Basic Description
+  ------------------------
+
+  OPARI2 is used for two purposes:
+  1) Instrumentation of OpenMP constructs
+  2) Activation of manual instrumentation using "POMP directives"
+
+  For each source file "<base>.<ext>", OPARI2 as called by the instrumenter
+  scripts does the following:
+  1) Create a modified (instrumented) file "<base>.mod.<ext>".
+  2) Create an instrumentation descriptor file named "<base>.<ext>.opari.inc"
+     which contains the corresponding instrumentation descriptor definitions.
+  3) All temporary intermediate files
+     are automatically removed when they are no longer needed
+     (unless the verbose flag was specified when instrumenting).
+
+
+  Note to users of earlier versions of Scalasca
+  ---------------------------------------------
+
+  In the previous version, OPARI ran into problems when the source files
+  were distributed over multiple directories or multiple targets were
+  built inside a directory. The options -rcfile and -table to work 
+  around these limitations are now deprecated.
+
+  Known issues
+  ------------
+
+  - All languages
+
+      + OPARI2 processes source files before the compiler preprocessor,
+        so macros and included files are not processed.  Conditionally
+        compiled source code is also not resolved and can therefore
+        result in erroneous instrumentation of partial OpenMP constructs.
+
+      + Sources containing OpenMP used within the scope of Intel "offload"
+        pragmas/directives are not instrumented correctly and will fail to
+        compile: this may be fixed with OPARI2-1.0.8 or a later release.
+
+      + The instrumented source files generated by OPARI2 may confuse
+        automatic dependency tracking by "make", "autotools", etc.
+        For autotools, configure with "--disable-dependency-tracking".
+
+      + Literal file-filter rules like "INCLUDE bt.f" for files that will
+        be processed by OPARI2 do not work, as OPARI2 changes the file
+        name (e.g., to bt.mod.F).
+
+      + Some OpenMP compilers (e.g. PGI) are non-standard-conforming
+        in the way they process OpenMP directives by not allowing
+        macro replacement of OpenMP directive parameters. This results
+        in error messages containing references to POMP_DLIST_#####
+        where ##### is a five-digit number.  In this case, try to use
+        the OPARI2 option "--nodecl". This is unfortunately not a
+        perfect workaround, as this can trigger other errors in some
+        rare cases.
+
+      + Sometimes instrumentation of OpenMP source files work, but the
+        traces get enormously large because the application is using
+        large numbers (millions) of small OpenMP synchronisation
+        operations like atomic, locks or flushes which are
+        instrumented by default.  Also, in that case, the
+        instrumentation overhead might become excessive.
+
+        In that case, you can tell OPARI2 not to instrument these
+        constructs by using the
+        "--disable=<construct>[,<construct>]..." option.  Valid values
+        for constructs are:
+
+          atomic, critical, flush, locks, master, ordered, single
+
+        or "sync" which disables all of the above.
+
+        Of course, then these constructs are not measured and you have
+        to keep this in mind later, when you analyze the results, that
+        although they do not show up in the analysis report that the
+        application might have some performance problem because of too
+        many OpenMP synchronisation calls!
+
+
+  - Fortran:
+
+      + The !$OMP END DO and !$OMP END PARALLEL DO directives are required
+        (and are not optional as described in the OpenMP specification).
+
+      + The atomic expression controlled by a !$OMP ATOMIC directive has
+        to be on a line all by itself.
+
+      + The Fortran95 statement terminator (";") is not handled correctly
+        when it is used within parallel loops.
+
+      + Identifiers containing Fortran keywords (such as "do", "function",
+        "module" or "subroutine") may result in incorrect instrumentation.
+
+      + If an #ifdef block is used at the beginning of the variable
+        definition part, instrumentation is incorrectly inserted within
+        the block and not compiled later when the evaluation is false.
+        (A workaround is to move the conditional variable definition
+        after some unconditional definitions.)
+
+      + Some Fortran compilers (e.g., Sun) don't fully support C
+        preprocessor commands, especially the "#line" commands.  In
+        case you track a compilation error on a OPARI2
+        modified/instrumented file down to such a statement, try using
+        "--nosrc" as this suppresses the generation of "#line"
+        statements.  (With the Sun Fortran compiler, using "-xpp=cpp"
+        is a better workaround.)
+
+      + Some Fortran compilers (e.g., IBM XLF) don't disable C trigraph
+        substitution when preprocessing and leading to compilation errors.
+        (With IBM XF compilers, adding "-d -WF,-qlanglvl=classic" can be
+        used as a workaround, however, line numbers will be inaccurate.)
+
+      + The first SECTION directive inside a SECTIONS workshare directive
+        is required (and is not optional as described in the OpenMP
+        specification).
+
+      + OPARI instrumentation includes declarations of unnecessary
+        variables (particularly in routines which don't use OpenMP)
+        which result in numerous warnings if -Wunused or -Wall are used,
+        or compilation errors in conjunction with -Werror.
+
+  - C/C++:
+
+      + Structured blocks describing the extend of an OpenMP pragma need
+        to be either compound statements {....}, while loops, or simple
+        statements.  In addition, for loops are supported after omp for
+        and omp parallel for pragmas. Complex statements like if-then-else
+        or do-while need to be enclosed in a block ( {....} ).
+
+      + C99 6.10.9 _Pragma operators are not supported.
+
+  It is planned to address these limitations in future releases.
+
+--------------------------------------------------------------------------------
+

@@ -1,0 +1,169 @@
+#****************************************************************************
+#*  SCALASCA    http://www.scalasca.org/                                   **
+#****************************************************************************
+#*  Copyright (c) 1998-2013                                                **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#***************************************************************************/
+
+
+PATTERN "MPI_CLS_COUNT" = [
+  PARENT    = "COMMS_RECV"
+  NAME      = "Late Senders"
+  DOCNAME   = "Late Sender Instances (Communications)"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_CLS_Count"
+  INFO      = "Number of Late Sender instances in communications"
+  DESCR     = {
+    Provides the total number of Late Sender instances ( see
+    @ref(MPI_LATESENDER) for details) found in point-to-point communication
+    operations.
+  }
+  UNIT      = "occ"
+  CALLBACKS = [
+    "LATE_SENDER" = {
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND_LS);
+
+      if (send->get_sent() != 0)
+        ++m_severity[event.get_cnode()];
+    }
+  ]
+]
+
+
+PATTERN "MPI_CLSWO_COUNT" = [
+  PARENT    = "MPI_CLS_COUNT"
+  NAME      = "Messages in Wrong Order"
+  DOCNAME   = "Late Sender, Wrong Order Instances (Communications)"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_CLSWO_Count"
+  INFO      = "Number of Late Sender instances in communications were messages are received in wrong order"
+  DESCR     = {
+    Provides the total number of Late Sender instances found in
+    point-to-point communication operations were messages where sent in
+    wrong order (see also @ref(MPI_LATESENDER_WO)).
+  }
+  UNIT      = "occ"
+  CALLBACKS = [
+    "LATE_SENDER_WO" = {
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND_LSWO);
+      Event       recv = data->m_local->get_event(ROLE_RECV_LSWO);
+
+      if (send->get_sent() != 0)
+        ++m_severity[recv.get_cnode()];
+    }
+  ]
+]
+
+
+PATTERN "MPI_CLR_COUNT" = [
+  PARENT    = "COMMS_SEND"
+  NAME      = "Late Receivers"
+  DOCNAME   = "Late Receiver Instances (Communications)"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_CLR_Count"
+  INFO      = "Number of Late Receiver instances in communications"
+  DESCR     = {
+    Provides the total number of Late Receiver instances (see
+    @ref(MPI_LATERECEIVER) for details) found in point-to-point
+    communication operations.
+  }
+  UNIT      = "occ"
+  DATA      = {
+    rem_sev_container_t m_remote_sev;
+  }
+  CALLBACKS = [
+    "LATE_RECEIVER" = {
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND_LR);
+
+      if (send->get_sent() != 0)
+        ++m_remote_sev[send.get_location()][send.get_cnode()->get_id()];
+    }
+
+    "FINISHED" = {
+      exchange_severities(*(data->m_defs), m_remote_sev);
+    }
+  ]
+]
+
+
+PATTERN "MPI_SLS_COUNT" = [
+  PARENT    = "SYNCS_RECV"
+  NAME      = "Late Senders"
+  DOCNAME   = "Late Sender Instances (Synchronizations)"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_SLS_Count"
+  INFO      = "Number of Late Sender instances in synchronizations"
+  DESCR     = {
+    Provides the total number of Late Sender instances (see
+    @ref(MPI_LATESENDER) for details) found in point-to-point
+    synchronization operations (i.e., zero-sized message transfers).
+  }
+  UNIT      = "occ"
+  CALLBACKS = [
+    "LATE_SENDER" = {
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND_LS);
+
+      if (send->get_sent() == 0)
+        ++m_severity[event.get_cnode()];
+    }
+  ]
+]
+
+
+PATTERN "MPI_SLSWO_COUNT" = [
+  PARENT    = "MPI_SLS_COUNT"
+  NAME      = "Messages in Wrong Order"
+  DOCNAME   = "Late Sender, Wrong Order Instances (Synchronizations)"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_SLSWO_Count"
+  INFO      = "Number of Late Sender instances in synchronizations were messages are received in wrong order"
+  DESCR     = {
+    Provides the total number of Late Sender instances found in
+    point-to-point synchronization operations (i.e., zero-sized message
+    transfers) where messages are received in wrong order (see also
+    @ref(MPI_LATESENDER_WO)).
+  }
+  UNIT      = "occ"
+  CALLBACKS = [
+    "LATE_SENDER_WO" = {
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND_LSWO);
+      Event       recv = data->m_local->get_event(ROLE_RECV_LSWO);
+
+      if (send->get_sent() == 0)
+        ++m_severity[recv.get_cnode()];
+    }
+  ]
+]
+
+
+PATTERN "MPI_SLR_COUNT" = [
+  PARENT    = "SYNCS_SEND"
+  NAME      = "Late Receivers"
+  DOCNAME   = "Late Receiver Instances (Synchronizations)"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_SLR_Count"
+  INFO      = "Number of Late Receiver instances in synchronizations"
+  DESCR     = {
+    Provides the total number of Late Receiver instances (see
+    @ref(MPI_LATERECEIVER) for details) found in point-to-point
+    synchronization operations (i.e., zero-sized message transfers).
+  }
+  UNIT      = "occ"
+  DATA      = {
+    rem_sev_container_t m_remote_sev;
+  }
+  CALLBACKS = [
+    "LATE_RECEIVER" = {
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND_LR);
+
+      if (send->get_sent() == 0)
+        ++m_remote_sev[send.get_location()][send.get_cnode()->get_id()];
+    }
+
+    "FINISHED" = {
+      exchange_severities(*(data->m_defs), m_remote_sev);
+    }
+  ]
+]

@@ -1,0 +1,1248 @@
+#****************************************************************************
+#*  SCALASCA    http://www.scalasca.org/                                   **
+#****************************************************************************
+#*  Copyright (c) 1998-2013                                                **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#***************************************************************************/
+
+
+#--- MPI-related performance patterns ---------------------------------------
+
+PROLOG {
+  #include <algorithm>
+  #include <cctype>
+  #include <cfloat>
+  #include <functional>
+  #include <list>
+
+  #include <elg_error.h>
+
+  #include <CallbackManager.h>
+  #include <Location.h>
+  #include <Process.h>
+
+  #if defined(_MPI)
+    #include <EventSet.h>
+    #include <Group.h>
+    #include <MpiComm.h>
+    #include <MpiMessage.h>
+    #include <RemoteEventSet.h>
+
+    #include "MpiDatatypes.h"
+    #include "MpiOperators.h"
+  #endif   // _MPI
+
+  #include "Predicates.h"
+  #include "Roles.h"
+  #include "scout_types.h"
+  #include "user_events.h"
+
+
+  //--- Utility functions -----------------------------------------------------
+
+  namespace
+  {
+
+  struct fo_tolower : public std::unary_function<int,int> {
+    int operator()(int x) const {
+      return std::tolower(x);
+    }
+  };
+
+  string lowercase(const std::string& str)
+  {
+    string result(str);
+
+    std::transform(str.begin(), str.end(), result.begin(), fo_tolower());
+
+    return result;
+  }
+
+  }   // unnamed namespace
+}
+
+
+PATTERN "MPI" = [
+  PARENT    = "EXECUTION"
+  NAME      = "MPI"
+  DOCNAME   = "MPI Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI"
+  INFO      = "Time spent in MPI calls"
+  DESCR     = {
+    This pattern refers to the time spent in (instrumented) MPI calls.
+  }
+  DIAGNOSIS = {
+    Expand the metric tree to determine which classes of MPI operation
+    contribute the most time. Typically the remaining (exclusive) MPI Time,
+    corresponding to instrumented MPI routines that are not in one of the
+    child classes, will be negligible. There can, however, be significant
+    time in collective operations such as <tt>MPI_Comm_create</tt>,
+    <tt>MPI_Comm_free</tt> and <tt>MPI_Cart_create</tt> that are considered
+    neither explicit synchronization nor communication, but result in
+    implicit barrier synchronization of participating processes. Avoidable
+    waiting time for these operations will be reduced if all processes
+    execute them simultaneously. If these are repeated operations, e.g., in
+    a loop, it is worth investigating whether their frequency can be
+    reduced by re-use.
+  }
+  UNIT      = "sec"
+  HIDDEN
+  CALLBACKS = [
+    "ENTER" = {
+      Region* region = event->get_region();
+
+      if (is_mpi_init(region))
+        cbmanager.notify(INIT, event, data);
+      else if (is_mpi_finalize(region))
+        cbmanager.notify(FINALIZE, event, data);
+    }
+  ]
+]
+
+
+PATTERN "MPI_SYNCHRONIZATION" = [
+  PARENT    = "MPI"
+  NAME      = "Synchronization"
+  DOCNAME   = "MPI Synchronization Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_Sync"
+  INFO      = "Time spent in MPI barrier calls"
+  DESCR     = {
+    This pattern refers to the time spent in MPI explicit synchronization
+    calls, i.e., barriers. Time in point-to-point messages with no data
+    used for coordination is currently part of @ref(MPI_POINT2POINT).
+  }
+  DIAGNOSIS = {
+    Expand the metric tree further to determine the proportion of time in
+    different classes of MPI synchronization operations. Expand the
+    calltree to identify which callpaths are responsible for the most
+    synchronization time. Also examine the distribution of synchronization
+    time on each participating process for indication of load imbalance in
+    preceding code.
+  }
+  UNIT      = "sec"
+  HIDDEN
+]
+
+
+PATTERN "MPI_COMMUNICATION" = [
+  PARENT    = "MPI"
+  NAME      = "Communication"
+  DOCNAME   = "MPI Communication Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_Comm"
+  INFO      = "Time spent in MPI communication calls"
+  DESCR     = {
+    This pattern refers to the time spent in MPI communication calls.
+  }
+  DIAGNOSIS = {
+    Expand the metric tree further to determine the proportion of time in
+    different classes of MPI communication operations. Expand the calltree
+    to identify which callpaths are responsible for the most communication
+    time. Also examine the distribution of communication time on each
+    participating process for indication of communication imbalance or load
+    imbalance in preceding code.
+  }
+  UNIT      = "sec"
+  HIDDEN
+]
+
+
+PATTERN "MPI_IO" = [
+  PARENT    = "MPI"
+  NAME      = "File I/O"
+  DOCNAME   = "MPI File I/O Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_IO"
+  INFO      = "Time spent in MPI file I/O calls"
+  DESCR     = {
+    This pattern refers to the time spent in MPI file I/O calls.
+  }
+  DIAGNOSIS = {
+    Expand the metric tree further to determine the proportion of time in
+    different classes of MPI file I/O operations. Expand the calltree to
+    identify which callpaths are responsible for the most file I/O time. 
+    Also examine the distribution of MPI file I/O time on each process for
+    indication of load imbalance. Use a parallel filesystem (such as
+    <tt>/work</tt>) when possible, and check that appropriate hints values
+    have been associated with the <tt>MPI_Info</tt> object of MPI files.
+    </dd><p><dd>
+    Exclusive MPI file I/O time relates to individual (non-collective)
+    operations. When multiple processes read and write to files, MPI
+    collective file reads and writes can be more efficient.
+  }
+  UNIT      = "sec"
+  HIDDEN
+]
+
+
+PATTERN "MPI_IO_COLLECTIVE" = [
+  PARENT    = "MPI_IO"
+  NAME      = "Collective"
+  DOCNAME   = "MPI Collective File I/O Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_CollIO"
+  INFO      = "Time spent in collective MPI file I/O calls"
+  DESCR     = {
+    This pattern refers to the time spent in collective MPI file I/O calls.
+  }
+  DIAGNOSIS = {
+    Expand the calltree to identify which callpaths are responsible for the
+    most collective file I/O time. Examine the distribution of times on
+    each participating process for indication of imbalance in the operation
+    itself or in preceding code. Examine the number of @ref(MPI_FILE_COPS)
+    done by each process as a possible origin of imbalance. Where asychrony
+    or imbalance prevents effective use of collective file I/O,
+    (non-collective) individual file I/O may be preferable.
+  }
+  UNIT      = "sec"
+  HIDDEN
+]
+
+
+PATTERN "MPI_INIT_EXIT" = [
+  PARENT    = "MPI"
+  NAME      = "Init/Exit"
+  DOCNAME   = "MPI Init/Exit Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_Init"
+  INFO      = "Time spent in MPI initialization calls"
+  DESCR     = {
+    Time spent in MPI initialization and finalization calls, i.e.,
+    <tt>MPI_Init</tt> or <tt>MPI_Init_thread</tt> and
+    <tt>MPI_Finalize</tt>.
+  }
+  DIAGNOSIS = {
+    These are unavoidable one-off costs for MPI parallel programs, which
+    can be expected to increase for larger numbers of processes. Some
+    applications may not use all of the processes provided (or not use some
+    of them for the entire execution), such that unused and wasted
+    processes wait in <tt>MPI_Finalize</tt> for the others to finish. If
+    the proportion of time in these calls is significant, it is probably
+    more effective to use a smaller number of processes (or a larger amount
+    of computation).
+  }
+  UNIT      = "sec"
+  HIDDEN
+]
+
+
+PATTERN "MPI_SYNC_COLLECTIVE" = [
+  PARENT    = "MPI_SYNCHRONIZATION"
+  NAME      = "Collective"
+  DOCNAME   = "MPI Collective Synchronization Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_SyncCollective"
+  INFO      = "Time spent in MPI barriers"
+  DESCR     = {
+    This pattern refers to the total time spent in MPI barriers.
+  }
+  DIAGNOSIS = {
+    When the time for MPI explicit barrier synchronization is significant,
+    expand the call tree to determine which <tt>MPI_Barrier</tt> calls are
+    responsible, and compare with their @ref(VISITS) count to see how
+    frequently they were executed.  Barrier synchronizations which are not
+    necessary for correctness should be removed. It may also be appropriate
+    to use a communicator containing fewer processes, or a number of
+    point-to-point messages for coordination instead. Also examine the
+    distribution of time on each participating process for indication of
+    load imbalance in preceding code.
+    </dd><p><dd>
+    Automatic trace analysis can be employed to quantify time wasted due to
+    @ref(MPI_BARRIER_WAIT) at entry and @ref(MPI_BARRIER_COMPLETION).
+  }
+  UNIT      = "sec"
+  HIDDEN
+  CALLBACKS = [
+    "MPI_COLLEXIT" = {
+      Event enter = data->m_callstack.top();
+      if (!is_mpi_barrier(enter->get_region()))
+        return;
+
+      // A single process will not wait for itself
+      if (event->get_comm()->get_group()->num_ranks() < 2)
+        return;
+
+      data->m_local->add_event(enter, ROLE_BARRIER_ENTER);
+      data->m_local->add_event(event, ROLE_BARRIER_EXIT);
+
+      // Retrieve latest ENTER and earliest EXIT event
+      TimeVec2 local_times;
+      local_times.value[0] = event->get_time();
+      local_times.value[1] = enter->get_time();
+      MpiComm* comm = event->get_comm();
+      MPI_Allreduce(&local_times, &data->m_timevec, 1, TIMEVEC2,
+                    MINMAX_TIMEVEC2, comm->get_comm());
+      cbmanager.notify(SYNC_COLL, event, data);
+    }
+  ]
+]
+
+
+PATTERN "MPI_BARRIER_WAIT" = [
+  PARENT    = "MPI_SYNC_COLLECTIVE"
+  NAME      = "Wait at Barrier"
+  DOCNAME   = "Wait at MPI Barrier Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_BarrierWait"
+  INFO      = "Waiting time in front of MPI barriers"
+  DESCR     = {
+    This pattern covers the time spent waiting in front of an MPI barrier,
+    which is the time inside the barrier call until the last processes has
+    reached the barrier.
+    </dd><p><dd>
+    @img(WaitAtBarrier.png)
+  }
+  DIAGNOSIS = {
+    A large amount of waiting time at barriers can be an indication of load
+    imbalance. Examine the waiting times for each process and try to
+    distribute the preceding computation from processes with the shortest
+    waiting times to those with the longest waiting times.
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "SYNC_COLL" = {
+      pearl::timestamp_t max_time = data->m_timevec.value[1];
+
+      // Validate clock condition
+      if (max_time > event->get_time()) {
+        elg_cntl_msg("Unsynchronized clocks (loc: %d, reg: %s, diff: %es)!\n",
+                     event.get_location()->get_id(),
+                     event.get_cnode()->get_region()->get_name().c_str(),
+                     max_time - event->get_time());
+        cbmanager.notify(CCV_COLL, event, data);
+
+        // Restrict waiting time to time spent in operation
+        max_time = event->get_time();
+      }
+
+      // Calculate waiting time
+      data->m_idle = max_time - event.enterptr()->get_time();
+      if (data->m_idle > 0)
+        m_severity[event.get_cnode()] += data->m_idle;
+
+      // There will always be waiting time at barriers; all processes need
+      // to take part in most-severe instance tracking
+      cbmanager.notify(WAIT_BARRIER, event, data);
+    }
+  ]
+]
+
+
+PATTERN "MPI_BARRIER_COMPLETION" = [
+  PARENT    = "MPI_SYNC_COLLECTIVE"
+  NAME      = "Barrier Completion"
+  DOCNAME   = "Barrier Completion Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_BarrierCompletion"
+  INFO      = "Time needed to finish an MPI barrier"
+  DESCR     = {
+    This pattern refers to the time spent in MPI barriers after the first
+    process has left the operation.
+    </dd><p><dd>
+    @img(BarrierCompletion.png)
+  }
+  DIAGNOSIS = {
+    Generally all processes can be expected to leave MPI barriers
+    simultaneously, and any significant barrier completion time may
+    indicate an inefficient MPI implementation or interference from other
+    processes running on the same compute resources.
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "SYNC_COLL" = {
+      pearl::timestamp_t min_time = data->m_timevec.value[0];
+      pearl::timestamp_t max_time = data->m_timevec.value[1];
+
+      // Validate clock condition
+      if (min_time < max_time) {
+        // Do not report violation again -- already done by "Wait at Barrier"
+        min_time = max_time;
+      }
+
+      // Calculate waiting time
+      data->m_idle = event->get_time() - min_time;
+      if (data->m_idle > 0)
+        m_severity[event.get_cnode()] += data->m_idle;
+
+      // There will always be completion time at barriers; all processes need
+      // to take part in most-severe instance tracking
+      cbmanager.notify(BARRIER_COMPL, event, data);
+    }
+  ]
+]
+
+
+PATTERN "MPI_POINT2POINT" = [
+  PARENT    = "MPI_COMMUNICATION"
+  NAME      = "Point-to-point communication"
+  DOCNAME   = "MPI Point-to-point Communication Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_P2P"
+  INFO      = "MPI point-to-point communication"
+  DESCR     = {
+    This pattern refers to the total time spent in MPI point-to-point
+    communication calls. Note that this is only the respective times for
+    the sending and receiving calls, and <em>not</em> message transmission
+    time.
+  }
+  DIAGNOSIS = {
+    Investigate whether communication time is commensurate with the number
+    of @ref(COMMS) and @ref(BYTES). Consider replacing blocking
+    communication with non-blocking communication that can potentially be
+    overlapped with computation, or using persistent communication to
+    amortize message setup costs for common transfers. Also consider the
+    mapping of processes onto compute resources, especially if there are
+    notable differences in communication time for particular processes,
+    which might indicate longer/slower transmission routes or network
+    congestion.
+  }
+  UNIT      = "sec"
+  DATA      = {
+    std::vector<MpiMessage*> m_pending;
+    std::vector<MPI_Request> m_requests;
+    std::vector<int>         m_indices;
+    std::vector<MPI_Status>  m_statuses;
+  }
+  HIDDEN
+  CALLBACKS = [
+    "MPI_SEND" = {
+      if (!is_mpi_api(event.enterptr()->get_region()))
+        return;
+
+      data->m_local->add_event(event, ROLE_SEND);
+      data->m_local->add_event(event.enterptr(), ROLE_ENTER_SEND);
+
+      cbmanager.notify(PRE_SEND, event, data);
+
+      MpiComm*    comm = event->get_comm();
+      MpiMessage* msg;
+      msg = data->m_local->isend(*comm,
+                                 event->get_dest(),
+                                 event->get_tag());
+
+      m_pending.push_back(msg);
+      m_requests.push_back(msg->get_request());
+
+      cbmanager.notify(POST_SEND, event, data);
+      cbmanager.notify(PENDING, event, data);
+    }
+
+    "MPI_RECV" = {
+      if (!is_mpi_api(event.enterptr()->get_region()))
+        return;
+
+      data->m_local->add_event(event, ROLE_RECV);
+      data->m_local->add_event(event.enterptr(), ROLE_ENTER_RECV);
+      data->m_local->add_event(event.exitptr(), ROLE_EXIT_RECV);
+
+      cbmanager.notify(PRE_RECV, event, data);
+
+      MpiComm* comm = event->get_comm();
+      data->m_remote->recv(*data->m_defs,
+                           *comm,
+                           event->get_source(),
+                           event->get_tag());
+
+      // Validate clock condition
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND);
+      if (send->get_time() > event->get_time()) {
+        elg_cntl_msg("Unsynchronized clocks (loc: %d, reg: %s, diff: %es)!\n",
+                     event.get_location()->get_id(),
+                     event.get_cnode()->get_region()->get_name().c_str(),
+                     send->get_time() - event->get_time());
+        cbmanager.notify(CCV_P2P, event, data);
+      }
+
+      cbmanager.notify(POST_RECV, event, data);
+    }
+
+    "PENDING" = {
+      // No pending requests? ==> continue
+      if (m_pending.empty())
+        return;
+
+      // Check for completed messages
+      int completed;
+      int count = m_pending.size();
+      m_indices.resize(count);
+      m_statuses.resize(count);
+      MPI_Testsome(count, &m_requests[0], &completed, &m_indices[0], &m_statuses[0]);
+
+      // Update array of pending messages
+      for (int i = 0; i < completed; ++i) {
+        int index = m_indices[i];
+
+        delete m_pending[index];
+        m_pending[index] = NULL;
+      }
+      m_pending.erase(remove(m_pending.begin(), m_pending.end(),
+                             static_cast<MpiMessage*>(NULL)),
+                      m_pending.end());
+      m_requests.erase(remove(m_requests.begin(), m_requests.end(),
+                              static_cast<MPI_Request>(MPI_REQUEST_NULL)),
+                       m_requests.end());
+    }
+
+    "FINALIZE" = {
+      MPI_Barrier(MPI_COMM_WORLD);
+
+      // Try to complete pending messages
+      cbmanager.notify(PENDING, event, data);
+
+      // Handle remaining messages
+      if (!m_pending.empty()) {
+        int count = m_pending.size();
+
+        // Print warning
+        elg_warning("Encountered %d unreceived send operations!", count);
+
+        // Cancel pending messages
+        for (int i = 0; i < count; ++i) {
+          MPI_Cancel(&m_requests[i]);
+          m_pending[i]->wait();
+          delete m_pending[i];
+        }
+      }
+    }
+  ]
+]
+
+
+PATTERN "MPI_LATESENDER" = [
+  PARENT    = "MPI_POINT2POINT"
+  NAME      = "Late Sender"
+  DOCNAME   = "Late Sender Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_LateSender"
+  INFO      = "Time a receiving process is waiting for a message"
+  DESCR     = {
+    Refers to the time lost waiting caused by a blocking receive operation
+    (e.g., <tt>MPI_Recv</tt> or <tt>MPI_Wait</tt>) that is posted earlier
+    than the corresponding send operation.
+    </dd><p><dd>
+    @img(LateSender.png)
+    </dd><p><dd>
+    If the receiving process is waiting for multiple messages to arrive
+    (e.g., in an call to <tt>MPI_Waitall</tt>), the maximum waiting time is
+    accounted, i.e., the waiting time due to the latest sender.
+  }
+  DIAGNOSIS = {
+    Try to replace <tt>MPI_Recv</tt> with a non-blocking receive <tt>MPI_Irecv</tt>
+    that can be posted earlier, proceed concurrently with computation, and
+    complete with a wait operation after the message is expected to have been sent.
+    Try to post sends earlier, such that they are available when receivers
+    need them. Note that outstanding messages (i.e., sent before the
+    receiver is ready) will occupy internal message buffers, and that large
+    numbers of posted receive buffers will also introduce message management overhead,
+    therefore moderation is advisable.
+  }
+  UNIT      = "sec"
+  DATA      = {
+    double         m_max_idle;
+    EventSet       m_receive;
+    RemoteEventSet m_send;
+  }
+  INIT      = {
+    m_max_idle = 0.0;
+  }
+  CALLBACKS = [
+    "PRE_SEND" = {
+      data->m_local->add_event(event, ROLE_SEND_LS);
+      data->m_local->add_event(event.enterptr(), ROLE_ENTER_SEND_LS);
+    }
+
+    "PRE_RECV" = {
+      data->m_local->add_event(event, ROLE_RECV_LS);
+      data->m_local->add_event(event.enterptr(), ROLE_ENTER_RECV_LS);
+      data->m_local->add_event(event.exitptr(), ROLE_EXIT_RECV_LS);
+    }
+
+    "POST_RECV" = {
+      RemoteEvent enter_send = data->m_remote->get_event(ROLE_ENTER_SEND_LS);
+      Event       enter_recv = data->m_local->get_event(ROLE_ENTER_RECV_LS);
+      Event       exit_recv  = data->m_local->get_event(ROLE_EXIT_RECV_LS);
+
+      Region* region = enter_recv->get_region();
+
+      if (is_mpi_testx(region))
+        return;
+
+      // Validate clock condition
+      pearl::timestamp_t max_time = enter_send->get_time();
+      if (max_time > exit_recv->get_time()) {
+        // Do not report violation again -- already done in generic P2P code
+        max_time = exit_recv->get_time();
+      }
+
+      // Calculate waiting time
+      data->m_idle = max_time - enter_recv->get_time();
+      if (data->m_idle > 0) {
+        if (is_mpi_wait_multi(region)) {
+          if (data->m_idle > m_max_idle) {
+            RemoteEvent send = data->m_remote->get_event(ROLE_SEND_LS);
+
+            m_receive.clear();
+            m_send.clear();
+
+            m_max_idle = data->m_idle;
+            m_receive.add_event(event, ROLE_RECV);
+            m_send.add_event(send, ROLE_SEND);
+          }
+        } else {
+          m_severity[event.get_cnode()] += data->m_idle;
+
+          cbmanager.notify(LATE_SENDER, event, data);
+        }
+      }
+    }
+
+    "EXIT" = {
+      if (m_max_idle > 0.0 &&
+          is_mpi_wait_multi(event.enterptr()->get_region())) {
+        m_severity[event.get_cnode()] += m_max_idle;
+
+        Event recv       = m_receive.get_event(ROLE_RECV);
+        RemoteEvent send = m_send.get_event(ROLE_SEND);
+
+        data->m_idle = m_max_idle;
+        data->m_local->add_event(recv, ROLE_RECV_LS);
+        data->m_remote->add_event(send, ROLE_SEND_LS);
+
+        cbmanager.notify(LATE_SENDER, recv, data);
+      }
+
+      m_max_idle = 0.0;
+    }
+  ]
+]
+
+
+PATTERN "MPI_LATESENDER_WO" = [
+  PARENT    = "MPI_LATESENDER"
+  NAME      = "Messages in Wrong Order"
+  DOCNAME   = "Late Sender, Wrong Order Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_LateSenderWO"
+  INFO      = "Late Sender situation due to messages received in the wrong order"
+  DESCR     = {
+    A Late Sender situation may be the result of messages that are received
+    in the wrong order. If a process expects messages from one or more
+    processes in a certain order, although these processes are sending them
+    in a different order, the receiver may need to wait for a message if it
+    tries to receive a message early that has been sent late.
+    </dd><p><dd>
+    This pattern comes in two variants:
+    <ul>
+      <li>The messages involved were sent from the same source location</li>
+      <li>The messages involved were sent from different source locations</li>
+    </ul>
+    See the description of the corresponding specializations for more details.
+  }
+  DIAGNOSIS = {
+    Check the proportion of @ref(COMMS_RECV) that are @ref(MPI_CLS_COUNT).
+    Swap the order of receiving from different sources to match the most
+    common ordering. 
+  }
+  UNIT      = "sec"
+  DATA      = {
+    static const uint32_t BUFFERSIZE = 100;
+
+    struct LateSender {
+      LateSender(RemoteEvent send, Event recv, timestamp_t idle)
+        : m_send(send), m_recv(recv), m_idle(idle) {}
+
+      RemoteEvent m_send;
+      Event       m_recv;
+      timestamp_t m_idle;
+    };
+    typedef std::list<LateSender> LsBuffer;
+
+    LsBuffer m_buffer;
+  }
+  CALLBACKS = [
+    "LATE_SENDER" = {
+      // Construct entry
+      LateSender item(data->m_remote->get_event(ROLE_SEND_LS),
+                      event, data->m_idle);
+
+      // Store entry in buffer
+      if (m_buffer.size() == BUFFERSIZE)
+        m_buffer.pop_front();
+      m_buffer.push_back(item);
+    }
+
+    "POST_RECV" = {
+      RemoteEvent send = data->m_remote->get_event(ROLE_SEND);
+
+      // Search for "wrong order" situations
+      LsBuffer::iterator it = m_buffer.begin();
+      while (it != m_buffer.end()) {
+        if (it->m_send->get_time() > send->get_time()) {
+          double tmp = data->m_idle;
+
+          data->m_idle = it->m_idle;
+          m_severity[it->m_recv.get_cnode()] += data->m_idle;
+
+          // Store data and notify specializations
+          data->m_remote->add_event(it->m_send, ROLE_SEND_LSWO);
+          data->m_local->add_event(it->m_recv, ROLE_RECV_LSWO);
+          cbmanager.notify(LATE_SENDER_WO, event, data);
+
+          it = m_buffer.erase(it);
+
+          data->m_idle = tmp;
+        } else  {
+          ++it;
+        }
+      }
+    }
+  ]
+]
+
+
+PATTERN "MPI_LSWO_DIFFERENT" = [
+  PARENT    = "MPI_LATESENDER_WO"
+  NAME      = "Messages from different sources"
+  DOCNAME   = "Late Sender, Wrong Order Time / Different Sources"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_LswoDifferent"
+  INFO      = "Wrong order situation due to messages received from different sources"
+  DESCR     = {
+    This specialization of the <i>Late Sender, Wrong Order</i> pattern refers
+    to wrong order situations due to messages received from different source
+    locations.
+    </dd><p><dd>
+    @img(LSWO_DifferentSource.png)
+  }
+  DIAGNOSIS = {
+    Check the proportion of @ref(COMMS_RECV) that are 
+    @ref(MPI_CLSWO_COUNT). Swap the order of receiving from different
+    sources to match the most common ordering.  Consider using the wildcard
+    <tt>MPI_ANY_SOURCE</tt> to receive (and process) messages as they
+    arrive from any source rank.
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "LATE_SENDER_WO" = {
+      Event recv = data->m_local->get_event(ROLE_RECV_LSWO);
+
+      if (recv->get_source() != event->get_source())
+        m_severity[recv.get_cnode()] += data->m_idle;
+    }
+  ]
+]
+
+
+PATTERN "MPI_LSWO_SAME" = [
+  PARENT    = "MPI_LATESENDER_WO"
+  NAME      = "Messages from same source"
+  DOCNAME   = "Late Sender, Wrong Order Time / Same Source"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_LswoSame"
+  INFO      = "Wrong order situation due to messages received from the same source"
+  DESCR     = {
+    This specialization of the <i>Late Sender, Wrong Order</i> pattern refers
+    to wrong order situations due to messages received from the same source
+    location.
+    </dd><p><dd>
+    @img(LSWO_SameSource.png)
+  }
+  DIAGNOSIS = {
+    Swap the order of receiving to match the order messages are sent, or
+    swap the order of sending to match the order they are expected to be
+    received. Consider using the wildcard <tt>MPI_ANY_TAG</tt> to receive
+    (and process) messages in the order they arrive from the source.
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "LATE_SENDER_WO" = {
+      Event recv = data->m_local->get_event(ROLE_RECV_LSWO);
+
+      if (recv->get_source() == event->get_source())
+        m_severity[recv.get_cnode()] += data->m_idle;
+    }
+  ]
+]
+
+
+PATTERN "MPI_LATERECEIVER" = [
+  PARENT    = "MPI_POINT2POINT"
+  NAME      = "Late Receiver"
+  DOCNAME   = "Late Receiver Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_LateReceiver"
+  INFO      = "Time a sending process is waiting for the receiver to become ready"
+  DESCR     = {
+    A send operation may be blocked until the corresponding receive
+    operation is called, and this pattern refers to the time spent waiting
+    as a result of this situation.
+    </dd><p><dd>
+    @img(LateReceiver.png)
+    </dd><p><dd>
+    Note that this pattern does currently not apply to nonblocking sends
+    waiting in the corresponding completion call, e.g., <tt>MPI_Wait</tt>.
+  }
+  DIAGNOSIS = {
+    Check the proportion of @ref(COMMS_SEND) that are @ref(MPI_CLR_COUNT).
+    The MPI implementation may be working in synchronous mode by default,
+    such that explicit use of asynchronous nonblocking sends can be tried.
+    If the size of the message to be sent exceeds the available MPI
+    internal buffer space then the operation will be blocked until the data
+    can be transferred to the receiver: some MPI implementations allow
+    larger internal buffers or different thresholds to be specified. Also
+    consider the mapping of processes onto compute resources, especially if
+    there are notable differences in communication time for particular
+    processes, which might indicate longer/slower transmission routes or
+    network congestion.
+  }
+  UNIT      = "sec"
+  DATA      = {
+    rem_sev_container_t m_remote_sev;
+  }
+  CALLBACKS = [
+    "PRE_SEND" = {
+      data->m_local->add_event(event, ROLE_SEND_LR);
+
+      Event completion = event.completion();
+
+      data->m_local->add_event(completion.enterptr(), ROLE_ENTER_SEND_LR);
+      data->m_local->add_event(completion.exitptr(), ROLE_EXIT_SEND_LR);
+    }
+
+    "PRE_RECV" = {
+      data->m_local->add_event(event, ROLE_RECV_LR);
+
+      Event request = event.request();
+
+      data->m_local->add_event(request.enterptr(), ROLE_ENTER_RECV_LR);
+      data->m_local->add_event(request.exitptr(), ROLE_EXIT_RECV_LR);
+    }
+
+    "POST_RECV" = {
+      RemoteEvent enter_sendcmp = data->m_remote->get_event(ROLE_ENTER_SEND_LR);
+      RemoteEvent exit_sendcmp  = data->m_remote->get_event(ROLE_EXIT_SEND_LR);
+      Event       enter_recvreq = data->m_local->get_event(ROLE_ENTER_RECV_LR);
+
+      Region* region = enter_sendcmp->get_region();
+      if (!(is_mpi_block_send(region) || is_mpi_wait_single(region)))
+	return;
+
+      // No overlap?
+      if (exit_sendcmp->get_time() < enter_recvreq->get_time())
+	return;
+
+      // Calculate waiting time
+      data->m_idle = enter_recvreq->get_time() - enter_sendcmp->get_time();
+      if (data->m_idle > 0) {
+        Location* loc     = enter_sendcmp.get_location();
+        uint32_t  cnodeid = enter_sendcmp.get_cnode()->get_id();
+
+        m_remote_sev[loc][cnodeid] += data->m_idle;
+
+        cbmanager.notify(LATE_RECEIVER, event, data);
+      }
+    }
+
+    "FINISHED" = {
+      exchange_severities(*(data->m_defs), m_remote_sev);
+    }
+  ]
+]
+
+
+PATTERN "MPI_COLLECTIVE" = [
+  PARENT    = "MPI_COMMUNICATION"
+  NAME      = "Collective"
+  DOCNAME   = "MPI Collective Communication Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_Collective"
+  INFO      = "MPI collective communication"
+  DESCR     = {
+    This pattern refers to the total time spent in MPI collective
+    communication calls.
+  }
+  DIAGNOSIS = {
+    As the number of participating MPI processes
+    increase (i.e., ranks in <tt>MPI_COMM_WORLD</tt> or a subcommunicator),
+    time in collective communication can be expected to increase
+    correspondingly.  Part of the increase will be due to additional data
+    transmission requirements, which are generally similar for all
+    participants. A significant part is typically time some (often many)
+    processes are blocked waiting for the last of the required participants
+    to reach the collective operation. This may be indicated by significant
+    variation in collective communication time across processes, but is
+    most conclusively quantified from the child metrics determinable via
+    automatic trace pattern analysis.
+    </dd><p><dd>
+    Since basic transmission cost per byte for collectives can be relatively high,
+    combining several collective operations of the same type each with small amounts of data
+    (e.g., a single value per rank) into fewer operations with larger payloads
+    using either a vector/array of values or aggregate datatype may be beneficial.
+    (Overdoing this and aggregating very large message payloads is counter-productive
+    due to explicit and implicit memory requirements, and MPI protocol switches
+    for messages larger than an eager transmission threshold.)
+    </dd><p><dd>
+    MPI implementations generally provide optimized collective communication operations,
+    however, in rare cases, it may be appropriate to replace a collective
+    communication operation provided by the MPI implementation with a
+    customized implementation of your own using point-to-point operations.
+    For example, certain MPI implementations of <tt>MPI_Scan</tt> include
+    unnecessary synchronization of all participating processes, or
+    asynchronous variants of collective operations may be preferable to
+    fully synchronous ones where they permit overlapping of computation.
+  }
+  UNIT      = "sec"
+  HIDDEN
+  CALLBACKS = [
+    "MPI_COLLEXIT" = {
+      Event   enter  = event.enterptr();
+      Region* region = enter->get_region();
+
+      // A single process will not wait for itself
+      if (event->get_comm()->get_group()->num_ranks() < 2)
+        return;
+
+      data->m_local->add_event(event, ROLE_COLL_EXIT);
+      data->m_local->add_event(enter, ROLE_COLL_ENTER);
+
+      if (is_mpi_12n(region))
+	cbmanager.notify(COLL_12N, event, data);
+      else if (is_mpi_n21(region))
+	cbmanager.notify(COLL_N21, event, data);
+      else if (is_mpi_scan(region))
+        cbmanager.notify(COLL_SCAN, event, data);
+      else if (is_mpi_n2n(region)) {
+        string name = lowercase(region->get_name());
+
+        // Ignore MPI_Alltoallv and MPI_Alltoallw
+        if (name == "mpi_alltoallv" || name == "mpi_alltoallw")
+          return;
+
+        // Set up timestamps to transfer:
+        //   [0] - earliest EXIT for NxN completion calculation
+        //         (w/o non-synchronizing processes)
+        //   [1] - latest ENTER (w/o zero-sized transfers) for Wait at NxN
+        //         calculation and CCV detection
+        TimeVec2 local_times;
+        local_times.value[0] = event->get_time();
+        local_times.value[1] = event.enterptr()->get_time();
+        if (event->get_sent() == 0)
+          local_times.value[1] = -DBL_MAX;
+        if (event->get_sent() == 0 || event->get_received() == 0)
+          local_times.value[0] = DBL_MAX;
+
+        // Retrieve latest ENTER (w/o zero-sized transfers) and
+        // earliest EXIT (w/o non-synchronizing processes) event
+        MpiComm* comm = event->get_comm();
+        MPI_Allreduce(&local_times, &data->m_timevec, 1, TIMEVEC2,
+                      MINMAX_TIMEVEC2, comm->get_comm());
+
+        // Non-receiver processes do not have to wait
+        if (event->get_received() == 0)
+          data->m_timevec.value[1] = -DBL_MAX;
+
+	cbmanager.notify(COLL_N2N, event, data);
+      }
+    }
+  ]
+]
+
+
+PATTERN "MPI_EARLYREDUCE" = [
+  PARENT    = "MPI_COLLECTIVE"
+  NAME      = "Early Reduce"
+  DOCNAME   = "Early Reduce Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_EarlyReduce"
+  INFO      = "Waiting time due to an early receiver in MPI n-to-1 operations"
+  DESCR     = {
+    Collective communication operations that send data from all processes
+    to one destination process (i.e., n-to-1) may suffer from waiting times
+    if the destination process enters the operation earlier than its
+    sending counterparts, that is, before any data could have been sent.
+    The pattern refers to the time lost as a result of this situation. It
+    applies to the MPI calls <tt>MPI_Reduce</tt>, <tt>MPI_Gather</tt> and
+    <tt>MPI_Gatherv</tt>.
+    </dd><p><dd>
+    @img(EarlyReduce.png)
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "COLL_N21" = {
+      MpiComm* comm = event->get_comm();
+
+      // Set up timestamps to transfer:
+      //   [0] - earliest ENTER (w/o root and zero-sized transfers) for
+      //         wait-state calculation
+      //   [1] - latest ENTER (w/o zero-sized transfers) for CCV detection
+      TimeVec2 local_times;
+      local_times.value[0] = event.enterptr()->get_time();
+      local_times.value[1] = event.enterptr()->get_time();
+      if (event.get_location()->get_process()->get_id() ==
+          comm->get_group()->get_global_rank(event->get_root()))
+        local_times.value[0] = DBL_MAX;
+      else if (event->get_sent() == 0) {
+        local_times.value[0] = DBL_MAX;
+        local_times.value[1] = -DBL_MAX;
+      }
+
+      // Retrieve earliest ENTER (w/o root and zero-sized transfers)
+      // and latest ENTER (w/o zero-sized transfers)
+      TimeVec2 reduced_times;
+      MPI_Reduce(&local_times, &reduced_times, 1, TIMEVEC2, MINMAX_TIMEVEC2,
+                 event->get_root(),
+                 comm->get_comm());
+
+      // Wait-state detection
+      pearl::timestamp_t min_time = reduced_times.value[0];
+      pearl::timestamp_t max_time = reduced_times.value[1];
+      if ((event.get_location()->get_process()->get_id() ==
+           comm->get_group()->get_global_rank(event->get_root())) &&
+          (event->get_received() != 0)) {
+        // Validate clock condition
+        if (max_time > event->get_time()) {
+          elg_cntl_msg("Unsynchronized clocks (loc: %d, reg: %s, diff: %es)!\n",
+                       event.get_location()->get_id(),
+                       event.get_cnode()->get_region()->get_name().c_str(),
+                       max_time - event->get_time());
+          cbmanager.notify(CCV_COLL, event, data);
+        }
+
+        // Restrict waiting time to time spent in operation
+        if (min_time > event->get_time())
+          min_time = event->get_time();
+
+        // Calculate waiting time
+	data->m_idle = min_time - event.enterptr()->get_time();
+	if (data->m_idle > 0) {
+	  m_severity[event.get_cnode()] += data->m_idle;
+
+          // Early Reduce time only occurs on the root process, i.e.,
+          // most-severe instance tracking can be performed locally
+          cbmanager.notify(EARLY_REDUCE, event, data);
+        }
+      }
+    }
+  ]
+]
+
+
+PATTERN "MPI_EARLYSCAN" = [
+  PARENT    = "MPI_COLLECTIVE"
+  NAME      = "Early Scan"
+  DOCNAME   = "Early Scan Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_EarlyScan"
+  INFO      = "Waiting time due to an early receiver in an MPI scan operation"
+  UNIT      = "sec"
+  DESCR     = {
+    <tt>MPI_Scan</tt> or <tt>MPI_Exscan</tt> operations may suffer from
+    waiting times if the process with rank <i>n</i> enters the operation
+    earlier than its sending counterparts (i.e., ranks 0..<i>n</i>-1). The
+    pattern refers to the time lost as a result of this situation.
+    </dd><p><dd>
+    @img(EarlyScan.png)
+  }
+  CALLBACKS = [
+    "COLL_SCAN" = {
+      MpiComm* comm = event->get_comm();
+
+      // Ignore zero-sized transfers
+      if (event->get_sent() == 0 && event->get_received() == 0)
+        return;
+
+      // Retrieve latest ENTER event of ranks 0..n
+      pearl::timestamp_t local_time = event.enterptr()->get_time();
+      pearl::timestamp_t max_time;
+      MPI_Scan(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, comm->get_comm());
+
+      // Validate clock condition
+      if (max_time > event->get_time()) {
+        elg_cntl_msg("Unsynchronized clocks (loc: %d, reg: %s, diff: %es)!\n",
+                     event.get_location()->get_id(),
+                     event.get_cnode()->get_region()->get_name().c_str(),
+                     max_time - event->get_time());
+        cbmanager.notify(CCV_COLL, event, data);
+
+        // Restrict waiting time to time spent in operation
+        max_time = event->get_time();
+      }
+
+      // Calculate waiting time
+      data->m_idle = max_time - local_time;
+      if (data->m_idle > 0)
+        m_severity[event.get_cnode()] += data->m_idle;
+
+      // All processes need to take part in the most-severe instance tracking
+      cbmanager.notify(EARLY_SCAN, event, data);
+    }
+  ]
+]
+
+
+PATTERN "MPI_LATEBROADCAST" = [
+  PARENT    = "MPI_COLLECTIVE"
+  NAME      = "Late Broadcast"
+  DOCNAME   = "Late Broadcast Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_LateBroadcast"
+  INFO      = "Waiting time due to a late sender in MPI 1-to-n operations"
+  DESCR     = {
+    Collective communication operations that send data from one source
+    process to all processes (i.e., 1-to-n) may suffer from waiting times
+    if destination processes enter the operation earlier than the source
+    process, that is, before any data could have been sent. The pattern
+    refers to the time lost as a result of this situation. It applies to
+    the MPI calls <tt>MPI_Bcast</tt>, <tt>MPI_Scatter</tt> and
+    <tt>MPI_Scatterv</tt>.
+    </dd><p><dd>
+    @img(LateBroadcast.png)
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "COLL_12N" = {
+      MpiComm* comm = event->get_comm();
+
+      // Broadcast timestamp of root's ENTER event
+      pearl::timestamp_t root_time = event.enterptr()->get_time();
+      MPI_Bcast(&root_time, 1, MPI_DOUBLE,
+                event->get_root(),
+                comm->get_comm());
+
+      // Wait-state detection (w/o root and zero-sized transfers)
+      if ((event.get_location()->get_process()->get_id() !=
+           comm->get_group()->get_global_rank(event->get_root())) &&
+          (event->get_received() != 0)) {
+        // Validate clock condition
+        if (root_time > event->get_time()) {
+          elg_cntl_msg("Unsynchronized clocks (loc: %d, reg: %s, diff: %es)!\n",
+                       event.get_location()->get_id(),
+                       event.get_cnode()->get_region()->get_name().c_str(),
+                       root_time - event->get_time());
+          cbmanager.notify(CCV_COLL, event, data);
+
+          // Restrict waiting time to time spent in operation
+          root_time = event->get_time();
+        }
+
+        // Calculate waiting time
+        data->m_idle = root_time - event.enterptr()->get_time();
+        if (data->m_idle > 0)
+          m_severity[event.get_cnode()] += data->m_idle;
+        cbmanager.notify(LATE_BCAST, event, data);
+      } else {
+        // All processes need to take part in the most-severe instance tracking
+        data->m_idle = 0.0;
+        if ((event.get_location()->get_process()->get_id() == comm->get_group()->get_global_rank(event->get_root())) &&
+           (event->get_received() != 0))
+          cbmanager.notify(LATE_BCAST, event, data);
+      }
+    }
+  ]
+]
+
+
+PATTERN "MPI_WAIT_NXN" = [
+  PARENT    = "MPI_COLLECTIVE"
+  NAME      = "Wait at N x N"
+  DOCNAME   = "Wait at N x N Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_WaitNxN"
+  INFO      = "Time due to inherent synchronization in MPI n-to-n operations"
+  DESCR     = {
+    Collective communication operations that send data from all processes
+    to all processes (i.e., n-to-n) exhibit an inherent synchronization
+    among all participants, that is, no process can finish the operation
+    until the last process has started it. This pattern covers the time
+    spent in n-to-n operations until all processes have reached it. It
+    applies to the MPI calls <tt>MPI_Reduce_scatter</tt>,
+    <tt>MPI_Reduce_scatter_block</tt>, <tt>MPI_Allgather</tt>,
+    <tt>MPI_Allgatherv</tt>, <tt>MPI_Allreduce</tt> and <tt>MPI_Alltoall</tt>.
+    </dd><p><dd>
+    @img(WaitAtNxN.png)
+    </dd><p><dd>
+    Note that the time reported by this pattern is not necessarily
+    completely waiting time since some processes could &ndash; at least
+    theoretically &ndash; already communicate with each other while others
+    have not yet entered the operation.
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "COLL_N2N" = {
+      pearl::timestamp_t max_time = data->m_timevec.value[1];
+
+      // Validate clock condition
+      if (max_time > event->get_time()) {
+        elg_cntl_msg("Unsynchronized clocks (loc: %d, reg: %s, diff: %es)!\n",
+                     event.get_location()->get_id(),
+                     event.get_cnode()->get_region()->get_name().c_str(),
+                     max_time - event->get_time());
+        cbmanager.notify(CCV_COLL, event, data);
+
+        // Restrict waiting time to time spent in operation
+        max_time = event->get_time();
+      }
+
+      // Calculate waiting time
+      data->m_idle = max_time - event.enterptr()->get_time();
+      if (data->m_idle > 0)
+        m_severity[event.get_cnode()] += data->m_idle;
+
+      // There will always be waiting time at NxN collectives; all processes
+      // need to take part in most-severe instance tracking
+      cbmanager.notify(WAIT_NXN, event, data);
+    }
+  ]
+]
+
+
+PATTERN "MPI_NXN_COMPLETION" = [
+  PARENT    = "MPI_COLLECTIVE"
+  NAME      = "N x N Completion"
+  DOCNAME   = "N x N Completion Time"
+  TYPE      = "MPI"
+  CLASS     = "PatternMPI_NxNCompletion"
+  INFO      = "Time needed to finish a n-to-n collective operation"
+  DESCR     = {
+    This pattern refers to the time spent in MPI n-to-n collectives after
+    the first process has left the operation.
+    </dd><p><dd>
+    @img(NxNCompletion.png)
+    </dd><p><dd>
+    Note that the time reported by this pattern is not necessarily
+    completely waiting time since some processes could &ndash; at least
+    theoretically &ndash; still communicate with each other while others
+    have already finished communicating and exited the operation.
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "COLL_N2N" = {
+      pearl::timestamp_t min_time = data->m_timevec.value[0];
+      pearl::timestamp_t max_time = data->m_timevec.value[1];
+
+      // Only an N'xN' synchronization pattern can have a completion time
+      if (event->get_sent() == 0 || event->get_received() == 0)
+        return;
+
+      // Validate clock condition
+      if (min_time < max_time) {
+        // Do not report violation again -- already done by "Wait at NxN"
+        // Restrict waiting time to time spent in operation
+        min_time = max_time;
+      }
+
+      // Calculate waiting time
+      data->m_idle = event->get_time() - min_time;
+      if (data->m_idle > 0)
+        m_severity[event.get_cnode()] += data->m_idle;
+
+      // There will always be completion time at NxN collectives; all processes
+      // need to take part in most-severe instance tracking
+      cbmanager.notify(NXN_COMPL, event, data);
+    }
+  ]
+]

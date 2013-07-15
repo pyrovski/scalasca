@@ -1,0 +1,142 @@
+/****************************************************************************
+ **  SCALASCA    http://www.scalasca.org/                                   **
+ *****************************************************************************
+ **  Copyright (c) 1998-2013                                                **
+ **  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+ **                                                                         **
+ **  See the file COPYRIGHT in the package base directory for details       **
+ ****************************************************************************/
+
+ 										 SALSA Usage Guide
+ 										 =================
+
+This Guide consists of the following parts:
+
+A) What is SALSA?
+B) How to build SALSA?
+C) How to create Communication Matrices with SALSA?
+D) How to visualize a Communication Matrix using R?
+
+A) What is SALSA?
+=================
+
+SALSA is a set of tools to generate and visualize point-to-point communication
+matrices of parallel programs.
+- count    -- the number of messages
+- length   -- the length of the messages
+- duration -- the duration of a communication operation
+- rate     -- the throughput of a communication operation (length/duration)
+each (except count) with one of the following modes:
+- min -- stores the minimal occurring value
+- max -- stores the maximal occurring value
+- avg -- stores the average of the occurring values
+- sum -- stores the sum of all occurring values (not applicable for rate)
+
+Additionally, it is possible to constrain among certain criteria, these are
+- message size
+- message tag
+- communicator
+
+For more details on constraints see section C)
+
+
+B) How to build SALSA?
+======================
+
+SALSA consists of two parts: one part for generating communication matrices
+of parallel programs and one part for the visualization of these matrices with
+the statistics program R. Since matrix generation and visualization are likely
+be performed on different machines, e.g. matrix generation on a
+supercomputer and visualization on a desktop workstation, these two parts have to be
+considered separately.
+
+The matrix generation part of SALSA is build automatically with Scalasca.
+The visualization part can be found in the visualization subdirectory of SALSA.
+It consists of three files, the R script salsa.R and two C++ files. 
+The visualization component can be build using the provided Makefile.
+Please make sure that the resulting executable (salsa_rebuild) is in your PATH, since it is needed by the R script.
+
+
+C) How to create Communication Matrices with SALSA?
+===================================================
+
+SALSA is a parallel program based on MPI. Therefore it has to be started like
+every other MPI program with mpirun (or something similar, depending on
+your MPI installation) with as many processes as the original application.
+
+mpirun -n x salsa -e PATH_TO_EPIK_ARCHIVE -c COMMAND_FILE
+
+where x is the number of processes of the original application.
+
+SALSA requires an existing EPIK experiment archive (created by a preceding run
+of scalasca-analyze respectively scan) and a command file in which the the
+properties of each matrix are given (SALSA is able to generate more than one communication matrix in one run).
+There are also some optional parameters to set some global variables.
+Here is a list of all possible command line parameters:
+
+- -e, --experiment   :  path to epik experiment      (required)
+- -c, --commandfile  :  command file                 (required)
+- -d, --density      :  [sparse/dense]               (optional)
+- -f, --format       :  [ascii/binary]               (optional)
+- -b, --blocksize    :  blocksize                    (optional)
+- -h, --help         :  prints the usage information
+
+The optional parameters can be overwritten for each run in the command file.
+Each line of that file defines has the structure
+
+function mode [density]* [format]* [blocksize]* [constraints]*
+* = optional
+
+where
+- function is one of count, length, duration or rate (see section A)),
+- mode is one of min, max, avg or sum (see section A)),
+- density is sparse or dense (default: dense),
+- format is ascii or binary (default: ascii),
+- blocksize is an integer > 0 indicating how many lines of the matrix are
+  stored in each file (default: number of processes).
+
+The constraints have the form
+
+name (operator value | value1 - value2)
+
+where
+- name is size, tag or comm
+- operator is ==, !=, >=, >, <= or <
+- value(1,2) is a positive integer.
+- value1 - value2 indicates a range of all values between value1 and value2
+- more than one constraint per name have to be enclosed in brackets ([])
+
+Example:
+With the line
+
+count binary size [ 4 - 16 == 4096 ] tag == 42 comm == 0
+
+in the command file, SALSA generates a communication matrix where the messages
+of size 4 to 16 or of size equals 4096 are counted, which have the message tag
+42 and which are sent via communicator 0 (always MPI_COMM_WORLD). This matrix
+is written in binary format with the global density and block size.
+
+Note: Please mind the whitespaces between the tokens, otherwise the parser
+would produce an error message
+
+For each line in the command file, SALSA creates a directory which consists of a text file containing meta data and one or more "block files" containing the communication matrix.
+
+D) How to visualize a Communication Matrix using R?
+===================================================
+
+Start R in the directory containing the salsa.R script. This gives you the
+interactive R console. Include the script via
+
+source("salsa.R")
+
+and then call the salsa function via
+
+salsa(PATH_TO_SALSA_MATRIX)
+
+to open a graphics window with the visualization.
+
+The salsa function accepts additional optional parameters like:
+- shrink_dim  --  - default 512
+- shrink_mode --  - default "max"
+- legend_pos  --  - default "topleft"
+- plot        --  - default TRUE

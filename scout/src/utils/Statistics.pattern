@@ -1,0 +1,1562 @@
+PROLOG {
+  #include <cstring>
+  #include <pearl_replay.h>
+  #include <epk_archive.h>
+  #include <sys/stat.h>
+  #include "Quantile.h"
+  #include "ReportData.h"
+
+  #if defined(_MPI)
+    #include "MpiDatatypes.h"
+    #include "MpiOperators.h"
+  #endif   // _MPI
+
+  #if defined(_OPENMP)
+    #include "omp.h"
+  #endif   // _OPENMP
+  
+  /// Maximum number of coefficients used for quantile approximation
+  #define NUMBER_COEFF 60
+
+  extern bool enableStatistics;
+  /* For debugging: #define WRITE_CONTROL_VALUES */
+}
+
+
+PATTERN "STATISTICS" = [
+  NAME      = "STATISTICS"
+  TYPE      = "Generic"
+  CLASS     = "PatternStatistics"
+  INFO      = "Statistics for waiting time distribution"
+  UNIT      = "sec"
+  CONDITION = "enableStatistics"
+  HIDDEN
+  NODOCS
+  DATA      = {
+    /// Symbolic names for entries in arrays storing upper bounds of metric
+    /// durations
+    enum duration_t {
+      LS_MAX_DURATION = 0,
+      LR_MAX_DURATION,
+      WNXN_MAX_DURATION,
+      WB_MAX_DURATION,
+      ER_MAX_DURATION,
+      ES_MAX_DURATION,
+      LB_MAX_DURATION,
+      BC_MAX_DURATION,
+      NXNC_MAX_DURATION,
+      OMP_EB_MAX_DURATION,
+      OMP_IB_MAX_DURATION,
+      MAX_DURATION_ENTRIES
+    };
+
+    /// CallbackData struct used for preparation replay
+    struct MaxDurations : public pearl::CallbackData
+    {
+      double m_max_duration[MAX_DURATION_ENTRIES];
+
+      MaxDurations()
+      {
+        memset(m_max_duration, 0, MAX_DURATION_ENTRIES * sizeof(double));
+      }
+
+      void update_duration(duration_t idx, double value)
+      {
+        if (value > m_max_duration[idx]) {
+          m_max_duration[idx] = value;
+        }
+      }
+    };
+
+    // returns the position with first identical cnode
+    class find_cnode_position
+    {
+      public:
+        find_cnode_position (pearl::ident_t n)
+        : cnode(n)
+        {}
+
+        bool operator() (TopMostSevere element) const
+        {
+          return element.cnode == cnode;
+        }
+
+      private:
+        pearl::ident_t cnode;
+    };
+
+    // returns the position of first element with cnode not in this list and 
+    // bigger idletime
+    class find_idletime_position
+    {
+      public:
+        find_idletime_position (pearl::ident_t n, pearl::timestamp_t m)
+        : cnode(n), idle (m)
+        {}
+
+        bool operator() (TopMostSevere element) const
+        {
+          return ((element.cnode != cnode) && (element.idletime < idle));
+        }
+
+      private:
+        pearl::ident_t cnode;
+        pearl::timestamp_t idle;
+    };
+
+    void mpicexit_cb(const pearl::CallbackManager& cbmanager,
+                     int                           user_event,
+                     const pearl::Event&           event,
+                     pearl::CallbackData*          cdata)
+    {
+      Event         enter    = event.enterptr();
+      double        duration = event->get_time() - enter->get_time();
+      MaxDurations* data     = static_cast<MaxDurations*>(cdata);
+
+      Region* region = event.get_cnode()->get_region();
+      if (is_mpi_barrier(region)) {
+        // Wait at Barrier
+        data->update_duration(WB_MAX_DURATION, duration);
+        // Barrier Completion
+        data->update_duration(BC_MAX_DURATION, duration);
+      } else if (is_mpi_12n(region)) {
+        // Late Broadcast
+        data->update_duration(LB_MAX_DURATION, duration);
+      } else if (is_mpi_n21(region)) {
+        // Early Reduce
+        data->update_duration(ER_MAX_DURATION, duration);
+      } else if (is_mpi_scan(region)) {
+        // Early Scan
+        data->update_duration(ES_MAX_DURATION, duration);
+      } else if (is_mpi_n2n(region)) {
+        // Wait at NxN
+        data->update_duration(WNXN_MAX_DURATION, duration);
+        // NxN Completion
+        data->update_duration(NXNC_MAX_DURATION, duration);
+      }
+    }
+
+    void send_cb(const pearl::CallbackManager& cbmanager,
+                 int                           user_event,
+                 const pearl::Event&           event,
+                 pearl::CallbackData*          cdata)
+    {
+      Event         enter    = event.enterptr();
+      Event         exitev   = event.exitptr();
+      double        duration = exitev->get_time() - enter->get_time();
+      MaxDurations* data     = static_cast<MaxDurations*>(cdata);
+
+      // Late Receiver
+      data->update_duration(LR_MAX_DURATION, duration);
+    }
+
+    void recv_cb(const pearl::CallbackManager& cbmanager,
+                 int                           user_event,
+                 const pearl::Event&           event,
+                 pearl::CallbackData*          cdata)
+    {
+      Event         enter    = event.enterptr();
+      Event         exitev   = event.exitptr();
+      double        duration = exitev->get_time() - enter->get_time();
+      MaxDurations* data     = static_cast<MaxDurations*>(cdata);
+
+      // Late Sender
+      data->update_duration(LS_MAX_DURATION, duration);
+    }
+
+    void ompbarrier_cb(const pearl::CallbackManager& cbmanager,
+                 int                           user_event,
+                 const pearl::Event&           event,
+                 pearl::CallbackData*          cdata)
+    {
+      Event         enter    = event.enterptr();
+      double        duration = event->get_time() - enter->get_time();
+      MaxDurations* data     = static_cast<MaxDurations*>(cdata);
+
+      Region* region = event.get_cnode()->get_region();
+      if (is_omp_ebarrier(region)) {
+        // OpenMP explicit barrier
+        data->update_duration(OMP_EB_MAX_DURATION, duration);
+      } else if (is_omp_ibarrier(region)) {
+        // OpenMP implicit barrier
+        data->update_duration(OMP_IB_MAX_DURATION, duration);
+      }
+    }
+
+    // Statistics collector objects for individual patterns
+#if defined(_MPI)
+    Quantile* ls_quant;
+    Quantile* lsw_quant;
+    Quantile* lr_quant;
+    Quantile* lrw_quant;
+    Quantile* wnxn_quant;
+    Quantile* wb_quant;
+    Quantile* er_quant;
+    Quantile* es_quant;
+    Quantile* lb_quant;
+    Quantile* bc_quant;
+    Quantile* nxnc_quant;
+#endif // _MPI
+
+#if defined(_OPENMP)
+    Quantile* omp_eb_quant;
+    Quantile* omp_ib_quant;
+#endif // (_OPENMP)
+
+    double global_timebase;
+
+    // define deques for most severe instances
+#if defined(_MPI)
+    vector<TopMostSevere> LateSender, LateSenderWO, LateReceiver, EarlyReduce;
+    vector<TopMostSevere> BarrierNxNsum, BarrierSum, NxnComplSum, BarrierComplSum, LateBcastSum, EarlyScanSum;
+#endif // _MPI
+
+#if defined(_OPENMP)
+    vector<TopMostSevere> OmpEBarrierSum, OmpIBarrierSum;
+#endif // _OPENMP
+
+#if defined(MOST_SEVERE_MAX) && defined(_MPI)
+    vector<TopMostSevere> BarrierNxNmax, BarrierMax, NxnComplMax, BarrierComplMax, LateBcastMax, EarlyScanMax;
+#endif
+
+#if defined(MOST_SEVERE_MAX) && defined(_OPENMP)
+    vector<TopMostSevere> OmpEBarrierMax, OmpIBarrierMax;
+#endif
+
+    // merge results of found patterns
+    // from all processes and threads 
+    // static variables used here as an implicit shared variables
+    // to perform reduction for OpenMP threads
+    void result_merge(Quantile* quant)
+    {
+      // Determine global number of instances
+      // (The 'static' variable 'shared_n' is implicitly shared!)
+      double n, global_n;
+      static double shared_n;
+      #pragma omp master
+      {
+        shared_n = 0.0;
+      }
+      
+      // Determine global coefficients for collecting statistics
+      // (The 'static' array 'shared_coeff' is implicitly shared!)
+      double coeff[NUMBER_COEFF], global_coeff[NUMBER_COEFF];
+      static double shared_coeff[NUMBER_COEFF];
+
+      #pragma omp master
+      {
+        for (int i = 0; i < NUMBER_COEFF; i++) {
+          shared_coeff[i] = 0.0;
+        }
+      }
+
+#ifdef ADAPTIVE_APPROACH
+      // Determine global coefficients for control values
+      // (The 'static' array 'shared_control_val' is implicitly shared!)
+      double control_val[NUMBER_COEFF], global_control_val[NUMBER_COEFF];
+      static double shared_control_val[NUMBER_COEFF];
+    
+      #pragma omp master
+      {
+        for (int i = 0; i < NUMBER_COEFF; i++) {
+          shared_control_val[i] = 0.0;
+        }
+      }
+#endif
+
+      // Determine global max
+      // (The 'static' variable 'shared_max' is implicitly shared!)
+      double max_val, global_max;
+      static double shared_max;
+      #pragma omp master
+      {
+        shared_max = -DBL_MAX;
+      }
+      
+      // Determine global min
+      // (The 'static' variable 'shared_min' is implicitly shared!)
+      double min_val, global_min;
+      static double shared_min;
+      #pragma omp master
+      {
+        shared_min = DBL_MAX;
+      }
+
+      // Determine global sum
+      // (The 'static' variable 'shared_sum' is implicitly shared!)
+      double sum, global_sum;
+      static double shared_sum;
+      #pragma omp master
+      {
+        shared_sum = 0.0;
+      }
+
+      // Determine global squared sum
+      // (The 'static' variable 'shared_squared_sum' is implicitly shared!)
+      double squared_sum, global_squared_sum;
+      static double shared_squared_sum;
+      #pragma omp master
+      {
+        shared_squared_sum = 0.0;
+      }
+      
+      n = quant->get_n();
+      
+      #pragma omp barrier
+      #pragma omp critical
+      {
+        shared_n += n;
+      }
+      #pragma omp barrier
+      
+#if defined(_MPI)
+      #pragma omp master
+      {
+        MPI_Allreduce(&shared_n, &global_n, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        shared_n = global_n;
+      }
+#endif // _MPI
+      
+      #pragma omp barrier
+      global_n = shared_n;
+      #pragma omp barrier
+
+      for(int i=0; i<NUMBER_COEFF; i++) {
+        coeff[i] = (n/global_n) * quant->get_coeff(i);
+      }
+      
+      #pragma omp barrier
+      #pragma omp critical
+      {
+        for (int i = 0; i < NUMBER_COEFF; i++) {
+          shared_coeff[i] += coeff[i];
+        }
+      }
+      #pragma omp barrier
+      
+#if defined(_MPI)
+      #pragma omp master
+      {
+        MPI_Allreduce(shared_coeff, global_coeff, NUMBER_COEFF, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        for (int i = 0; i < NUMBER_COEFF; i++) {
+          shared_coeff[i] = global_coeff[i];
+        }
+      }
+#endif // _MPI
+
+      #pragma omp barrier
+      for (int i = 0; i < NUMBER_COEFF; i++) {
+        global_coeff[i] = shared_coeff[i];
+      }
+
+#ifdef ADAPTIVE_APPROACH    
+      for(int i=0; i<NUMBER_COEFF; i++) {
+        control_val[i] = (n/global_n) * quant->get_control_val(i);
+      }
+      
+      #pragma omp barrier
+      #pragma omp critical
+      {
+        for (int i = 0; i < NUMBER_COEFF; i++) {
+          shared_control_val[i] += control_val[i];
+        }
+      }
+      #pragma omp barrier
+#if defined(_MPI)
+      #pragma omp master
+      {
+        MPI_Allreduce(shared_control_val, global_control_val, NUMBER_COEFF, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        for (int i = 0; i < NUMBER_COEFF; i++) {
+          shared_control_val[i] = global_control_val[i];
+        }
+      }
+#endif // _MPI
+
+      #pragma omp barrier
+      for (int i = 0; i < NUMBER_COEFF; i++) {
+        global_control_val[i] = shared_control_val[i];
+      }
+
+#endif    
+
+      max_val     = quant->get_max_val();
+      min_val     = quant->get_min_val();
+      sum         = quant->get_sum();
+      squared_sum = quant->get_squared_sum();
+
+      #pragma omp barrier
+      
+      #pragma omp critical
+      {
+        if(shared_max < max_val)
+        {
+          shared_max = max_val;
+        }
+      
+        if(shared_min > min_val)
+        {
+          shared_min = min_val;
+        }
+      
+        shared_sum += sum;
+        shared_squared_sum += squared_sum;
+      }
+      #pragma omp barrier
+      
+#if defined(_MPI)
+      #pragma omp master
+      {
+        MPI_Allreduce(&shared_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+        MPI_Allreduce(&shared_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+        MPI_Allreduce(&shared_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&shared_squared_sum, &global_squared_sum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        shared_max = global_max;
+        shared_min = global_min;
+        shared_sum = global_sum;
+        shared_squared_sum = global_squared_sum;
+      }
+#endif // _MPI
+
+      #pragma omp barrier
+      global_max = shared_max;
+      global_min = shared_min;
+      global_sum = shared_sum;
+      global_squared_sum = shared_squared_sum;
+      #pragma omp barrier
+      
+#ifdef ADAPTIVE_APPROACH
+      quant->set_global_values(global_n, global_sum, global_squared_sum, global_min, global_max, global_coeff, global_control_val);
+#else      
+      quant->set_global_values(global_n, global_sum, global_squared_sum, global_min, global_max, global_coeff);
+#endif
+    }
+
+    void write_cube_file(Quantile* quant, vector<TopMostSevere>& instance, ReportData& data, FILE* cube_fp)
+    {
+      string patternName     = quant->get_metric();
+      double number_obs      = quant->get_n();
+      double sum_obs         = quant->get_sum();
+      double squared_sum_obs = quant->get_squared_sum();
+      double min_val         = quant->get_min_val();
+      double max_val         = quant->get_max_val();
+      double variance        = (squared_sum_obs/number_obs)-(sum_obs * sum_obs)/(number_obs*number_obs);
+      double mean            = sum_obs/number_obs;
+      double lower_quant     = quant->get_lower_quant();
+      double median          = quant->get_median();
+      double upper_quant     = quant->get_upper_quant();
+
+      if (number_obs>0) {
+        fprintf(cube_fp, "%-26s %9.0f %1.7f %1.7f %1.10f %1.10f %1.10f", patternName.c_str(), number_obs, mean, median, min_val, max_val, sum_obs);
+        if (number_obs >= 2)
+          fprintf(cube_fp, " %1.10f", variance);
+        if (number_obs >= 5)
+          fprintf(cube_fp, " %1.10f %1.10f", lower_quant, upper_quant);
+
+        unsigned int i = 0;
+        if (instance[i].idletime > 0.0)
+          fprintf(cube_fp, "\n");
+        while (instance[i].idletime > 0.0 && instance.size()> i) {               
+          fprintf(cube_fp, "- cnode %d enter: %1.10f exit: %1.10f duration: %1.10f rank: %d\n",data.cnodes[instance[i].cnode]->id, instance[i].entertime, instance[i].exittime, instance[i].idletime, instance[i].rank);
+          i++;
+        }
+
+        fprintf(cube_fp, "\n");
+      }
+    }  
+
+#ifdef WRITE_CONTROL_VALUES
+
+#if defined(_MPI)
+    vector<double> md_ls, md_lsw, md_lr, md_lrw, md_wnxn, md_wb, md_er, md_es, md_lb, md_bc, md_nxnc;
+#endif // _MPI
+
+#if defined(_OPENMP)
+    vector<double> md_omp_eb, md_omp_ib;
+#endif // _OPENMP
+
+    void write_values(Quantile* quant)
+    {
+      string filename = "stats/evaluation/" + quant->get_metric() + "_values.txt";
+      FILE* quant_fp = fopen(filename.c_str(), "w");
+
+#ifdef ADAPTIVE_APPROACH
+      int opt_number_coeff = quant->get_number_coeff();
+#endif
+      double number_obs = quant->get_n();
+      double sum_obs = quant->get_sum();
+      double squared_sum_obs = quant->get_squared_sum();
+      double min_val = quant->get_min_val();
+      double max_val = quant->get_max_val();
+      double factor = quant->get_factor();
+      double coeff[NUMBER_COEFF];
+
+      for(int i=0; i<NUMBER_COEFF; i++) {
+        coeff[i] = quant->get_coeff(i);
+      }
+
+      double mean = sum_obs/number_obs;
+      double variance = (squared_sum_obs/number_obs)-(sum_obs * sum_obs)/(number_obs*number_obs);
+
+      fprintf(quant_fp, "Number of all coefficients and all observations n : %d and %10.0f\n", NUMBER_COEFF, number_obs);
+#ifdef ADAPTIVE_APPROACH
+      fprintf(quant_fp, "Optimal number of coefficients: %d\n", opt_number_coeff);
+#endif
+      fprintf(quant_fp, "sum : %2.10f, squared sum: %2.10f\n", sum_obs, squared_sum_obs);
+      fprintf(quant_fp, "mean : %2.10f, variance: %2.10f\n", mean, variance);
+
+      double lower_quant = quant->get_lower_quant();
+      double median = quant->get_median();
+      double upper_quant = quant->get_upper_quant();
+
+      fprintf(quant_fp, "upper bound   : %2.15f\n\n", (1/factor));
+      fprintf(quant_fp, "minimum       : %2.15f\n", min_val);
+      fprintf(quant_fp, "lower quartile: %2.15f\n", (lower_quant));
+      fprintf(quant_fp, "median        : %2.15f\n", (median));
+      fprintf(quant_fp, "upper quartile: %2.15f\n", (upper_quant));
+      fprintf(quant_fp, "maximum       : %2.15f\n\n", max_val);
+    
+      for(int i=0; i<NUMBER_COEFF; i++) {
+        fprintf(quant_fp, "coeff nr %2d : %2.15f\n", (i+1), coeff[i]);
+      }
+
+      fclose(quant_fp);
+    }
+
+#endif
+
+    // This function performs insertion
+    // sort of array of structs, where 
+    // arr - input array to be sorted
+    // len - length of the array to be sorted
+    void insertionSort(TopMostSevere* arr, int len)
+    {
+      int j;
+      TopMostSevere tmp;
+      for (int i = 1; i < len; i++) {
+        j = i;
+        while (j > 0 && arr[j - 1].idletime < arr[j].idletime) {
+          tmp        = arr[j];
+          arr[j]     = arr[j - 1];
+          arr[j - 1] = tmp;
+          j--;
+        }
+      }
+    }
+
+    // This function inserts an element 
+    // into the sorted vector of structures
+    // and shifts the rest elements, where
+    // in    - First input array
+    // inout - Second input array, also storing the result
+    // i     - the id of the element which should be inserted
+    // j     - pointer to the position where the structure should be inserted
+    // len   - length of the vestor os structures
+    void insertAndShift(TopMostSevere* invec, TopMostSevere* inoutvec, int i, int& j, int& len)
+    {
+      //shift
+      std::memmove(&inoutvec[j + 1], &inoutvec[j], (len - j - 1) * sizeof(TopMostSevere));
+      //insert
+      inoutvec[j] = invec[i];
+    }
+
+#if defined(_MPI)
+    // performs reduction to compute
+    // the top most severe instances
+    void result_top_most(vector<TopMostSevere>& instance, TopMostSevere  * tmpRecv)
+    {
+      int len_sum;
+      int len = instance.size();
+      // check if one needs to make reduction
+      MPI_Allreduce(&len, &len_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+      if (len_sum > 0) {
+        if (instance.size() < TOP_SEVERE_INSTANCES) {
+          if (len > 1) {
+            insertionSort(&instance[0], len);
+          }
+          for (int i = TOP_SEVERE_INSTANCES - instance.size(); i > 0; i--) {
+            instance.push_back(TopMostSevere());
+          }
+        }
+
+        // define global rank
+        int rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+        MPI_Reduce(&instance[0], &tmpRecv[0], 1, TOPSEVEREARRAY,
+                   MAX_TOPSEVEREARRAY, 0, MPI_COMM_WORLD);
+        
+        if (rank == 0) {
+          for (int i = 0; i < TOP_SEVERE_INSTANCES; ++i) {
+            instance[i] = tmpRecv[i];
+          }
+        }
+      }
+    }
+#endif // _MPI
+
+    // collects and keep sorted
+    // most severe instances
+    // with different cnodes
+    void stat_collector(vector<TopMostSevere> &instance, pearl::timestamp_t idle, pearl::timestamp_t enter, pearl::timestamp_t exit, pearl::ident_t cnode, pearl::ident_t rank)
+    {
+      TopMostSevere tmp;
+      vector<TopMostSevere>::iterator iter_cnode, iter_idle;
+      int pos_cnode, pos_idle, len;
+      tmp = TopMostSevere(idle, enter, exit, cnode, rank);
+      
+      // if our vector buffer is not full
+      if (instance.size() < TOP_SEVERE_INSTANCES) {
+        // first severity data is inserted without any conditions
+        if (instance.empty()) {
+          instance.push_back(TopMostSevere(idle, enter, exit, cnode, rank));
+        }
+        // if it is not the first one, we have to check further conditions
+        else {
+          // find the position of the severity item with an identical "cnode" value
+          iter_cnode = find_if(instance.begin(), instance.end(), find_cnode_position(cnode));
+          pos_cnode = (int) (iter_cnode - instance.begin());
+          
+          // if we have severity with such "cnode" value and greater "idletime"
+          // then we update data with new values of time
+          if (((unsigned int)pos_cnode != instance.size()) && (idle > instance[pos_cnode].idletime)) {
+            instance[pos_cnode] = tmp;
+          }
+          // if we've not found any sevirity item with identical "cnode" value
+          // it will be inserted into the vector
+          else if ((unsigned int)pos_cnode == instance.size()) {
+            instance.push_back(TopMostSevere(idle, enter, exit, cnode, rank));
+            // if the maximum value of severities was reached, sort the vector due to "idletime"
+            if (instance.size() == TOP_SEVERE_INSTANCES) {
+              insertionSort(&instance[0], instance.size());
+            }
+          }
+        }
+      }
+      // now our vector buffer is full
+      else {
+        len = instance.size();
+        
+        // find the position of the severity item with an identical "cnode" value
+        iter_cnode = find_if(instance.begin(), instance.end(), find_cnode_position(cnode));
+        pos_cnode = (int) (iter_cnode - instance.begin());
+        
+        // find the position of the severity item with not identical "cnode" and greater "idletime"
+        iter_idle = find_if(instance.begin(), instance.end(), find_idletime_position(cnode, idle));
+        pos_idle = (int) (iter_idle - instance.begin());
+        
+        // update the values if our next item with the same "cnode" has greater "idletime"
+        // and sort it afterwards due to "idletime"
+        if (((unsigned int)pos_cnode != instance.size()) && (idle > instance[pos_cnode].idletime)) {
+          instance[pos_cnode] = tmp;
+          insertionSort(&instance[0], len);
+        }
+        // if we found the severity with a new "cnode" vlue and greater "idletime"
+        // then the vector will be shifted
+        else if (((unsigned int)pos_idle != instance.size()) && ((unsigned int)pos_cnode == instance.size())) {  
+          insertAndShift(&tmp, &instance[0], 0, pos_idle, len);
+        }
+      }
+    }
+    
+#if defined(_MPI)
+    // performs MPI reduction of idletime, enter and exit times
+    // of most severe instances for collective operations
+#if !defined(MOST_SEVERE_MAX)
+    void stat_collective(vector<TopMostSevere> &instSum, pearl::timestamp_t idle, pearl::timestamp_t enter, pearl::timestamp_t exit, pearl::ident_t cnode, pearl::ident_t global_rank, MpiComm* comm)
+#else
+    void stat_collective(vector<TopMostSevere> &instMax, vector<TopMostSevere> &instSum, pearl::timestamp_t idle, pearl::timestamp_t enter, pearl::timestamp_t exit, pearl::ident_t cnode, pearl::ident_t global_rank, MpiComm* comm)
+#endif
+    {
+      // define local rank
+      int local_rank;
+      MPI_Comm_rank(comm->get_comm(), &local_rank);
+      
+#if !defined(MOST_SEVERE_MAX)
+      TopMostSevere tmpSend, tmpRecv;
+      pearl::timestamp_t tmp_idletime_sum = 0.0;
+      tmpSend = TopMostSevere(idle, enter, exit, cnode, global_rank);
+
+      MPI_Reduce(&tmpSend.idletime, &tmp_idletime_sum, 1, MPI_DOUBLE, MPI_SUM, 0, comm->get_comm());
+      MPI_Reduce(&tmpSend, &tmpRecv, 1, TOPSEVERE, SUM_TOPSEVERE, 0, comm->get_comm());
+#else
+      TopMostSevereMaxSum tmpSend, tmpRecv;
+      tmpSend = TopMostSevereMaxSum(idle, idle, enter, exit, cnode, global_rank);
+      
+      MPI_Reduce(&tmpSend, &tmpRecv, 1, TOPSEVERECOLL, MAXSUM_TOPSEVERECOLL, 0, comm->get_comm());
+#endif
+
+      if (local_rank == 0) {
+        stat_collector(instSum, tmp_idletime_sum, tmpRecv.entertime, tmpRecv.exittime, tmpRecv.cnode, tmpRecv.rank);
+#if defined(MOST_SEVERE_MAX)
+        stat_collector(instMax, tmpRecv.idletime_max, tmpRecv.entertime, tmpRecv.exittime, tmpRecv.cnode, tmpRecv.rank);
+#endif
+      }
+    }
+#endif // _MPI
+
+#if defined(_OPENMP)
+    // performs OpenMP reduction of idletime, enter and exit times
+    // of most severe instances for collective operations
+#if !defined(MOST_SEVERE_MAX)
+    void stat_collective(vector<TopMostSevere> &instSum, pearl::timestamp_t idle, pearl::timestamp_t enter, pearl::timestamp_t exit, pearl::ident_t cnode, pearl::ident_t rank)
+    {
+      // define shared severe instance
+      static TopMostSevere sharedInst;
+      static pearl::timestamp_t sharedTime;
+      
+      #pragma omp barrier
+      #pragma omp master
+      {
+        sharedInst = TopMostSevere(0.0, DBL_MAX, -DBL_MAX, cnode, rank);
+        sharedTime = 0.0;
+      }
+      
+      #pragma omp barrier
+      #pragma omp critical
+      {
+        if(sharedInst.idletime < idle){
+          sharedInst.idletime = idle;
+          sharedInst.rank = rank;
+        }
+        
+        sharedTime += idle;
+        
+        if(sharedInst.entertime > enter)
+          sharedInst.entertime = enter;
+        
+        if(sharedInst.exittime < exit)
+          sharedInst.exittime = exit;
+      }
+      #pragma omp barrier
+      
+      #pragma omp master
+      {
+        stat_collector(instSum, sharedTime, sharedInst.entertime, sharedInst.exittime, sharedInst.cnode, sharedInst.rank);
+      }
+    }
+#else
+    void stat_collective(vector<TopMostSevere> &instMax, vector<TopMostSevere> &instSum, pearl::timestamp_t idle, pearl::timestamp_t enter, pearl::timestamp_t exit, pearl::ident_t cnode, pearl::ident_t rank)
+    {
+      // define shared severe instance
+      static TopMostSevereMaxSum sharedInst;
+
+      #pragma omp barrier
+      #pragma omp master
+      {
+        sharedInst = TopMostSevereMaxSum(-DBL_MAX, 0.0, DBL_MAX, -DBL_MAX, cnode, rank);
+      }
+      
+      #pragma omp barrier
+      #pragma omp critical
+      {
+        sharedInst.idletime += idle;
+        
+        if(sharedInst.entertime > enter)
+          sharedInst.entertime = enter;
+        
+        if(sharedInst.exittime < exit)
+          sharedInst.exittime = exit;
+        if(sharedInst.idletime < idle)
+          sharedInst.rank = rank;
+        if(sharedInst.idletime_max < idle)
+        {
+          sharedInst.idletime_max = idle;
+          sharedInst.rank = rank;
+        }
+      }
+      #pragma omp barrier
+      
+      #pragma omp master
+      {
+        stat_collector(instMax, sharedInst.idletime_max, sharedInst.entertime, sharedInst.exittime, sharedInst.cnode, sharedInst.rank);
+      }
+    }
+#endif
+#endif // _OPENMP
+
+    
+    public:
+      void gen_severities(ReportData&              data,
+                          int                      rank,
+                          const pearl::LocalTrace& trace,
+                          std::FILE*               fp)
+      {
+#if defined(_MPI)
+        result_merge(ls_quant);
+        result_merge(lsw_quant);
+        result_merge(lr_quant);
+        result_merge(wnxn_quant);
+        result_merge(wb_quant);
+        result_merge(er_quant);
+        result_merge(es_quant);
+        result_merge(lb_quant);
+        result_merge(bc_quant);
+        result_merge(nxnc_quant);
+#endif // _MPI
+#if defined(_OPENMP)
+        result_merge(omp_eb_quant);
+        result_merge(omp_ib_quant);
+#endif
+        #pragma omp master
+        {
+#ifdef WRITE_CONTROL_VALUES
+          if (rank == 0) {
+            mkdir("stats", 0700);
+            mkdir("stats/evaluation", 0700);
+#if defined(_MPI)
+            mkdir("stats/ls_stats",   0700);
+            mkdir("stats/lsw_stats",  0700);
+            mkdir("stats/lr_stats",   0700);
+            mkdir("stats/wnxn_stats", 0700);
+            mkdir("stats/wb_stats",   0700);
+            mkdir("stats/er_stats",   0700);
+            mkdir("stats/es_stats",   0700);
+            mkdir("stats/lb_stats",   0700);
+            mkdir("stats/bc_stats",   0700);
+            mkdir("stats/nxnc_stats", 0700);
+#endif // _MPI
+
+#if defined(_OPENMP)
+            mkdir("stats/omp_eb_stats", 0700);
+            mkdir("stats/omp_ib_stats", 0700);
+#endif // _OPENMP
+          }
+#if defined(_MPI)
+          MPI_Barrier(MPI_COMM_WORLD);
+#endif // _MPI
+        }
+          
+          // write values for OpenMp patterns
+#if defined(_OPENMP)
+          char name_omp[50];
+          FILE* stats_omp_fp;
+          unsigned int thread_id;
+          thread_id = omp_get_thread_num();
+          #pragma omp barrier
+          
+          // OpenMP explicit barrier
+          snprintf(name_omp, 50, "stats/omp_eb_stats/omp_eb_stats.%06dx%06d", rank, thread_id);
+          stats_omp_fp = fopen(name_omp, "w");
+          for (size_t i = 0; i < md_omp_eb.size(); i++)
+            fprintf(stats_omp_fp, "%2.14f\n", md_omp_eb[i]);
+          fclose(stats_omp_fp);
+
+          // OpenMP implicit barrier
+          snprintf(name_omp, 50, "stats/omp_ib_stats/omp_ib_stats.%06dx%06d", rank, thread_id);
+          stats_omp_fp = fopen(name_omp, "w");
+          for (size_t i = 0; i < md_omp_ib.size(); i++)
+            fprintf(stats_omp_fp, "%2.14f\n", md_omp_ib[i]);
+          fclose(stats_omp_fp);
+#endif
+
+        #pragma omp master
+        {
+#if defined(_MPI)
+          char name_mpi[40];
+          FILE* stats_mpi_fp;
+
+          // Late Sender values
+          snprintf(name_mpi, 40, "stats/ls_stats/ls_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_ls.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_ls[i]);
+          fclose(stats_mpi_fp);
+
+          // Late Sender, Wrong Order values
+          snprintf(name_mpi, 40, "stats/lsw_stats/lsw_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_lsw.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_lsw[i]);
+          fclose(stats_mpi_fp);
+
+          // Late Receiver values
+          snprintf(name_mpi, 40, "stats/lr_stats/lr_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_lr.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_lr[i]);
+          fclose(stats_mpi_fp);
+
+          // Wait at NxN values
+          snprintf(name_mpi, 40, "stats/wnxn_stats/wnxn_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_wnxn.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_wnxn[i]);
+          fclose(stats_mpi_fp);
+
+          // Wait at Barrier values
+          snprintf(name_mpi, 40, "stats/wb_stats/wb_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_wb.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_wb[i]);
+          fclose(stats_mpi_fp);
+
+          // Early Reduce values
+          snprintf(name_mpi, 40, "stats/er_stats/er_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_er.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_er[i]);
+          fclose(stats_mpi_fp);
+
+          // Early Scan values
+          snprintf(name_mpi, 40, "stats/es_stats/es_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_es.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_es[i]);
+          fclose(stats_mpi_fp);
+
+          // Late Broadcast values
+          snprintf(name_mpi, 40, "stats/lb_stats/lb_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_lb.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_lb[i]);
+          fclose(stats_mpi_fp);
+
+          // Barrier Completion values
+          snprintf(name_mpi, 40, "stats/bc_stats/bc_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_bc.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_bc[i]);
+          fclose(stats_mpi_fp);
+
+          // NxN Completion values
+          snprintf(name_mpi, 40, "stats/nxnc_stats/nxnc_stats.%06d", rank);
+          stats_mpi_fp = fopen(name_mpi, "w");
+          for (size_t i = 0; i < md_nxnc.size(); i++)
+            fprintf(stats_mpi_fp, "%2.14f\n", md_nxnc[i]);
+          fclose(stats_mpi_fp);
+#endif // _MPI
+#endif
+
+          // Merge results for each pattern
+#if defined(_MPI)
+          // define temporary receive buffer 
+          TopMostSevere * tmpRecv;
+          tmpRecv = new TopMostSevere[TOP_SEVERE_INSTANCES];
+
+          result_top_most(LateSender, tmpRecv);
+          result_top_most(LateSenderWO, tmpRecv);
+          result_top_most(LateReceiver, tmpRecv);
+          result_top_most(EarlyReduce, tmpRecv);
+          result_top_most(BarrierNxNsum, tmpRecv);
+          result_top_most(BarrierSum, tmpRecv);
+          result_top_most(NxnComplSum, tmpRecv);
+          result_top_most(BarrierComplSum, tmpRecv);
+          result_top_most(LateBcastSum, tmpRecv);
+          result_top_most(EarlyScanSum, tmpRecv);
+#if defined(_OPENMP)
+          result_top_most(OmpEBarrierSum, tmpRecv);
+          result_top_most(OmpIBarrierSum, tmpRecv);
+#endif // _OPENMP
+#if defined(MOST_SEVERE_MAX)
+          result_top_most(BarrierNxNmax, tmpRecv);
+          result_top_most(BarrierMax, tmpRecv);
+          result_top_most(NxnComplMax, tmpRecv);
+          result_top_most(BarrierComplMax, tmpRecv);
+          result_top_most(LateBcastMax, tmpRecv);
+          result_top_most(EarlyScanMax, tmpRecv);
+#if defined(_OPENMP)
+          result_top_most(OmpEBarrierMax, tmpRecv);
+          result_top_most(OmpIBarrierMax, tmpRecv);
+#endif // _OPENMP
+#endif
+      // free temporary receive buffer 
+      delete [] tmpRecv;
+#endif // _MPI
+
+          if (rank == 0) {
+            // Open statistics file
+            string filename = epk_archive_get_name();
+            filename += "/trace.stat";
+            FILE*  cube_fp  = fopen(filename.c_str(), "w");
+            if (NULL == cube_fp) {
+              // Only warn (instead of abort) since we still might get a
+              // valid CUBE file
+              elg_warning("Could not create statistics file!");
+            } else {
+              // Write statistics
+              fprintf(cube_fp, "PatternName               Count      Mean    Median      Minimum      Maximum      Sum     Variance    Quartil25    Quartil75\n");
+
+#if defined(_MPI)
+              ls_quant->set_metric("mpi_latesender");
+              ls_quant->calc_quantiles();
+              write_cube_file(ls_quant, LateSender, data, cube_fp);
+
+              lsw_quant->set_metric("mpi_latesender_wo");
+              lsw_quant->calc_quantiles();
+              write_cube_file(lsw_quant, LateSenderWO, data, cube_fp);
+
+              lr_quant->set_metric("mpi_latereceiver");
+              lr_quant->calc_quantiles();
+              write_cube_file(lr_quant, LateReceiver, data, cube_fp);
+
+              wnxn_quant->set_metric("mpi_wait_nxn");
+              wnxn_quant->calc_quantiles();
+              write_cube_file(wnxn_quant, BarrierNxNsum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(wnxn_quant, BarrierNxNmax, data, cube_fp);
+#endif
+
+              wb_quant->set_metric("mpi_barrier_wait");
+              wb_quant->calc_quantiles();
+              write_cube_file(wb_quant, BarrierSum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(wb_quant, BarrierMax, data, cube_fp);
+#endif
+
+              er_quant->set_metric("mpi_earlyreduce");
+              er_quant->calc_quantiles();
+              write_cube_file(er_quant, EarlyReduce, data, cube_fp);
+
+              es_quant->set_metric("mpi_earlyscan");
+              es_quant->calc_quantiles();
+              write_cube_file(es_quant, EarlyScanSum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(es_quant, EarlyScanMax, data, cube_fp);
+#endif
+
+              lb_quant->set_metric("mpi_latebroadcast");
+              lb_quant->calc_quantiles();
+              write_cube_file(lb_quant, LateBcastSum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(lb_quant, LateBcastMax, data, cube_fp);
+#endif
+
+              bc_quant->set_metric("mpi_barrier_completion");
+              bc_quant->calc_quantiles();
+              write_cube_file(bc_quant, BarrierComplSum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(bc_quant, BarrierComplMax, data, cube_fp);
+#endif
+
+              nxnc_quant->set_metric("mpi_nxn_completion");
+              nxnc_quant->calc_quantiles();
+              write_cube_file(nxnc_quant, NxnComplSum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(nxnc_quant, NxnComplMax, data, cube_fp);
+#endif
+#endif // _MPI
+
+#if defined(_OPENMP)
+              omp_eb_quant->set_metric("omp_ebarrier_wait");
+              omp_eb_quant->calc_quantiles();
+              write_cube_file(omp_eb_quant, OmpEBarrierSum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(omp_eb_quant, OmpEBarrierMax, data, cube_fp);
+#endif
+
+              omp_ib_quant->set_metric("omp_ibarrier_wait");
+              omp_ib_quant->calc_quantiles();
+              write_cube_file(omp_ib_quant, OmpIBarrierSum, data, cube_fp);
+#if defined(MOST_SEVERE_MAX)
+              write_cube_file(omp_ib_quant, OmpIBarrierMax, data, cube_fp);
+#endif
+#endif // _OPENMP
+
+              // Close statistics file
+              fclose(cube_fp);
+              
+#ifdef WRITE_CONTROL_VALUES
+              // Write coefficients per pattern for debugging
+#if defined(_MPI)
+              write_values(ls_quant);
+              write_values(lsw_quant);
+              write_values(lr_quant);
+              write_values(wnxn_quant);
+              write_values(wb_quant);
+              write_values(er_quant);
+              write_values(es_quant);
+              write_values(lb_quant);
+              write_values(bc_quant);
+              write_values(nxnc_quant);
+#endif // _MPI
+
+#if defined(_OPENMP)
+              write_values(omp_eb_quant);
+              write_values(omp_ib_quant);
+#endif // _OPENMP
+#endif
+
+            }
+          }
+        }
+      }
+  }
+
+  INIT = {
+    // Create statistics objects for MPI metrics
+#if defined(_MPI)
+    ls_quant   = new Quantile(NUMBER_COEFF);
+    lsw_quant  = new Quantile(NUMBER_COEFF);
+    lr_quant   = new Quantile(NUMBER_COEFF);
+    wnxn_quant = new Quantile(NUMBER_COEFF);
+    wb_quant   = new Quantile(NUMBER_COEFF);
+    er_quant   = new Quantile(NUMBER_COEFF);
+    es_quant   = new Quantile(NUMBER_COEFF);
+    lb_quant   = new Quantile(NUMBER_COEFF);
+    bc_quant   = new Quantile(NUMBER_COEFF);
+    nxnc_quant = new Quantile(NUMBER_COEFF);
+#endif
+
+#if defined(_OPENMP)
+    omp_eb_quant   = new Quantile(NUMBER_COEFF);
+    omp_ib_quant   = new Quantile(NUMBER_COEFF);
+#endif // _OPENMP
+  }
+
+  CLEANUP = {
+    // Release statistics objects
+#if defined(_MPI)
+    delete ls_quant;
+    delete lsw_quant;
+    delete lr_quant;
+    delete wnxn_quant;
+    delete wb_quant;
+    delete er_quant;
+    delete es_quant;
+    delete lb_quant;
+    delete bc_quant;
+    delete nxnc_quant;
+#endif
+
+#if defined(_OPENMP)
+    delete omp_eb_quant;
+    delete omp_ib_quant;
+#endif // _OPENMP
+  }
+
+  CALLBACKS = [
+    "PREPARE" = {
+      // Determine minimal absolute timestamp of the application
+      // (The 'static' variable 'shared_time' is implicitly shared!)
+      static double shared_time = DBL_MAX;
+      double        local_time  = data->m_trace->begin()->get_time();
+      #pragma omp barrier
+      #pragma omp critical
+      {
+        if (local_time < shared_time)
+          shared_time = local_time;
+      }
+      #pragma omp barrier
+      ;   /* FIXME: This extra "statement" is required for some versions
+                    of the Intel 10.1 compilers */
+
+#if defined(_MPI)
+      double global;
+      #pragma omp master
+      {
+        MPI_Allreduce(&shared_time, &global, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+        shared_time = global;
+      }
+#endif // _MPI
+
+      #pragma omp barrier
+      global_timebase = shared_time;
+      #pragma omp barrier
+      ;   /* FIXME: This extra "statement" is required for some versions
+                    of the Intel 10.1 compilers */
+
+      // Determine local upper bounds for pattern durations
+      CallbackManager cb;
+      MaxDurations    durations;
+
+#if defined(_MPI)
+      cb.register_callback(MPI_COLLEXIT, PEARL_create_callback(this, &PatternStatistics::mpicexit_cb));
+      cb.register_callback(MPI_SEND, PEARL_create_callback(this, &PatternStatistics::send_cb));
+      cb.register_callback(MPI_RECV, PEARL_create_callback(this, &PatternStatistics::recv_cb));
+#endif // _MPI
+
+#if defined(_OPENMP)
+      cb.register_callback(OMP_COLLEXIT, PEARL_create_callback(this, &PatternStatistics::ompbarrier_cb));
+#endif // _OPENMP
+      
+      PEARL_forward_replay(*(data->m_trace), cb, &durations);
+      
+      // Determine global upper bounds for pattern durations
+      // (The 'static' variable 'global_durations' is implicitly shared!)
+      static MaxDurations global_durations;
+      
+      #pragma omp master
+      {
+        global_durations.m_max_duration[OMP_EB_MAX_DURATION] = - DBL_MAX;
+        global_durations.m_max_duration[OMP_IB_MAX_DURATION] = - DBL_MAX;
+      }
+      
+      #pragma omp barrier 
+      #pragma omp critical
+      {
+        if (global_durations.m_max_duration[OMP_EB_MAX_DURATION] < durations.m_max_duration[OMP_EB_MAX_DURATION]) {
+          global_durations.m_max_duration[OMP_EB_MAX_DURATION] = durations.m_max_duration[OMP_EB_MAX_DURATION];
+        }
+        if (global_durations.m_max_duration[OMP_IB_MAX_DURATION] < durations.m_max_duration[OMP_IB_MAX_DURATION]) {
+          global_durations.m_max_duration[OMP_IB_MAX_DURATION] = durations.m_max_duration[OMP_IB_MAX_DURATION];
+        }
+      }
+      #pragma omp barrier
+      
+#if defined(_MPI)
+      #pragma omp master
+      {
+        durations.m_max_duration[OMP_EB_MAX_DURATION] = global_durations.m_max_duration[OMP_EB_MAX_DURATION];
+        durations.m_max_duration[OMP_IB_MAX_DURATION] = global_durations.m_max_duration[OMP_IB_MAX_DURATION];
+        MPI_Allreduce(&(durations.m_max_duration),
+                      &(global_durations.m_max_duration),
+                      MAX_DURATION_ENTRIES, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      }
+#endif // _MPI
+
+      #pragma omp barrier
+      
+#if defined(_MPI)
+      ls_quant->set_factor_by_upperbound(global_durations.m_max_duration[LS_MAX_DURATION]);
+      lsw_quant->set_factor_by_upperbound(global_durations.m_max_duration[LS_MAX_DURATION]);
+      lr_quant->set_factor_by_upperbound(global_durations.m_max_duration[LR_MAX_DURATION]);
+      wnxn_quant->set_factor_by_upperbound(global_durations.m_max_duration[WNXN_MAX_DURATION]);
+      wb_quant->set_factor_by_upperbound(global_durations.m_max_duration[WB_MAX_DURATION]);
+      er_quant->set_factor_by_upperbound(global_durations.m_max_duration[ER_MAX_DURATION]);
+      es_quant->set_factor_by_upperbound(global_durations.m_max_duration[ES_MAX_DURATION]);
+      lb_quant->set_factor_by_upperbound(global_durations.m_max_duration[LB_MAX_DURATION]);
+      bc_quant->set_factor_by_upperbound(global_durations.m_max_duration[BC_MAX_DURATION]);
+      nxnc_quant->set_factor_by_upperbound(global_durations.m_max_duration[NXNC_MAX_DURATION]);
+#endif // _MPI
+
+#if defined(_OPENMP)
+      omp_eb_quant->set_factor_by_upperbound(global_durations.m_max_duration[OMP_EB_MAX_DURATION]);
+      omp_ib_quant->set_factor_by_upperbound(global_durations.m_max_duration[OMP_IB_MAX_DURATION]);
+#endif // _OPENMP  
+    }
+
+
+    "LATE_SENDER" = {
+#if defined(_MPI)
+      ls_quant->add_value(data->m_idle);
+
+      Event enter = data->m_local->get_event(ROLE_RECV_LS);
+
+      stat_collector(LateSender,
+                     data->m_idle,
+                     enter.enterptr()->get_time() - global_timebase,
+                     event->get_time() - global_timebase,
+                     enter.get_cnode()->get_id(),
+                     event.get_location()->get_process()->get_id());
+      
+#ifdef WRITE_CONTROL_VALUES
+      md_ls.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "LATE_SENDER_WO" = {
+#if defined(_MPI)
+      lsw_quant->add_value(data->m_idle);
+      
+      RemoteEvent enter = data->m_remote->get_event(ROLE_SEND);
+      Event exit = data->m_local->get_event(ROLE_RECV_LSWO);
+      
+      stat_collector(LateSenderWO,
+                     data->m_idle,
+                     enter->get_time() - global_timebase,
+                     event->get_time() - global_timebase,
+                     exit.get_cnode()->get_id(),
+                     event.get_location()->get_process()->get_id());
+                     
+#ifdef WRITE_CONTROL_VALUES
+      md_lsw.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "LATE_RECEIVER" = {
+#if defined(_MPI)
+      lr_quant->add_value(data->m_idle);
+      
+      RemoteEvent enter = data->m_remote->get_event(ROLE_ENTER_SEND_LR);
+      
+      stat_collector(LateReceiver,
+                     data->m_idle,
+                     enter->get_time() - global_timebase,
+                     event->get_time() - global_timebase,
+                     enter.get_cnode()->get_id(),
+                     event.get_location()->get_process()->get_id());
+                     
+#ifdef WRITE_CONTROL_VALUES
+      md_lr.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "WAIT_NXN" = {
+#if defined(_MPI)
+      if (data->m_idle > 0)
+        wnxn_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+      
+      MpiComm* comm = event->get_comm();
+
+#if !defined(MOST_SEVERE_MAX)
+      stat_collective(BarrierNxNsum, data->m_idle,
+#else
+      stat_collective(BarrierNxNmax, BarrierNxNsum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id(),
+                      comm);
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_wnxn.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "WAIT_BARRIER" = {
+#if defined(_MPI)
+      if (data->m_idle > 0)
+        wb_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+      
+      MpiComm* comm = event->get_comm();
+
+#if !defined(MOST_SEVERE_MAX)      
+      stat_collective(BarrierSum, data->m_idle,
+#else
+      stat_collective(BarrierMax, BarrierSum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id(),
+                      comm);
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_wb.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "EARLY_REDUCE" = {
+#if defined(_MPI)
+      er_quant->add_value(data->m_idle);
+
+      stat_collector(EarlyReduce,
+                     data->m_idle,
+                     data->m_callstack.top()->get_time() - global_timebase,
+                     event->get_time() - global_timebase,
+                     event.get_cnode()->get_id(),
+                     event.get_location()->get_process()->get_id());
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_er.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "EARLY_SCAN" = {
+#if defined(_MPI)
+      if (data->m_idle > 0)
+        es_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+        
+      MpiComm* comm = event->get_comm();
+      
+#if !defined(MOST_SEVERE_MAX)      
+      stat_collective(EarlyScanSum, data->m_idle,
+#else
+      stat_collective(EarlyScanMax, EarlyScanSum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id(),
+                      comm);
+      
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_es.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "LATE_BCAST" = {
+#if defined(_MPI)
+      if (data->m_idle > 0)
+        lb_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+        
+      MpiComm* comm = event->get_comm();
+
+#if !defined(MOST_SEVERE_MAX)      
+      stat_collective(LateBcastSum, data->m_idle,
+#else
+      stat_collective(LateBcastMax, LateBcastSum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id(),
+                      comm);
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_lb.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "NXN_COMPL" = {
+#if defined(_MPI)
+      if (data->m_idle > 0)
+        nxnc_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+        
+      MpiComm* comm = event->get_comm();
+
+#if !defined(MOST_SEVERE_MAX)
+      stat_collective(NxnComplSum, data->m_idle,
+#else
+      stat_collective(NxnComplMax, NxnComplSum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id(),
+                      comm);
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_nxnc.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "BARRIER_COMPL" = {
+#if defined(_MPI)
+      if (data->m_idle > 0)
+        bc_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+        
+      MpiComm* comm = event->get_comm();
+
+#if !defined(MOST_SEVERE_MAX)
+      stat_collective(BarrierComplSum, data->m_idle,
+#else
+      stat_collective(BarrierComplMax, BarrierComplSum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id(),
+                      comm);
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_bc.push_back(data->m_idle);
+#endif
+#else   // !_MPI
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _MPI
+    }
+
+
+    "OMP_EBARRIER_WAIT" = {
+#if defined(_OPENMP)
+      if (data->m_idle > 0)
+        omp_eb_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+
+#if !defined(MOST_SEVERE_MAX)
+      stat_collective(OmpEBarrierSum, data->m_idle,
+#else
+      stat_collective(OmpEBarrierMax, OmpEBarrierSum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id());
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_omp_eb.push_back(data->m_idle);
+#endif
+#else   // !_OPENMP
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _OPENMP
+    }
+
+
+    "OMP_IBARRIER_WAIT" = {
+#if defined(_OPENMP)
+      if (data->m_idle > 0)
+        omp_ib_quant->add_value(data->m_idle);
+      else
+        data->m_idle = 0.0;
+
+#if !defined(MOST_SEVERE_MAX)
+      stat_collective(OmpIBarrierSum, data->m_idle,
+#else
+      stat_collective(OmpIBarrierMax, OmpIBarrierSum, data->m_idle,
+#endif
+                      data->m_callstack.top()->get_time() - global_timebase,
+                      event->get_time() - global_timebase,
+                      event.get_cnode()->get_id(),
+                      event.get_location()->get_process()->get_id());
+
+#ifdef WRITE_CONTROL_VALUES
+      if (data->m_idle > 0)
+        md_omp_ib.push_back(data->m_idle);
+#endif
+#else   // !_OPENMP
+      // Ugly hack to avoid 'unused variable' warning
+      (void)data;
+#endif   // _OPENMP
+    }
+  ]
+]

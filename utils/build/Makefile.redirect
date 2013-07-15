@@ -1,0 +1,12 @@
+TOPDIR = .
+include Makefile.defs
+
+.DEFAULT:
+	@echo "INFO: make replaced by GNU make (${MAKE}) ..."
+	@echo ""
+	@${MAKE} -f GNUmakefile $@
+
+all:
+	@echo "INFO: make replaced by GNU make (${MAKE}) ..."
+	@echo ""
+	@${MAKE} -f GNUmakefile $@

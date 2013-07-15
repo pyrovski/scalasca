@@ -1,0 +1,13 @@
+EPFLAG       = -m$(PREC)
+ECFLAGS      = $(EPFLAG) -xO3
+ECXXFLAGS    = $(EPFLAG) -xO3
+
+
+#------------------------------------------------------------------------------
+# Shared library settings
+#------------------------------------------------------------------------------
+
+#ESH_CXXFLAGS = -Kpic
+#ESH_AR       = $(ECXX)
+#ESH_ARFLAGS  = $(EPFLAG) -G
+#ESH_RPATH    = -R$(LIBDIR)

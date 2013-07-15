@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/distance1_small.png</file>
+        <file>images/distance2_small.png</file>
+        <file>images/up_small.png</file>
+        <file>images/down_small.png</file>
+        <file>images/left_small.png</file>
+        <file>images/right_small.png</file>
+        <file>images/reset_small.png</file>
+        <file>images/scale_small.png</file>
+        <file>images/user_small.png</file>
+        <file>images/xrotate1_small.png</file>
+        <file>images/yrotate1_small.png</file>
+        <file>images/zrotate1_small.png</file>
+        <file>images/xrotate2_small.png</file>
+        <file>images/yrotate2_small.png</file>
+        <file>images/zrotate2_small.png</file>
+        <file>images/zoomin_small.png</file>
+        <file>images/zoomout_small.png</file>
+        <file>images/warning_small.png</file>
+        <file>images/fzjlogo.xpm</file>
+        <file>images/CubeIcon.xpm</file>
+        <file>images/CubeLogo.xpm</file>
+        <file>images/zxy_small.png</file>
+        <file>images/yx_small.png</file>
+        <file>images/yzx_small.png</file>
+    </qresource>
+</RCC>

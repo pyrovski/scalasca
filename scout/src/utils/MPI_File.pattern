@@ -1,0 +1,266 @@
+#****************************************************************************
+#*  SCALASCA    http://www.scalasca.org/                                   **
+#****************************************************************************
+#*  Copyright (c) 1998-2013                                                **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#***************************************************************************/
+
+
+#--- MPI File operations patterns -------------------------------------------
+
+PATTERN "MPI_FILE_OPS" = [
+  NAME      = "MPI file operations"
+  DOCNAME   = "MPI File Operations"
+  CLASS     = "PatternMPI_File_ops"
+  INFO      = "Number of MPI file operations"
+  DESCR     = {
+    Number of MPI file operations of any type.
+  }
+  DIAGNOSIS = {
+    Expand the metric tree to see the breakdown of different classes of MPI
+    file operation, expand the calltree to see where they occur, and look
+    at the distribution of operations done by each process.
+    Compare with the corresponding number of @ref(MPI_FILE_BYTES).
+  }
+  UNIT      = "occ"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_IOPS" = [
+  PARENT    = "MPI_FILE_OPS"
+  NAME      = "Individual"
+  DOCNAME   = "MPI File Individual Operations"
+  CLASS     = "PatternMPI_File_iops"
+  INFO      = "Number of MPI individual file operations"
+  DESCR     = {
+    Number of individual MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the distribution of individual MPI file operations done by each
+    process and compare with the corresponding number of @ref(MPI_FILE_IBYTES)
+    and resulting <em>exclusive</em> @ref(MPI_IO).
+  }
+  UNIT      = "occ"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_IROPS" = [
+  PARENT    = "MPI_FILE_IOPS"
+  NAME      = "Read"
+  DOCNAME   = "MPI File Individual Read Operations"
+  CLASS     = "PatternMPI_File_irops"
+  INFO      = "Number of MPI individual file read operations"
+  DESCR     = {
+    Number of individual MPI file read operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where individual MPI file reads occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_IRBYTES).
+  }
+  UNIT      = "occ"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_IWOPS" = [
+  PARENT    = "MPI_FILE_IOPS"
+  NAME      = "Write"
+  DOCNAME   = "MPI File Individual Write Operations"
+  CLASS     = "PatternMPI_File_iwops"
+  INFO      = "Number of MPI individual file write operations"
+  DESCR     = {
+    Number of individual MPI file write operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where individual MPI file writes occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_IWBYTES).
+  }
+  UNIT      = "occ"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_COPS" = [
+  PARENT    = "MPI_FILE_OPS"
+  NAME      = "Collective"
+  DOCNAME   = "MPI File Collective Operations"
+  CLASS     = "PatternMPI_File_cops"
+  INFO      = "Number of MPI collective file operations"
+  DESCR     = {
+    Number of collective MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the distribution of collective MPI file operations done by each
+    process and compare with the corresponding number of @ref(MPI_FILE_CBYTES)
+    and resulting @ref(MPI_IO_COLLECTIVE).
+  }
+  UNIT      = "occ"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_CROPS" = [
+  PARENT    = "MPI_FILE_COPS"
+  NAME      = "Read"
+  DOCNAME   = "MPI File Collective Read Operations"
+  CLASS     = "PatternMPI_File_crops"
+  INFO      = "Number of MPI collective file read operations"
+  DESCR     = {
+    Number of collective MPI file read operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where collective MPI file reads occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_CRBYTES).
+  }
+  UNIT      = "occ"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_CWOPS" = [
+  PARENT    = "MPI_FILE_COPS"
+  NAME      = "Write"
+  DOCNAME   = "MPI File Collective Write Operations"
+  CLASS     = "PatternMPI_File_cwops"
+  INFO      = "Number of MPI collective file write operations"
+  DESCR     = {
+    Number of collective MPI file write operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where collective MPI file writes occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_CWBYTES).
+  }
+  UNIT      = "occ"
+  HIDDEN
+]
+
+
+#--- MPI File bytes transferred patterns ------------------------------------
+
+PATTERN "MPI_FILE_BYTES" = [
+  NAME      = "MPI file bytes transferred"
+  DOCNAME   = "MPI File Bytes Transferred"
+  CLASS     = "PatternMPI_File_bytes"
+  INFO      = "Number of bytes read or written in MPI file operations"
+  DESCR     = {
+    Number of bytes read or written in MPI file operations of any type.
+  }
+  DIAGNOSIS = {
+    Expand the metric tree to see the breakdown of different classes of MPI
+    file operation, expand the calltree to see where they occur, and look
+    at the distribution of bytes transferred by each process.
+    Compare with the corresponding number of @ref(MPI_FILE_OPS).
+  }
+  UNIT      = "bytes"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_IBYTES" = [
+  PARENT    = "MPI_FILE_BYTES"
+  NAME      = "Individual"
+  DOCNAME   = "MPI File Individual Bytes Transferred"
+  CLASS     = "PatternMPI_File_ibytes"
+  INFO      = "Number of bytes read or written in MPI individual file operations"
+  DESCR     = {
+    Number of bytes read or written in individual MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the distribution of bytes transferred in individual MPI file operations done by each
+    process and compare with the corresponding number of @ref(MPI_FILE_IOPS)
+    and resulting <em>exclusive</em> @ref(MPI_IO).
+  }
+  UNIT      = "bytes"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_IRBYTES" = [
+  PARENT    = "MPI_FILE_IBYTES"
+  NAME      = "Read"
+  DOCNAME   = "MPI File Individual Bytes Read"
+  CLASS     = "PatternMPI_File_irbytes"
+  INFO      = "Number of bytes read in MPI individual file operations"
+  DESCR     = {
+    Number of bytes read in individual MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where individual MPI file reads occur and the
+    distribution of bytes read by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_IROPS).
+  }
+  UNIT      = "bytes"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_IWBYTES" = [
+  PARENT    = "MPI_FILE_IBYTES"
+  NAME      = "Written"
+  DOCNAME   = "MPI File Individual Bytes Written"
+  CLASS     = "PatternMPI_File_iwbytes"
+  INFO      = "Number of bytes written MPI individual file operations"
+  DESCR     = {
+    Number of bytes written in individual MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where individual MPI file writes occur and the
+    distribution of bytes written by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_IWOPS).
+  }
+  UNIT      = "bytes"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_CBYTES" = [
+  PARENT    = "MPI_FILE_BYTES"
+  NAME      = "Collective"
+  DOCNAME   = "MPI File Collective Bytes Transferred"
+  CLASS     = "PatternMPI_File_cbytes"
+  INFO      = "Number of bytes read or written in MPI collective file operations"
+  DESCR     = {
+    Number of bytes read or written in collective MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the distribution of bytes transferred in collective MPI file operations done by each
+    process and compare with the corresponding number of @ref(MPI_FILE_COPS)
+    and resulting @ref(MPI_IO_COLLECTIVE).
+  }
+  UNIT      = "bytes"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_CRBYTES" = [
+  PARENT    = "MPI_FILE_CBYTES"
+  NAME      = "Read"
+  DOCNAME   = "MPI File Collective Bytes Read"
+  CLASS     = "PatternMPI_File_crbytes"
+  INFO      = "Number of bytes read in MPI collective file operations"
+  DESCR     = {
+    Number of bytes read in collective MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where collective MPI file reads occur and the
+    distribution of bytes read by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_CROPS).
+  }
+  UNIT      = "bytes"
+  HIDDEN
+]
+
+PATTERN "MPI_FILE_CWBYTES" = [
+  PARENT    = "MPI_FILE_CBYTES"
+  NAME      = "Written"
+  DOCNAME   = "MPI File Collective Bytes Written"
+  CLASS     = "PatternMPI_File_cwbytes"
+  INFO      = "Number of bytes written in MPI collective file operations"
+  DESCR     = {
+    Number of bytes written in collective MPI file operations.
+  }
+  DIAGNOSIS = {
+    Examine the callpaths where collective MPI file writes occur and the
+    distribution of bytes written by each process in them, and compare with
+    the corresponding number of @ref(MPI_FILE_CWOPS).
+  }
+  UNIT      = "bytes"
+  HIDDEN
+]

@@ -1,0 +1,49 @@
+TOPDIR = .
+
+include Makefile.defs
+TOPDIR = ..
+
+include $(TOPDIR)/mf/common.defs
+
+BSUF=
+
+all: setup
+	cd build; $(MAKE) -f RealMakefile all
+
+install: all
+	cd build; $(MAKE) -f RealMakefile install
+
+clean:
+	cd build; $(MAKE) -f RealMakefile clean
+
+relink: setup mklinks chklinks
+
+setup:
+	@if test ! -d build; then $(MAKE) setup-real; fi
+
+setup-real: mk-build-dir build/lndir mklinks
+
+mk-build-dir:
+	@echo ""
+	@echo "++++++++++ SETUP ++++++++++++++++++++++++++++++"
+	-mkdir build
+
+mklinks:
+	cd build; ./lndir ../..
+	cd build; rm -f RealMakefile; ln -s ../../utils/build/RealMakefile .
+	cd build; rm -f GNUmakefile; ln -s RealMakefile GNUmakefile
+	cd build; rm -f Makefile; \
+		ln -s ../../utils/build/Makefile.redirect Makefile
+	cd build; rm -f Makefile.defs; ln -s ../Makefile.defs Makefile.defs
+	cd build; rm -f qt.pro.defs; ln -s ../qt.pro.defs qt.pro.defs
+	cd build; rm -f mpi-support.defs; ln -s ../mpi-support.defs
+
+chklinks:
+	$(TOPDIR)/utils/build/cleanlinks.sh build
+
+build/lndir: $(TOPDIR)/utils/build/lndir.c
+	$(CC) $(TOPDIR)/utils/build/lndir.c -o build/lndir
+
+realclean:
+	rm -rf build
+	

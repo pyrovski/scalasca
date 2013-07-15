@@ -1,0 +1,333 @@
+#!/bin/sh
+
+# General settings
+PROJECT="CUBE"
+LOGFILE="/tmp/cube-config-$$.log"
+
+
+####################
+# Helper functions #
+####################
+
+usage () {
+  cat > /dev/tty <<[[EOT]]
+usage  : $0 [options]
+options: [--prefix=DIR]                # Installation directory
+         [--with-qmake=PATH]           # Qt's qmake (name or absolute path)
+         [--disable-gui]               # Build CUBE libraries only
+         [--enable-shared]             # Build shared CUBE C++ library
+         [--enable-wx]                 # Enable wxWidgets-based GUI (deprecated)
+         [--force-(32|64)]             # Force 32-/64-bit installation
+         [--with-paraver-cfg=FILE]     # Paraver Integration config file FILE
+[[EOT]]
+}
+
+CFGecho () {
+  echo "$1" | tee -a ${LOGFILE}
+}
+
+ErrorAndExit () {
+  echo "ERROR: $1"
+  exit 1
+}
+
+ForceAbsolutePath () {
+  case "$2" in
+    /* )
+      ;;
+    *)
+      ErrorAndExit "Expected an absolute path for $1"
+      ;;
+  esac
+}
+
+########################
+# Command line parsing #
+########################
+
+PREFIX=""
+QMAKE=""
+NOGUI=""
+SHARED=""
+USEWX=""
+PREC=""
+PRVCFG=""
+
+for arg in "$@"; do
+  case ${arg} in
+  --help) usage
+          exit 1
+          ;;
+  --prefix=*)
+          PREFIX=`echo $arg | sed -e 's/--prefix=//'`
+          PREFIX=`eval echo ${PREFIX}`    # tilde and variable expansion
+          ForceAbsolutePath "--prefix" "${PREFIX}"
+          ;;
+  --with-qmake=*)
+          QMAKE=`echo $arg | sed -e 's/--with-qmake=//'`
+          QMAKE=`eval echo ${QMAKE}`    # tilde and variable expansion
+          ForceAbsolutePath "--with-qmake" "${QMAKE}"
+          ;;
+  --with-paraver-cfg=*)
+          PRVCFG=`echo $arg | sed -e 's/--with-paraver-cfg=//'`
+          PRVCFG=`eval echo ${PRVCFG}`  # tilde and variable expansion
+          ForceAbsolutePath "--with-paraver-cfg" "${PRVCFG}"
+          ;;
+  --disable-gui)
+          NOGUI=yes
+          ;;
+  --enable-shared)
+          SHARED=yes
+          ;;
+  --enable-wx)
+          USEWX=yes
+          ;;
+  --force-*)
+          FRC=`echo $arg | sed -e 's/--force-//'`
+          case ${FRC} in
+            32|64)
+              PREC=${FRC}
+              ;;
+            *)  ErrorAndExit "--force: Unknown feature '${FRC}'"
+              ;;
+          esac
+          ;;
+  *)      ErrorAndExit "ERROR: unknown option '${arg}'"
+          ;;
+  esac
+done
+
+
+###############################
+# Analysis Requirement Checks #
+###############################
+
+#---------- GNU make ----------
+. utils/build/select-gmake.sh
+
+#--------- Compiler -----------
+SYSTEM=`uname -s`
+ARCH=`uname -m`
+case ${SYSTEM} in
+  AIX)
+    ECC="xlc"
+    ECXX="xlC"
+    ;;
+  SunOS)
+    ECC="cc"
+    ECXX="CC"
+    ;;
+  *)
+    ECC="gcc"
+    ECXX="g++"
+    ;;
+esac
+
+# Handle compiler overrides
+if [ -n "${CC}" ]; then
+  ECC="${CC}"
+fi
+if [ -n "${CXX}" ]; then
+  ECXX="${CXX}"
+fi
+
+#--------- GUI toolkits -------
+if [ -n "${USEWX}" ]; then
+  . utils/build/select-wx.sh
+fi
+. utils/build/select-qt.sh
+
+
+#########################
+# Package configuration #
+#########################
+
+CFGecho "- Generating Makefile.defs"
+cp mf/Makefile.defs.in Makefile.defs || exit 1
+cp mf/qt.pro.defs . || exit 1
+CFGecho "Configuring Makefile.defs"
+
+# Installation prefix
+if [ -n "${PREFIX}" ]; then
+  CFGecho "- Setting PREFIX=${PREFIX}"
+  sed -e 's,^PREFIX = .*$,PREFIX = '${PREFIX}',' Makefile.defs > sed.out \
+      && mv sed.out Makefile.defs || exit 1
+fi
+
+# Compiler setup
+. utils/build/determine-ecc.sh
+. utils/build/determine-ecxx.sh
+if [ "${COMPCC}" != "${COMPCXX}" ]; then
+  ErrorAndExit "Mixed compiler setup not supported!"
+fi
+sed -e "s,^ECC \(.*\)= .*$,ECC \1= ${ECC}," Makefile.defs > sed.out \
+    &&  mv sed.out Makefile.defs || exit 1
+sed -e "s,^ECXX \(.*\)= .*$,ECXX \1= ${ECXX}," Makefile.defs > sed.out \
+    &&  mv sed.out Makefile.defs || exit 1
+if [ -f "mf/compiler-${COMPCXX}.defs" ]; then
+  sed -e '/^@COMPILER@/r 'mf/compiler-${COMPCXX}.defs -e '/^@COMPILER@/d' \
+      Makefile.defs > sed.out &&  mv sed.out Makefile.defs || exit 1
+else
+  sed -e '/^@COMPILER@/r 'mf/compiler-default.defs -e '/^@COMPILER@/d' \
+      Makefile.defs > sed.out &&  mv sed.out Makefile.defs || exit 1
+fi
+
+# Compiler flag overrides
+if [ -n "${CFLAGS}" ]; then
+  sed -e "s,^ECFLAGS \(.*\)= .*$,ECFLAGS \1= ${CFLAGS}," Makefile.defs > sed.out \
+      && mv sed.out Makefile.defs || exit 1
+fi
+if [ -n "${CXXFLAGS}" ]; then
+  sed -e "s,^ECXXFLAGS \(.*\)= .*$,ECXXFLAGS \1= ${CXXFLAGS}," Makefile.defs > sed.out \
+      && mv sed.out Makefile.defs || exit 1
+fi
+
+# Linker flag override
+if [ -n "${LDFLAGS}" ]; then
+  sed -e "s,^LDFLAGS \(.*\)=.*$,LDFLAGS \1= ${LDFLAGS}," Makefile.defs > sed.out \
+      && mv sed.out Makefile.defs || exit 1
+fi
+
+# GUI toolkits
+if [ -z "${NOGUI}" ]; then
+  if [ -n "${WX}" ]; then
+    CFGecho "- Using wxWidgets version ${WX}"
+    sed -e 's,^#WX,WX,' Makefile.defs > sed.out \
+        &&  mv sed.out Makefile.defs || exit 1
+  fi
+  if [ -n "${QT}" ]; then
+    CFGecho "- Using Qt version ${QT}"
+    sed -e 's,^#QT,QT,' \
+        -e 's,^QT_QMAKE \(.*\)=.*$,QT_QMAKE \1= '${QMAKE}',' \
+        Makefile.defs > sed.out && mv sed.out Makefile.defs || exit 1
+
+    # Configure Vampir integration via dbus
+    HASDBUS=`pkg-config --list-all 2>/dev/null | grep ^dbus-1 `
+    if [ -n "${HASDBUS}" ]
+    then
+      DBUSVER=`pkg-config --modversion dbus-1`
+      case "${DBUSVER}" in
+        0.*) ;; # too old
+        1.*) DBUSINC=`pkg-config --cflags-only-I dbus-1 | sed -e 's/-I//g' -e 's/ /%/g'`
+             DBUSLIB=`pkg-config --libs dbus-1 | sed -e 's/ /%/g'`
+             DBUSLOC=`echo ${DBUSINC} | sed -e 's#^.*%/#/#' -e 's#/include%*$##'`
+             CFGecho "- Configuring DBUS-1 (using ${DBUSLOC} ${DBUSVER})"
+             sed -e 's,^#VAMPIR_,VAMPIR_,' -e 's,^#TB_,TB_,' \
+                 -e 's,^VAMPIR_DBUS_INCLUDEPATH.*$,VAMPIR_DBUS_INCLUDEPATH = '${DBUSINC}',' \
+                 -e 's,^VAMPIR_DBUS_LIBS.*$,VAMPIR_DBUS_LIBS = '${DBUSLIB}',' \
+                 -e 's,%, ,g' \
+                 qt.pro.defs > sed.out && mv sed.out qt.pro.defs || exit 1
+             ;;
+          *) echo "- IGNORING dbus-1 version ${DBUSVER}" ;;
+      esac
+    fi
+
+    # Configure Paraver integration via config file
+    if [ -n "${PRVCFG}" ]
+    then
+      CFGecho "- Configuring Paraver Integration (using ${PRVCFG})"
+      sed -e 's,^#PV_,PV_,' -e 's,^#TB_,TB_,' \
+          -e 's,^PV_DEF_CFG.*$,PV_DEF_CFG = '${PRVCFG}',' \
+          -e 's,%, ,g' \
+          qt.pro.defs > sed.out && mv sed.out qt.pro.defs || exit 1
+    fi
+  fi
+fi
+
+# Shared C++ library
+if [ -n "${SHARED}" ]; then
+  if [ "${SYSTEM}" != "Darwin" -a "${SYSTEM}" != "AIX" ]; then
+    CFGecho "- Building shared C++ library"
+    sed -e 's,^#ESH_,ESH_,' \
+        Makefile.defs > sed.out && mv sed.out Makefile.defs || exit 1
+  fi
+fi
+
+# Determine default precision
+if [ -z "${PREC}" ]; then
+  cat > conftest.cpp <<[[EOT]]
+  int main() { return 0; }
+[[EOT]]
+  cat > Makefile.conftest <<[[EOT]]
+conftest: conftest.cpp
+	@\$(CXX) \$(CXXFLAGS) conftest.cpp -o conftest
+[[EOT]]
+  ${MK} -f Makefile.conftest conftest
+  if file conftest | grep 64 > /dev/null 2>&1; then
+    DEFPREC=64
+  else
+    DEFPREC=32
+  fi
+  PREC=${DEFPREC}
+  rm -f conftest.cpp conftest.o conftest Makefile.conftest
+fi
+sed -e "s,PREC \(.*\)=.*$,PREC \1= ${PREC}," \
+    Makefile.defs > sed.out && mv sed.out Makefile.defs || exit 1
+
+# Platform-specific adjustments
+if [ "${SYSTEM}" = "AIX" ]; then
+  sed -e 's,\(EPFLAG.*\)-m\(\$.*\)$,\1-maix\2,' \
+      -e 's,\(ECXX_ARFLAGS.*\)$,\1 -X\$(PREC),' \
+      Makefile.defs > sed.out && mv sed.out Makefile.defs || exit 1
+fi
+if [ "${SYSTEM}" = "SunOS" ]; then
+  sed -e 's,\(ESH_RPATH.*\)-rpath\(.*\)$,\1-R\2,' \
+      Makefile.defs > sed.out && mv sed.out Makefile.defs || exit 1
+fi
+if [ "${SYSTEM}" = "Linux" -a "${ARCH}" = "ia64" ]; then
+  sed -e 's,\(EPFLAG.*=\).*,\1,' \
+      Makefile.defs > sed.out && mv sed.out Makefile.defs || exit 1
+fi
+
+
+########################
+# Print final comments #
+########################
+
+if [ -z "${NOGUI}" ]; then
+  if [ -n "${USEWX}" ]; then
+    wxComments
+  fi
+  qtComments
+fi
+
+if [ ! -f "mf/compiler-${COMPCXX}.defs" ]; then
+  CFGecho ""
+  CFGecho "NOTE: Compiler '${COMPCXX}' unsupported"
+  CFGecho "      - Using generic default settings"
+  if [ -n "${FRC}" ]; then
+    CFGecho"       - Forcing ${FRC}-bit compilation not supported"
+  fi
+fi
+
+if [ -n "${SHARED}" ]; then
+  if [ "${SYSTEM}" = "Darwin" ]; then
+    CFGecho ""
+    CFGecho "NOTE: Building of shared libraries not yet supported on Mac OS X"
+  elif [ "${SYSTEM}" = "AIX" ]; then
+    CFGecho ""
+    CFGecho "NOTE: Building of shared libraries not yet supported on AIX"
+  elif [ `grep -c '^ESH_' Makefile.defs` -eq 0 ]; then
+    CFGecho ""
+    CFGecho "NOTE: Shared libraries not supported for this compiler"
+    CFGecho "      - Skipping building shared C++ library."
+  fi
+fi
+
+# Save configuration info
+echo "% $0 $@" > configure.log
+echo "" >> configure.log
+cat ${LOGFILE} >> configure.log
+rm ${LOGFILE}
+
+CFGecho ""
+CFGecho "####################################################################"
+CFGecho "CONFIGURATION COMPLETE"
+CFGecho ""
+CFGecho "Next steps:"
+CFGecho " - Edit Makefile.defs to adjust compiler settings [optional]"
+CFGecho " - ${MK}"
+CFGecho " - ${MK} install"
+CFGecho "####################################################################"
+
+exit 0

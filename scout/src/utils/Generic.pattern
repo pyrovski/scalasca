@@ -1,0 +1,195 @@
+#****************************************************************************
+#*  SCALASCA    http://www.scalasca.org/                                   **
+#****************************************************************************
+#*  Copyright (c) 1998-2013                                                **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#***************************************************************************/
+
+
+#--- Generic performance patterns -------------------------------------------
+
+PATTERN "TIME" = [
+  NAME      = "Time"
+  CLASS     = "PatternTime"
+  INFO      = "Total CPU allocation time (includes time allocated for idle threads)"
+  DESCR     = {
+    Total time spent for program execution including the idle times of CPUs
+    reserved for slave threads during OpenMP sequential execution. This
+    pattern assumes that every thread of a process allocated a separate CPU
+    during the entire runtime of the process.
+  }
+  DIAGNOSIS = {
+    Expand the metric tree hierarchy to break down total time into
+    constituent parts which will help determine how much of it is due to
+    local/serial computation versus MPI and/or OpenMP parallelization
+    costs, and how much of that time is wasted waiting for other processes
+    or threads due to ineffective load balance or due to insufficient
+    parallelism.
+    </dd><p><dd>
+    Expand the call tree to identify important callpaths and routines where
+    most time is spent, and examine the times for each process or thread to
+    locate load imbalance.
+  }
+  UNIT      = "sec"
+  CALLBACKS = [
+    "EXIT" = {
+      Event  enter = data->m_callstack.top();
+      CNode* cnode = enter.get_cnode();
+
+      m_severity[cnode] += event->get_time() - enter->get_time();
+    }
+
+    "OMP_MGMT_FORK" = {
+      m_severity[event.get_cnode()] += data->m_idle;
+    }
+
+    "OMP_MGMT_JOIN" = {
+      m_severity[event.get_cnode()] += data->m_idle;
+    }
+
+    "FINISHED" = {
+      // Exclusify profile
+      uint32_t count = data->m_defs->num_cnodes();
+      for (ident_t id = 0; id < count; ++id) {
+        CNode* cnode = data->m_defs->get_cnode(id);
+
+        map<CNode*,double>::iterator it = m_severity.find(cnode);
+        if (it != m_severity.end()) {
+          CNode* parent = cnode->get_parent();
+
+          // If there is a parent but no severity stored, we are at the
+          // outermost OpenMP parallel region (hopefully)
+          if (parent && m_severity.find(parent) != m_severity.end())
+            m_severity[parent] -= it->second;
+        }
+      }
+    }
+  ]
+]
+
+
+PATTERN "VISITS" = [
+  NAME      = "Visits"
+  CLASS     = "PatternVisits"
+  INFO      = "Number of visits"
+  DESCR     = {
+    Number of times a call path has been visited. Visit counts for MPI
+    routine call paths directly relate to the number of MPI @ref(COMMS) and
+    @ref(SYNCS). Visit counts for OpenMP operations and parallel regions
+    (loops) directly relate to the number of times they were executed.
+    Routines which were not instrumented, or were filtered during
+    measurement, do not appear on recorded call paths. Similarly, routines
+    are not shown if the compiler optimizer successfully in-lined them
+    prior to automatic instrumentation.
+  }
+  DIAGNOSIS = {
+    Call paths that are frequently visited (and thereby have high exclusive
+    Visit counts) can be expected to have an important role in application
+    execution performance (e.g., @ref(EXECUTION)). Very frequently executed
+    routines, which are relatively short and quick to execute, may have an
+    adverse impact on measurement quality. This can be due to
+    instrumentation preventing in-lining and other compiler optimizations
+    and/or overheads associated with measurement such as reading timers and
+    hardware counters on routine entry and exit. When such routines consist
+    solely of local/sequential computation (i.e., neither communication nor
+    synchronization), they should be eliminated to improve the quality of
+    the parallel measurement and analysis. One approach is to specify the
+    names of such routines in a <em>filter</em> file for subsequent
+    measurements to ignore, and thereby considerably reduce their
+    measurement impact. Alternatively, <em>selective instrumentation</em>
+    can be employed to entirely avoid instrumenting such routines and
+    thereby remove all measurement impact. In both cases, uninstrumented
+    and filtered routines will not appear in the measurement and analysis,
+    much as if they had been "in-lined" into their calling routine.
+  }
+  UNIT      = "occ"
+  CALLBACKS = [
+    "ENTER" = {
+      ++m_severity[event.get_cnode()];
+    }
+  ]
+]
+
+
+PATTERN "EXECUTION" = [
+  PARENT    = "TIME"
+  NAME      = "Execution"
+  DOCNAME   = "Execution Time"
+  CLASS     = "PatternExec"
+  INFO      = "Execution time (does not include time allocated for idle threads)"
+  DESCR     = {
+    Time spent on program execution but without the idle times of slave
+    threads during OpenMP sequential execution.
+  }
+  DIAGNOSIS = {
+    Expand the call tree to determine important callpaths and routines
+    where most exclusive execution time is spent, and examine the time for
+    each process or thread on those callpaths looking for significant
+    variations which might indicate the origin of load imbalance.
+    </dd><p><dd>
+    Where exclusive execution time on each process/thread is unexpectedly
+    slow, profiling with PAPI preset or platform-specific hardware counters
+    may help to understand the origin. Serial program profiling tools
+    (e.g., gprof) may also be helpful. Generally, compiler optimization
+    flags and optimized libraries should be investigated to improve serial
+    performance, and where necessary alternative algorithms employed.
+  }
+  UNIT      = "sec"
+  HIDDEN
+]
+
+
+PATTERN "OVERHEAD" = [
+  PARENT    = "TIME"
+  NAME      = "Overhead"
+  DOCNAME   = "Overhead Time"
+  CLASS     = "PatternOverhead"
+  INFO      = "Time spent performing tasks related to trace generation"
+  DESCR     = {
+    Time spent performing major tasks related to measurement, such as
+    creation of the experiment archive directory, clock synchronization or
+    dumping trace buffer contents to a file. Note that normal per-event
+    overheads &ndash; such as event acquisition, reading timers and
+    hardware counters, runtime call-path summarization and storage in trace
+    buffers &ndash; is <em>not</em> included.
+  }
+  DIAGNOSIS = {
+    Significant measurement overheads are typically incurred when
+    measurement is initialized (e.g., in the program <tt>main</tt> routine
+    or <tt>MPI_Init</tt>) and finalized (e.g., in <tt>MPI_Finalize</tt>),
+    and are generally unavoidable. While they extend the total (wallclock)
+    time for measurement, when they occur before parallel execution starts
+    or after it completes, the quality of measurement of the parallel
+    execution is not degraded.  Trace file writing overhead time can be
+    kept to a minimum by specifying an efficient parallel filesystem (when
+    provided) for the experiment archive (e.g.,
+    <tt>EPK_GDIR=/work/mydir</tt>) and <em>not</em> specifying a different
+    location for intermediate files (i.e., <tt>EPK_LDIR=$EPK_GDIR</tt>).
+    </dd><p><dd>
+    When measurement overhead is reported for other call paths, especially
+    during parallel execution, measurement perturbation is considerable and
+    interpretation of the resulting analysis much more difficult. A common
+    cause of measurement overhead during parallel execution is the flushing
+    of full trace buffers to disk: warnings issued by the EPIK measurement
+    system indicate when this occurs. When flushing occurs simultaneously
+    for all processes and threads, the associated perturbation is
+    localized. More usually, buffer filling and flushing occurs
+    independently at different times on each process/thread and the
+    resulting perturbation is extremely disruptive, often forming a
+    catastrophic chain reaction. It is highly advisable to avoid
+    intermediate trace flushes by appropriate instrumentation and
+    measurement configuration, such as specifying a <em>filter</em> file
+    listing purely computational routines (classified as type USR by
+    <em>cube3_score&nbsp;-r</em>&nbsp;) or an adequate trace buffer size
+    (<tt>ELG_BUFFER_SIZE</tt> larger than max_tbc reported by
+    <em>cube3_score</em>). If the maximum trace buffer capacity requirement
+    remains too large for a full-size measurement, it may be necessary to
+    configure the subject application with a smaller problem size or to
+    perform fewer iterations/timesteps to shorten the measurement (and
+    thereby reduce the size of the trace).
+  }
+  UNIT      = "sec"
+  HIDDEN
+]

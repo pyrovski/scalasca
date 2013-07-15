@@ -1,0 +1,23 @@
+#!/bin/sh
+
+TDIR=${TMPDIR:-.}
+
+echo ""
+echo ""
+echo "VTF3SORT - Emulate vptmerge using UNIX sort"
+echo "-------------------------------------------"
+if [ $# != "3" ]
+then
+  echo "usage: $0 -o outfile <infile>"
+  exit 1
+fi
+
+GNUSORT=`sort --help </dev/null 1>/dev/null 2>&1 && echo "-s"`
+
+echo "Generating header ..."
+sed -n -e /UNMERGED/d -e /^[0-9]/q -e /./p $3 > $2
+echo "Sorting event records ..."
+grep '^[0-9]' $3 | sort -T ${TDIR} -n ${GNUSORT} >> $2
+echo "... done."
+echo ""
+exit 0

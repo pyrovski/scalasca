@@ -1,0 +1,193 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+
+/**
+@defgroup adapters Measurement adapters
+
+The EPIK measurement system supports different programming paradigms 
+through the use of specific adapters. These adapters include:
+
+- @ref adapters_mpi
+- @ref adapters_openmp
+
+*/
+
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup adapters_mpi MPI adapter
+@ingroup  adapters
+
+The Message Passing Interface (MPI) adapter of EPIK supports the tracing
+of most of MPI's 300+ function calls. MPI defines a so-called 'profiling
+interface' that supports the provision of wrapper libraries that can
+easily interposed between the user application and the MPI library
+calls.
+
+EPIK supports selective event generation. Currently, this means that at
+start time of the application, the user can decide whether event
+generation is turned on or off for a group of functions. These groups
+are the listed sub modules of this adapter. Each module has a short
+string token that identifies this group. To activate event generation
+for a specific group, the user can specify a colon-seperated list of
+tokens in the environmen variable \p EPK_MPI_ENABLED. Additionally,
+special tokens exist to ease the handling by the user. A complete list
+of available tokens that can be specified in the runtime configuration
+is listed below.
+
+<table>
+<tr>
+ <th>Token</th><th>Module</th>
+</tr>
+<tr>
+ <td>ALL</td><td>Activate all available modules</td>
+</tr>
+<tr>
+ <td>DEFAULT</td><td>Activate the configured default modules. This can
+ be used to easily activate additional modules.</td>
+</tr>
+<tr>
+ <td>CG</td><td>@ref cg</td>
+</tr>
+<tr>
+ <td>COLL</td><td>@ref coll</td>
+</tr>
+<tr>
+ <td>ENV</td><td>@ref env</td>
+</tr>
+<tr>
+ <td>ERR</td><td>@ref err</td>
+</tr>
+<tr>
+ <td>EXT</td><td>@ref ext</td>
+</tr>
+<tr>
+ <td>IO</td><td>@ref io</td>
+</tr>
+<tr>
+ <td>MISC</td><td>@ref misc</td>
+</tr>
+<tr>
+ <td>P2P</td><td>@ref p2p</td>
+</tr>
+<tr>
+ <td>RMA</td><td>@ref rma</td>
+</tr>
+<tr>
+ <td>SPAWN</td><td>@ref spawn</td>
+</tr>
+<tr>
+ <td>TOPO</td><td>@ref topo</td>
+</tr>
+<tr>
+ <td>TYPE</td><td>@ref type</td>
+</tr>
+</table>
+
+@note Event generation in this context only relates to flow and and
+transfer events. Tracking of communicators, groups, and other internal
+data is unaffected and always turned on.
+
+Example:
+<pre>
+EPK_MPI_ENABLED=ENV:P2P
+</pre>
+
+This will enable event generation for environmental managment, including
+MPI_Init and MPI_Finalize, as well as point-to-point communication, but
+will disable it for all other functions groups.
+
+A shorthand to get event generation for all supported function calls is
+<pre>
+EPK_MPI_ENABLED=ALL
+</pre>
+
+A shorthand to add a single group, e.g. \p TYPE, to the configured default is
+<pre>
+EPK_MPI_ENABLED=DEFAULT:TYPE
+</pre>
+
+
+
+*/
+
+/**
+@defgroup cg      Communicators and Groups
+@ingroup adapters_mpi
+
+  @defgroup cg_err  Error handling
+  @ingroup cg
+  @defgroup cg_ext  External interfaces
+  @ingroup cg
+  @defgroup cg_misc Handle conversion
+  @ingroup cg
+
+@defgroup coll Collective Communication
+@ingroup adapters_mpi
+  
+@defgroup env Environmental management
+@ingroup adapters_mpi
+
+@defgroup err Error handling
+@ingroup adapters_mpi
+
+@defgroup ext External interfaces
+@ingroup adapters_mpi
+
+@defgroup io Parallel I/O
+@ingroup adapters_mpi
+
+  @defgroup io_err  Error handling
+  @ingroup io
+  @defgroup io_misc Handle conversion
+  @ingroup io
+
+@defgroup misc Miscellaneous
+@ingroup adapters_mpi
+
+@defgroup p2p Point-to-point
+@ingroup adapters_mpi
+
+@defgroup rma One-sided communication
+@ingroup adapters_mpi
+
+  @defgroup rma_err  Error handling
+  @ingroup rma
+  @defgroup rma_ext  External interfaces
+  @ingroup rma
+  @defgroup rma_misc Handle conversion
+  @ingroup rma
+
+@defgroup spawn Process spawning interface
+@ingroup adapters_mpi
+
+@defgroup topo Topologies
+@ingroup adapters_mpi
+
+@defgroup type Datatypes
+@ingroup adapters_mpi
+
+  @defgroup type_ext  External interfaces
+  @ingroup type
+  @defgroup type_misc Handle conversion
+  @ingroup type
+
+@defgroup util Utility functions
+@ingroup adapters_mpi
+ */
+/*-------------------------------------------------------------------------*/
+
+/**
+@defgroup adapters_openmp OpenMP adapter
+@ingroup  adapters
+*/
+
+/*-------------------------------------------------------------------------*/
+

@@ -1,0 +1,40 @@
+#------------------------------------------------------------------------------
+# General settings
+#------------------------------------------------------------------------------
+
+# Install path
+PREFIX = /opt/cube3
+
+# Precision setting
+PREC   = 32
+
+
+#------------------------------------------------------------------------------
+# Compiler, Linker & Archiver settings
+#------------------------------------------------------------------------------
+
+ECC           = gcc
+ECXX          = g++
+LDFLAGS       =
+ECXX_AR       = ar
+ECXX_ARFLAGS  = -rcs
+
+@COMPILER@
+
+
+#------------------------------------------------------------------------------
+# CUBE configuration (wxWidgets & Qt support)
+#------------------------------------------------------------------------------
+
+# wxWidgets
+#WX_TARGETS = src/GUI-wx
+#WX_CFLAGS  = `wx-config --cflags`
+#WX_LDLIBS  = `wx-config --libs`
+
+# Qt
+#QT_QMAKE   = qmake
+#QT_MKSPEC  = default
+#QT_TARGETS = src/GUI-qt
+#QT_PLAT    = -unix
+
+CUBE_TARGETS = $(WX_TARGETS) $(QT_TARGETS)

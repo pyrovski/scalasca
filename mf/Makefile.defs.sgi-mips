@@ -1,0 +1,145 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.sgi-mips)
+#------------------------------------------------------------------------------
+
+CFGKEY = sgi-mips
+CONFIG = SGI cluster with IRIX compilers
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC    = 32
+PFLAG32 = -n32
+PFLAG64 = -64
+PFLAG   = $(PFLAG$(PREC))
+AFLAG   =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = origin
+MACHINE   = -DMACHINE=\"SGI\ Irix\ MIPS\ \($(PREC)-bit\)\"
+#PLAT_LDIR = -DPFORM_LDIR=\"/tmp\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = cc
+PLAT_CFLAGS =
+
+OPTFLAGS =
+CC       = cc -c99
+CFLAGS   = $(PFLAG) $(OPTFLAGS)
+CXX      = CC
+CXXFLAGS = $(PFLAG) -LANG:std $(OPTFLAGS)
+#Use the following if your SGI CC doesn't support the <c....> headers
+#CXXFLAGS = $(PFLAG) -LANG:std 
+F77      = f77
+F90      = f90
+
+FFLAGS   = $(PFLAG) $(OPTFLAGS)
+FPP      = -cpp
+FDOPT    = -D
+LDFLAGS  = $(PFLAG) -LANG:std $(OPTFLAGS)
+UTILLIB  = -lgen
+FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+MPICC     = $(CC)
+MPICXX    = $(CXX)
+MPIF90    = $(F90)
+MPILIB    = -lmpi
+PMPILIB   = 
+FMPILIB   = -lepk.ad.fmpi
+FMPIOBJ   = libepk.ad.fmpi.a
+MPIEXT32  =
+MPIEXT64  = 
+MPIEXTRA  = -DSGI_MPT $(MPIEXT$(PREC))
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = $(CC)
+OMPCXX     = $(CXX)
+OMPF90     = $(F90)
+OMPFLAG    = -mp
+OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+HYBCC      = $(MPICC)
+HYBCXX     = $(MPICXX)
+HYBF90     = $(MPIF90)
+HYBFLAG    = $(OMPFLAG)
+HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+#METR       = papi
+#METRDIR    = /usr/local/papi
+#METRINC    = -I$(METRDIR)/include
+#METRLIB32  = -lpapi
+#METRLIB64  = -lpapi
+#METRLDIR32 = $(METRDIR)/lib
+#METRLDIR64 = $(METRDIR)/lib
+#METRLIB    = -L$(METRLDIR$(PREC)) -rpath,$(METRLDIR$(PREC)) $(METRLIB$(PREC))
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS = -O3
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+ECXX         = CC $(CXXFLAGS)
+ECXXLIBS     = -lgen
+ECXX_AR      = CC
+ECXX_ARFLAGS = -ar -o
+
+LIBERTY      =
+
+#ECXX         = g++ -O3
+#ECXXLIBS     = -lstdc++ -lgen
+#ECXX_AR      = ar
+#ECXX_ARFLAGS = -rcs
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = generic
+#CINSTFLAG =
+#LINSTFLAG =
+#EXTRAOBJS =
+#KINST_EXTRA =
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#ANAME32     = sgin32
+#ANAME64     = sgi64
+#VTF3LIB     = -L$(VTF3DIR)/$(ANAME$(PREC))/lib -lvtf3
+#INST_VTF3   = install-vtf3
+

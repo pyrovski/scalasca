@@ -1,0 +1,61 @@
+Perturbation Compensation
+=========================
+
+Tracing parallel programs to observe their performance introduces
+intrusion as the result of trace measurement overhead. If post-mortem
+trace analysis does not compensate for the overhead, the intrusion
+will lead to errors in the performance results.
+
+This directory contains an experimental filter tool that can be used
+to approximate uninstrumented execution by accounting for intrusion
+errors. The filter consists of two parts: (i) a component to measure
+platform-specific quantities, such as the average per-event overhead
+and the memory bandwidth needed to compute the buffer copy time and
+(ii) the actual compensation engine to generate a new trace file with
+overheads removed.
+
+Usage
+-----
+
+(1) Measure the required platform-specific quantities on the target
+    platform by running 'elg_ovrhds'. This will generate a file called
+    'ovrhds.out'.
+
+(2) Copy the overhead file in the directory where your trace file
+    resides.
+
+(3) Run the compensation filter:
+
+    elg_pcomp [--upper | --lower] <infile> <outfile>
+
+    Options
+    -------
+    --upper: upper-bound approximation
+    --lower: lower-bound approximation
+
+Limitations
+-----------
+
+(1) The filter works only with single-threaded MPI applications.
+
+(2) The filter assume that the application uses only MPI_Send() and
+    MPI_Recv() for point-to-point and that MPI_Send() is always
+    non-blocking.
+
+(3) Only n-to-n and 1-to-n collective operations are
+    considered. Others are not supported.
+
+(4) The overhead measurement utility does not measure the overhead
+    introduced by hardware-counter reads.
+
+(5) As the filter only approximates uninstrumented execution, the
+    result will still be inaccurate. We therefore recommend to use the
+    filter only if the intrusion is large.
+
+Literature
+----------
+
+Wolf, F., Malony, A., Shende, S., Morris, A. "Trace-Based Parallel
+Performance Overhead Compensation". In Proc. of the International
+Conference on High Performance Computing and Communications (HPCC),
+Sorrento (Naples), Italy, September, 2005.

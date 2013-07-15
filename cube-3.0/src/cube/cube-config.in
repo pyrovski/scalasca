@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# Settings
+version="@VERSION@"
+prefix="@PREFIX@"
+incdir="@INCDIR@"
+libdir="@LIBDIR@"
+cxx="@CXX@"
+zlib="@ZLIB@"
+shared="@SHARED@"
+rpath="@RPATH@"
+
+
+usage()
+{
+    cat <<[[EOT]]
+Usage: cube-config [OPTION]
+
+Known values for OPTION are:
+
+  --version             print CUBE library version
+  --prefix              print installation prefix
+  --cxx                 print C++ compiler used for compiling CUBE
+  --cxxflags            print pre-processor and compiler flags for CUBE
+  --libs[=MODE]         print library linking information for CUBE
+
+The optional MODE argument of the '--libs' option is used to select either
+the shared or static versions of the CUBE library. If not specified, the
+static version is used. Recognized modes for this installation of CUBE are
+  static     (default)
+[[EOT]]
+    if test -n "${shared}"; then
+        echo "  shared"
+    fi
+    exit 1
+}
+
+if test $# -eq 0; then
+    usage
+fi
+
+while test $# -gt 0; do
+    case "$1" in
+    --version)
+        echo "${version}"
+        ;;
+
+    --prefix)
+        echo "${prefix}"
+        ;;
+
+    --cxx)
+        echo "${cxx}"
+        ;;
+
+    --cxxflags)
+        echo "-I${incdir}"
+        ;;
+
+    --libs*)
+        MODE="static"
+        if test "$1" != "--libs"; then
+            MODE=`echo $1 | sed -e 's/--libs=//'`
+        fi
+        CLIB="-L${libdir}"
+        case "${MODE}" in
+            static)
+                CLIB="${CLIB} -lcube3 ${zlib}"
+                ;;
+
+            shared)
+                if test -z "${shared}"; then
+                    usage
+                fi
+                CLIB="${CLIB} ${rpath} -lcube3so ${zlib}"
+                ;;
+
+            *)
+                usage
+                ;;
+        esac
+        echo "${CLIB}"
+        ;;
+
+    *)
+        usage
+        ;;
+    esac
+    shift
+done
+
+exit 0

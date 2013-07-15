@@ -1,0 +1,26 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * PEARL.writer
+ *
+ *---------------------------------------------------------------------------
+ */
+
+
+//--- Library description ---------------------------------------------------
+
+/**
+@defgroup PEARL_writer PEARL.writer
+@ingroup  PEARL
+@brief    Simple trace file writing capability provided by the PEARL Library
+*/

@@ -1,0 +1,37 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich, Juelich Supercomputing Centre               **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+
+//--- Library description ---------------------------------------------------
+
+/**
+@mainpage SILAS
+
+The simulator for large scale applications SILAS provides an
+infrastructure to model and simulate the application behaviour of large
+scale applications based on \@ref EPIK event traces.
+
+The simulator can be devided in three main modules:
+    * the simulation infrastructure,
+    * the simulation model, and
+    * the hypotheses with their implied transformations.
+
+The entire functionality is encapsulated in the namespace @ref silas.
+*/
+
+
+//--- Namespace description -------------------------------------------------
+
+/**
+@namespace silas
+@brief     Namespace of the SILAS simulator
+
+The C++ namespace silas encapsulates all classes, functions, and identifiers
+that are related to the simulator for large scale applications SILAS.
+*/

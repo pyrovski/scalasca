@@ -1,0 +1,13 @@
+EPFLAG       = -q$(PREC)
+ECFLAGS      = $(EPFLAG) -O3 -qstrict
+ECXXFLAGS    = $(EPFLAG) -O3 -qstrict -qstaticinline -qsuppress=1500-029:1500-030
+
+
+#------------------------------------------------------------------------------
+# Shared library settings
+#------------------------------------------------------------------------------
+
+#ESH_CXXFLAGS = -qpic
+#ESH_AR       = $(ECXX)
+#ESH_ARFLAGS  = $(EPFLAG) -qmkshrobj
+#ESH_RPATH    = -R$(LIBDIR)

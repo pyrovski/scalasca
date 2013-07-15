@@ -1,0 +1,20 @@
+# This file exists for easy integration with the KOJAK/Scalasca software.
+# Do not edit the definitions below.
+
+TOPDIR := $(TOPDIR)/..
+
+include $(TOPDIR)/Makefile.defs
+
+
+# The following conditionals are needed to let the cube-3.0 Makefile
+# recurse into the configured GUI subdirectories
+ifdef WX_BUILD_TARGETS
+  CUBE_TARGETS += src/GUI-wx
+endif
+ifdef QT_BUILD_TARGETS
+  CUBE_TARGETS += src/GUI-qt
+endif
+
+
+# From within KOJAK/Scalasca, we support only UNIX targets for now
+QT_PLAT = -unix

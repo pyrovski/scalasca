@@ -1,0 +1,156 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.linux-pathscale)
+#------------------------------------------------------------------------------
+
+CFGKEY = linux-pathscale
+CONFIG = Linux cluster with PathScale compilers and MPICH mpi
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC   = 32
+PFLAG  =
+AFLAG  =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = linux
+#PLAT_LDIR = -DPFORM_LDIR=\"/tmp\"
+MACHINE   = -DMACHINE=\"Linux\ Pathscale\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = pathcc
+PLAT_CFLAGS =
+
+OPTFLAGS =
+CC       = pathcc
+CFLAGS   = $(OPTFLAGS)
+CXX      = pathCC
+CXXFLAGS = $(OPTFLAGS)
+F77      = pathf90
+#F77      = pathf90 -fno-second-underscore
+F90      = $(F77)
+FFLAGS   = $(OPTFLAGS)
+FPP      =
+FDOPT    = -D
+LDFLAGS  = $(OPTFLAGS)
+UTILLIB  =
+FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+MPICC     = mpicc -cc="$(CC)"
+MPICXX    = mpicxx -CC="$(CXX)"
+MPIF90    = mpif90 -f90="$(F90)"
+MPILIB    = -lmpich
+PMPILIB   = -lpmpich
+#PMPILIB   = # MPICH2
+FMPILIB   = -lfmpich
+FMPIOBJ   =
+MPIEXTRA  =
+#MPIEXTRA  = -DHAS_MPI2_1SIDED #MPICH2
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = $(CC)
+OMPCXX     = $(CXX)
+OMPF90     = $(F90)
+OMPFLAG    = -openmp
+OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+HYBCC      = $(MPICC)
+HYBCXX     = $(MPICXX)
+HYBF90     = $(MPIF90)
+HYBFLAG    = $(OMPFLAG)
+HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS =
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+#METR       = papi
+#METRDIR    = /usr/local/papi
+#METRINC    = -I$(METRDIR)/include
+#METRLIB32  = -lpapi
+#METRLIB64  = -lpapi
+#METRLDIR32 = $(METRDIR)/lib
+#METRLDIR64 = $(METRDIR)/lib
+#METRLIB    = -L$(METRLDIR$(PREC)) -Wl,-rpath,$(METRLDIR$(PREC)) $(METRLIB$(PREC))
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+ECXX         = g++ -O3
+ECXXLIBS     = -lstdc++
+ECXX_AR      = ar
+ECXX_ARFLAGS = -rcs
+
+BINUTILS     = /opt/binutils
+LIBERTY      = -L$(BINUTILS)/lib64 -L$(BINUTILS)/lib -liberty
+
+#ECXX         = pathCC -O2 $(CXXFLAGS)
+#ECXXLIBS     =
+#ECXX_AR      = ar
+#ECXX_ARFLAGS = -rcs
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = generic
+#CINSTFLAG =
+#LINSTFLAG =
+#EXTRAOBJS =
+#KINST_EXTRA =
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#VTF3LIB     = -L$(VTF3DIR)/i386_linux/lib -lvtf3
+#INST_VTF3   = install-vtf3
+
+#------------------------------------------------------------------------------
+# OTF Support
+#-----------------------------------------------------------------------------
+
+#OTFDIR      =
+#OTFRTTI     =
+#OTFUNIFY    = elg_otfunify
+##OTFUNIFY    = elg_otfunify.omp
+#ELG_OTF     = elg2otf
+#OTFLIB      = -L$(OTFDIR)/lib64 -L$(OTFDIR)/lib -lotf -lz
+#INST_OTF    = install-otf
+#OTFELGLIB     = libelg.otf.a
+#OTFMPIELGLIB  = libelg.otf.mpi.a
+#OTFOMPELGLIB  = libelg.otf.omp.a
+#OTFHYBELGLIB  = libelg.otf.ompi.a
+

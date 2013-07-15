@@ -1,0 +1,186 @@
+*** elg_shmem.c.wrapper.gen	2005-08-18 18:23:23.038936796 +0200
+--- ../elg_shmem.c.wrapper.gen	2005-08-18 18:22:57.114907514 +0200
+***************
+*** 94,97 ****
+--- 94,98 ----
+  }
+  
++ #ifndef AIXTURBO
+  void shmem_short_add(short* target, short value, int pe)
+  {
+***************
+*** 106,109 ****
+--- 107,111 ----
+  #endif
+  }
++ #endif
+  
+  void shmem_short_inc(short* target, int pe)
+***************
+*** 194,197 ****
+--- 196,200 ----
+  }
+  
++ #ifndef AIXTURBO
+  short shmem_short_cswap(short* target, short cond, short value, int pe)
+  {
+***************
+*** 214,217 ****
+--- 217,221 ----
+    return res;
+  }
++ #endif
+  
+  void shmem_short_wait(short* ivar, short value)
+***************
+*** 505,508 ****
+--- 509,513 ----
+  }
+  
++ #ifndef AIXTURBO
+  int shmem_int_cswap(int* target, int cond, int value, int pe)
+  {
+***************
+*** 525,528 ****
+--- 530,534 ----
+    return res;
+  }
++ #endif
+  
+  void shmem_int_wait(int* ivar, int value)
+***************
+*** 716,719 ****
+--- 722,726 ----
+  }
+  
++ #ifndef AIXTURBO
+  void shmem_long_add(long* target, long value, int pe)
+  {
+***************
+*** 728,732 ****
+--- 735,741 ----
+  #endif
+  }
++ #endif
+  
++ #ifndef AIXTURBO
+  void shmem_long_inc(long* target, int pe)
+  {
+***************
+*** 741,744 ****
+--- 750,754 ----
+  #endif
+  }
++ #endif
+  
+  long shmem_long_g(long* target, int pe)
+***************
+*** 816,819 ****
+--- 826,830 ----
+  }
+  
++ #ifndef AIXTURBO
+  long shmem_long_cswap(long* target, long cond, long value, int pe)
+  {
+***************
+*** 836,839 ****
+--- 847,851 ----
+    return res;
+  }
++ #endif
+  
+  void shmem_long_wait(long* ivar, long value)
+***************
+*** 1027,1030 ****
+--- 1039,1043 ----
+  }
+  
++ #ifndef AIXTURBO
+  void shmem_longlong_add(long long* target, long long value, int pe)
+  {
+***************
+*** 1039,1043 ****
+--- 1052,1058 ----
+  #endif
+  }
++ #endif
+  
++ #ifndef AIXTURBO
+  void shmem_longlong_inc(long long* target, int pe)
+  {
+***************
+*** 1052,1055 ****
+--- 1067,1071 ----
+  #endif
+  }
++ #endif
+  
+  long long shmem_longlong_g(long long* target, int pe)
+***************
+*** 1127,1130 ****
+--- 1143,1147 ----
+  }
+  
++ #ifndef AIXTURBO
+  long long shmem_longlong_cswap(long long* target, long long cond, long long value, int pe)
+  {
+***************
+*** 1147,1150 ****
+--- 1164,1168 ----
+    return res;
+  }
++ #endif
+  
+  void shmem_longlong_wait(long long* ivar, long long value)
+***************
+*** 1483,1487 ****
+--- 1501,1509 ----
+  }
+  
++ #ifdef AIXTURBO
++ void shmem_double_ixput(double* target, double* source, long* idx, int len, int pe)
++ #else
+  void shmem_double_ixput(double* target, double* source, int* idx, int len, int pe)
++ #endif
+  {
+  #ifndef ELG_CSITE_INST
+***************
+*** 1697,1700 ****
+--- 1719,1723 ----
+  }
+  
++ #ifndef AIXTURBO
+  long double shmem_longdouble_swap(long double* target, long double value, int pe)
+  {
+***************
+*** 1715,1718 ****
+--- 1738,1742 ----
+    return res;
+  }
++ #endif
+  
+  void shmem_longdouble_min_to_all(long double* target, long double* source, int nreduce, int PE_start, int logPE_stride, int PE_size, long double* pWrk, long* pSync)
+***************
+*** 2056,2060 ****
+--- 2080,2088 ----
+  }
+  
++ #ifdef AIXTURBO
++ void shmem_ixget(void* target, void* source, long long* idx, int len, int pe)
++ #else
+  void shmem_ixget(void* target, void* source, int* idx, int len, int pe)
++ #endif
+  {
+  #ifndef ELG_CSITE_INST
+***************
+*** 2069,2073 ****
+--- 2097,2105 ----
+  }
+  
++ #ifdef AIXTURBO
++ void shmem_ixput(void* target, void* source, long long* idx, int len, int pe)
++ #else
+  void shmem_ixput(void* target, void* source, int* idx, int len, int pe)
++ #endif
+  {
+  #ifndef ELG_CSITE_INST

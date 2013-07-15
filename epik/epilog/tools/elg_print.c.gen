@@ -1,0 +1,470 @@
+/* -- automatically generated -- do not change ------------------------------ */
+/* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
+
+/* -- Region -- */
+
+void elg_readcb_ENTER(elg_ui4 lid, elg_d8 time, elg_ui4 rid,
+       elg_ui1 metc, elg_ui8 metv[], void* userdata) {
+  printf("%-20s", "<ENTER>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  rid    : %3u,", rid);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_ENTER_CS(elg_ui4 lid, elg_d8 time, elg_ui4 csid,
+       elg_ui1 metc, elg_ui8 metv[], void* userdata) {
+  printf("%-20s", "<ENTER_CS>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  csid   : %3u,", csid);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_EXIT(elg_ui4 lid, elg_d8 time, elg_ui1 metc, elg_ui8 metv[],
+       void* userdata) {
+  printf("%-20s", "<EXIT>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+/* -- MPI-1 -- */
+
+void elg_readcb_MPI_SEND(elg_ui4 lid, elg_d8 time, elg_ui4 dlid, elg_ui4 cid,
+       elg_ui4 tag, elg_ui4 sent, void* userdata) {
+  printf("%-20s", "<MPI_SEND>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  cid    : %3u,", cid);
+  printf("  tag    : %3u,", tag);
+  printf("  sent   : %3u", sent);
+  printf("\n");
+}
+
+void elg_readcb_MPI_RECV(elg_ui4 lid, elg_d8 time, elg_ui4 slid, elg_ui4 cid,
+       elg_ui4 tag, void* userdata) {
+  printf("%-20s", "<MPI_RECV>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  slid   : %3u,", slid);
+  printf("  cid    : %3u,", cid);
+  printf("  tag    : %3u", tag);
+  printf("\n");
+}
+
+void elg_readcb_MPI_COLLEXIT(elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 rlid, elg_ui4 cid, elg_ui4 sent,
+       elg_ui4 recvd, void* userdata) {
+  printf("%-20s", "<MPI_COLLEXIT>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  rlid   : %3u,", rlid);
+  printf("  cid    : %3u,", cid);
+  printf("  sent   : %3u,", sent);
+  printf("  recvd  : %3u,", recvd);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+/* -- MPI-1 Non-blocking -- */
+
+void elg_readcb_MPI_SEND_COMPLETE(elg_ui4 lid, elg_d8 time, elg_ui4 reqid,
+       void* userdata) {
+  printf("%-20s", "<MPI_SEND_COMPLETE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  reqid  : %3u", reqid);
+  printf("\n");
+}
+
+void elg_readcb_MPI_RECV_REQUEST(elg_ui4 lid, elg_d8 time, elg_ui4 reqid,
+       void* userdata) {
+  printf("%-20s", "<MPI_RECV_REQUEST>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  reqid  : %3u", reqid);
+  printf("\n");
+}
+
+void elg_readcb_MPI_REQUEST_TESTED(elg_ui4 lid, elg_d8 time, elg_ui4 reqid,
+       void* userdata) {
+  printf("%-20s", "<MPI_REQUEST_TESTED>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  reqid  : %3u", reqid);
+  printf("\n");
+}
+
+void elg_readcb_MPI_CANCELLED(elg_ui4 lid, elg_d8 time, elg_ui4 reqid,
+       void* userdata) {
+  printf("%-20s", "<MPI_CANCELLED>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  reqid  : %3u", reqid);
+  printf("\n");
+}
+
+/* -- MPI-2 One-sided Operations -- */
+
+void elg_readcb_MPI_PUT_1TS(elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes, void* userdata) {
+  printf("%-20s", "<MPI_PUT_1TS>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  wid    : %3u,", wid);
+  printf("  rmaid  : %3u,", rmaid);
+  printf("  nbytes : %3u", nbytes);
+  printf("\n");
+}
+
+void elg_readcb_MPI_PUT_1TE(elg_ui4 lid, elg_d8 time, elg_ui4 slid,
+       elg_ui4 wid, elg_ui4 rmaid, void* userdata) {
+  printf("%-20s", "<MPI_PUT_1TE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  slid   : %3u,", slid);
+  printf("  wid    : %3u,", wid);
+  printf("  rmaid  : %3u", rmaid);
+  printf("\n");
+}
+
+void elg_readcb_MPI_PUT_1TE_REMOTE(elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 wid, elg_ui4 rmaid, void* userdata) {
+  printf("%-20s", "<MPI_PUT_1TE_REMOTE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  wid    : %3u,", wid);
+  printf("  rmaid  : %3u", rmaid);
+  printf("\n");
+}
+
+void elg_readcb_MPI_GET_1TO(elg_ui4 lid, elg_d8 time, elg_ui4 rmaid,
+       void* userdata) {
+  printf("%-20s", "<MPI_GET_1TO>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  rmaid  : %3u", rmaid);
+  printf("\n");
+}
+
+void elg_readcb_MPI_GET_1TS(elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes, void* userdata) {
+  printf("%-20s", "<MPI_GET_1TS>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  wid    : %3u,", wid);
+  printf("  rmaid  : %3u,", rmaid);
+  printf("  nbytes : %3u", nbytes);
+  printf("\n");
+}
+
+void elg_readcb_MPI_GET_1TS_REMOTE(elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes, void* userdata) {
+  printf("%-20s", "<MPI_GET_1TS_REMOTE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  wid    : %3u,", wid);
+  printf("  rmaid  : %3u,", rmaid);
+  printf("  nbytes : %3u", nbytes);
+  printf("\n");
+}
+
+void elg_readcb_MPI_GET_1TE(elg_ui4 lid, elg_d8 time, elg_ui4 slid,
+       elg_ui4 wid, elg_ui4 rmaid, void* userdata) {
+  printf("%-20s", "<MPI_GET_1TE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  slid   : %3u,", slid);
+  printf("  wid    : %3u,", wid);
+  printf("  rmaid  : %3u", rmaid);
+  printf("\n");
+}
+
+void elg_readcb_MPI_WINEXIT(elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 wid, elg_ui4 cid, elg_ui1 synex,
+       void* userdata) {
+  printf("%-20s", "<MPI_WINEXIT>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  wid    : %3u,", wid);
+  printf("  cid    : %3u,", cid);
+  printf("  synex  : %3u,", synex);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_MPI_WINCOLLEXIT(elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 wid, void* userdata) {
+  printf("%-20s", "<MPI_WINCOLLEXIT>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  wid    : %3u,", wid);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_MPI_WIN_LOCK(elg_ui4 lid, elg_d8 time, elg_ui4 llid,
+       elg_ui4 wid, elg_ui1 ltype, void* userdata) {
+  printf("%-20s", "<MPI_WIN_LOCK>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  llid   : %3u,", llid);
+  printf("  wid    : %3u,", wid);
+  printf("  ltype  : %3u", ltype);
+  printf("\n");
+}
+
+void elg_readcb_MPI_WIN_UNLOCK(elg_ui4 lid, elg_d8 time, elg_ui4 llid,
+       elg_ui4 wid, void* userdata) {
+  printf("%-20s", "<MPI_WIN_UNLOCK>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  llid   : %3u,", llid);
+  printf("  wid    : %3u", wid);
+  printf("\n");
+}
+
+/* -- Generic One-sided Operations -- */
+
+void elg_readcb_PUT_1TS(elg_ui4 lid, elg_d8 time, elg_ui4 dlid, elg_ui4 rmaid,
+       elg_ui4 nbytes, void* userdata) {
+  printf("%-20s", "<PUT_1TS>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  rmaid  : %3u,", rmaid);
+  printf("  nbytes : %3u", nbytes);
+  printf("\n");
+}
+
+void elg_readcb_PUT_1TE(elg_ui4 lid, elg_d8 time, elg_ui4 slid, elg_ui4 rmaid,
+       void* userdata) {
+  printf("%-20s", "<PUT_1TE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  slid   : %3u,", slid);
+  printf("  rmaid  : %3u", rmaid);
+  printf("\n");
+}
+
+void elg_readcb_PUT_1TE_REMOTE(elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 rmaid, void* userdata) {
+  printf("%-20s", "<PUT_1TE_REMOTE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  rmaid  : %3u", rmaid);
+  printf("\n");
+}
+
+void elg_readcb_GET_1TS(elg_ui4 lid, elg_d8 time, elg_ui4 dlid, elg_ui4 rmaid,
+       elg_ui4 nbytes, void* userdata) {
+  printf("%-20s", "<GET_1TS>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  rmaid  : %3u,", rmaid);
+  printf("  nbytes : %3u", nbytes);
+  printf("\n");
+}
+
+void elg_readcb_GET_1TS_REMOTE(elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 rmaid, elg_ui4 nbytes, void* userdata) {
+  printf("%-20s", "<GET_1TS_REMOTE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  dlid   : %3u,", dlid);
+  printf("  rmaid  : %3u,", rmaid);
+  printf("  nbytes : %3u", nbytes);
+  printf("\n");
+}
+
+void elg_readcb_GET_1TE(elg_ui4 lid, elg_d8 time, elg_ui4 slid, elg_ui4 rmaid,
+       void* userdata) {
+  printf("%-20s", "<GET_1TE>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  slid   : %3u,", slid);
+  printf("  rmaid  : %3u", rmaid);
+  printf("\n");
+}
+
+void elg_readcb_COLLEXIT(elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 rlid, elg_ui4 cid, elg_ui4 sent,
+       elg_ui4 recvd, void* userdata) {
+  printf("%-20s", "<COLLEXIT>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  rlid   : %3u,", rlid);
+  printf("  cid    : %3u,", cid);
+  printf("  sent   : %3u,", sent);
+  printf("  recvd  : %3u,", recvd);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_ALOCK(elg_ui4 lid, elg_d8 time, elg_ui4 lkid, void* userdata) {
+  printf("%-20s", "<ALOCK>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  lkid   : %3u", lkid);
+  printf("\n");
+}
+
+void elg_readcb_RLOCK(elg_ui4 lid, elg_d8 time, elg_ui4 lkid, void* userdata) {
+  printf("%-20s", "<RLOCK>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  lkid   : %3u", lkid);
+  printf("\n");
+}
+
+/* -- OpenMP -- */
+
+void elg_readcb_OMP_FORK(elg_ui4 lid, elg_d8 time, void* userdata) {
+  printf("%-20s", "<OMP_FORK>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f", time);
+  printf("\n");
+}
+
+void elg_readcb_OMP_JOIN(elg_ui4 lid, elg_d8 time, void* userdata) {
+  printf("%-20s", "<OMP_JOIN>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f", time);
+  printf("\n");
+}
+
+void elg_readcb_OMP_ALOCK(elg_ui4 lid, elg_d8 time, elg_ui4 lkid,
+       void* userdata) {
+  printf("%-20s", "<OMP_ALOCK>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  lkid   : %3u", lkid);
+  printf("\n");
+}
+
+void elg_readcb_OMP_RLOCK(elg_ui4 lid, elg_d8 time, elg_ui4 lkid,
+       void* userdata) {
+  printf("%-20s", "<OMP_RLOCK>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  lkid   : %3u", lkid);
+  printf("\n");
+}
+
+void elg_readcb_OMP_COLLEXIT(elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], void* userdata) {
+  printf("%-20s", "<OMP_COLLEXIT>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+/* -- EPILOG Internal -- */
+
+void elg_readcb_LOG_OFF(elg_ui4 lid, elg_d8 time, elg_ui1 metc, elg_ui8 metv[],
+       void* userdata) {
+  printf("%-20s", "<LOG_OFF>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_LOG_ON(elg_ui4 lid, elg_d8 time, elg_ui1 metc, elg_ui8 metv[],
+       void* userdata) {
+  printf("%-20s", "<LOG_ON>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_ENTER_TRACING(elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], void* userdata) {
+  printf("%-20s", "<ENTER_TRACING>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}
+
+void elg_readcb_EXIT_TRACING(elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], void* userdata) {
+  printf("%-20s", "<EXIT_TRACING>");
+  printf("  lid    : %3u,", lid);
+  printf("  time   : %10.6f,", time);
+  printf("  metv   : ( ");
+  { int i;
+    for (i = 0; i < metc; i++)
+      printf("%3llu ", (long long unsigned) metv[i]);
+  }
+  printf(")");
+  printf("\n");
+}

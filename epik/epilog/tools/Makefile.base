@@ -1,0 +1,62 @@
+#------------------------------------------------------------------------------
+# General Settings
+#------------------------------------------------------------------------------
+
+ZLIB_CFLAGS = -I/usr/include -DELG_COMPRESSED
+
+CC = gcc
+CFLAGS = -g -O2 -DELG_SILENT $(ZLIB_CFLAGS)
+
+#------------------------------------------------------------------------------
+# Do not change below
+#------------------------------------------------------------------------------
+
+.SUFFIXES:  .cpp .c .f
+
+BASE_OBJS   = elg_rw.o elg_error.o epk_archive.o epk_conf.o elg_readcb.o
+
+all: elg_types.h libelg.base.a
+
+#------------------------------------------------------------------------------
+# Libraries
+#------------------------------------------------------------------------------
+
+libelg.base.a: $(BASE_OBJS)
+	ar -rcs $@ $(BASE_OBJS)
+
+#------------------------------------------------------------------------------
+# Special object files
+#------------------------------------------------------------------------------
+
+elg_rw.o : elg_rw.c elg_rw.h elg_error.h elg_impl.h elg_rw.c.gen
+	$(CC) $(CFLAGS) -c elg_rw.c
+elg_error.o : elg_error.c elg_error.h epk_conf.h
+	$(CC) $(CFLAGS) -c elg_error.c
+epk_archive.o : epk_archive.c epk_archive.h elg_error.h epk_conf.h
+	$(CC) $(CFLAGS) -c epk_archive.c
+epk_conf.o : epk_conf.c epk_conf.h elg_error.h
+	$(CC) $(CFLAGS) -c epk_conf.c
+elg_readcb.o : elg_readcb.c elg_readcb.c.gen elg_readcb.h elg_error.h elg_rw.h
+	$(CC) $(CFLAGS) -c elg_readcb.c
+
+
+#------------------------------------------------------------------------------
+# Generated source files
+#------------------------------------------------------------------------------
+
+elg_readcb.h : elg_defs.h
+elg_rw.h : elg_defs.h
+elg_defs.h : elg_types.h
+
+elg_types.h: gen_elg_types.c 
+	$(CC) $(CFLAGS) -DNEED_MAIN gen_elg_types.c -o gen
+	./gen
+	rm gen
+
+#------------------------------------------------------------------------------
+# Cleanup
+#------------------------------------------------------------------------------
+
+clean:
+	rm -f a.out core *.o
+	rm -f elg_types.h libelg*.a *~

@@ -1,0 +1,46 @@
+#!/bin/sh
+
+trap 'rm -f xx$$.vpt >/dev/null 2>&1' EXIT
+trap "exit 2" HUP INT QUIT PIPE TERM
+
+ARGS=""
+base=""
+dir="."
+
+for arg in "$@"
+do
+  case ${arg} in
+    -g|-G|-i|-O)
+      ARGS="${ARGS} ${arg}"
+      ;;
+    -*)
+      echo "Warning: Unknown option ${arg} ignored"
+      ;;
+    *.elg)
+      dir="`dirname $1`/"
+      base=`basename ${arg} .elg`
+      ;;
+    */)
+      dir=$1
+      base="epik"
+      ;;
+    *)
+      dir="$1/"
+      base="epik"
+      ;;
+  esac
+done
+
+if [ $# -eq 0  -o  -z "${base}" ]
+then
+  echo "usage: elg2vtf [<options>] (<infile>.elg | <experiment_archive>)"
+  echo "options:  -g  do not generate globalops for OMP barriers"
+  echo "          -G  do not generate globalops (for MPI + OMP)"
+  echo "          -i  do not add idle state"
+  echo "          -O  generate VTF3 OpenMP events"
+  exit 1
+fi
+
+eval elg_vtf3 ${ARGS} ${dir}${base}.elg xx$$.vpt || exit 0
+vptmerge -o ${dir}${base}.vpt xx$$.vpt
+exit 0

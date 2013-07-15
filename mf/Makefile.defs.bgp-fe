@@ -1,0 +1,138 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.bgp-fe)
+#------------------------------------------------------------------------------
+
+CFGKEY = bgp
+CONFIG = IBM BlueGene/P
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC   = 64
+PFLAG  =
+AFLAG  =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = generic
+MACHINE   = -DMACHINE=\"IBM\ BG/P\"
+PLAT_LDIR = -DPFORM_LDIR=\".\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = gcc -m$(PREC)
+PLAT_CFLAGS =
+
+OPTFLAGS =
+CC       = xlc -q$(PREC)
+CFLAGS   = $(OPTFLAGS)
+CXX      = xlC -q$(PREC)
+CXXFLAGS = $(OPTFLAGS) -O3
+F77      = xlf -q$(PREC)
+F90      =
+FFLAGS   = $(OPTFLAGS)
+FPP      =
+FDOPT    = -WF,-D
+LDFLAGS  = $(OPTFLAGS)
+UTILLIB  =
+#FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+#MPICC     =
+#MPICXX    =
+#MPIF90    =
+#MPILIB    = -lmpi
+#PMPILIB   = -lpmpi
+#FMPILIB   = -lepk.ad.fmpi
+#FMPIOBJ   = libepk.ad.fmpi.a
+#MPIEXTRA  =
+#MPIELGLIB = libelg.mpi.a
+
+#MPI_BUILD_TARGETS   = all-salsa
+#MPI_INSTALL_TARGETS = install-salsa
+#MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = $(CC)
+#OMPCXX     =
+#OMPF90     =
+OMPFLAG    = -OpenMPnotAvailable
+#OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+#HYBCC      = $(MPICC)
+#HYBCXX     = $(MPICXX)
+#HYBF90     = $(MPIF90)
+#HYBFLAG    = $(OMPFLAG)
+#HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+# --> removed as not needed on frontend
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS = -O3
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+ECXX         = g++ -m$(PREC) -DBG_MPIRUN
+ECXXLIBS     =
+ECXX_AR      = ar
+ECXX_ARFLAGS = -rcs
+
+LIBERTY      =
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = generic
+#CINSTFLAG =
+#LINSTFLAG =
+#EXTRAOBJS =
+#KINST_EXTRA =
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#VTF3LIB     = -L$(VTF3DIR)/<arch>/lib -lvtf3
+#INST_VTF3   = install-vtf3
+
+#------------------------------------------------------------------------------
+# OTF Support
+#-----------------------------------------------------------------------------
+
+#OTFDIR      =
+#OTFRTTI     =
+#OTFUNIFY    = elg_otfunify
+##OTFUNIFY    = elg_otfunify.omp
+#ELG_OTF     = elg2otf
+#OTFLIB      = -L$(OTFDIR)/lib64 -L$(OTFDIR)/lib -lotf -lz
+#INST_OTF    = install-otf
+# --> not on frontend: OTFELGLIB     = libelg.otf.a
+# --> not on frontend: OTFMPIELGLIB  = libelg.otf.mpi.a
+# --> not on frontend: OTFOMPELGLIB  = libelg.otf.omp.a
+# --> not on frontend: OTFHYBELGLIB  = libelg.otf.ompi.a
+

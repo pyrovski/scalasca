@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Scalasca instrumentation/measurement regions</title>
+</head>
+<body>
+<h2>Scalasca instrumentation/measurement regions</h2>
+
+<a name="EPIK"><h3>EPIK</h3></a>
+<dl>
+<dt>Description:</dt>
+<dd>
+    Synthetic events/regions associated with activities of the EPIK measurement system.
+<p>
+   A <tt>TRACING</tt> region indicates intermediate trace buffer flushing to file,
+as well as measurement initialization and finalization (including clock offset
+determination) even when tracing is disabled.
+<p>
+   A <tt>PAUSING</tt> region marks when measurement was explicitly paused
+via EPIK user API macros.  Events are not recorded while measurement is paused.
+<p>
+    A special <tt>PARALLEL</tt> region is synthesized to encapsulate MPI regions
+if an MPI region is the first to be encountered.  It defines the parallel execution
+between <tt>MPI_Init</tt> (or <tt>MPI_Init_thread</tt>) and <tt>MPI_Finalize</tt>.
+<p>
+    A special <tt>UNKNOWN</tt> region can also appear in measurements
+and is used to indicate various problems, such as failure to determine the actual
+name of a routine or truncation of the call-tree due to insufficient capacity.
+</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="MPI"><h3>MPI</h3></a>
+<dl>
+<dt>Description:</dt>
+<dd>
+    Functions from the MPI library for which instrumentation wrappers
+were generated and events configured at start of measurement.  Calls to
+measured MPI routines may occur in instrumented user sources, or in
+uninstrumented sources or libraries, however, MPI calls done internally
+by the measurement library or the MPI library itself are not measured.
+<p>
+    MPI regions cannot be filtered (like user-level regions), however,
+sets of regions which are not desired in a measurement can be disabled
+by eliminating them from the <tt>EPK_MPI_ENABLED</tt> specification 
+in EPIK.CONF or as an environment variable.  Execution time in
+uninstrumented or disabled MPI routines will appear attributed to the
+calling user-level routine.
+</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="OMP"><h3>OMP</h3></a>
+<dl>
+<dt>Description:</dt>
+<dd>
+    OpenMP API routines and parallel regions automatically instrumented by
+the OpenMP pragma and annotated region instrumenter (OPARI2).  OMP
+pragmas [C/C++] and executable directives [Fortran] are uniformly named with the
+"<tt>!$omp</tt>" prefix, the construct, and the source location (<tt>@filename:lineno</tt>).
+<p>
+    OMP regions cannot be filtered (like user-level regions) during
+measurement, however, source files containing OpenMP can be instrumented
+selectively.  Furthermore, OPARI2 can be configured to disable
+instrumentation of some or all of the more fine-grained OpenMP
+constructs <tt>atomic</tt>, <tt>critical</tt>, <tt>flush</tt>, <tt>locks</tt>,
+<tt>master</tt> and <tt>single</tt>.
+</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="USR"><h3>USR</h3></a>
+<dl>
+<dt>Description:</dt>
+<dd>
+    Ordinary user-level routines instrumented automatically by the compiler or PDT instrumenter,
+    and source code regions manually instrumented with POMP directives or EPIK user API macros.
+    (Currently the different types of user-level routines are not distinguished.)
+    Routine names provided by compilers may or may not include decorations such as
+    trailing underscores, embedded file/module names, parameters and return values.
+    For C++, the original routine name may be determined with a "demangler" library
+    (if supported and configured with Scalasca).
+<p>
+    If the frequent execution of a routine results in substantial overhead
+    (either through measurement dilation or trace buffer capacity), consider
+    specifying its name in a filter used for subsequent measurements, or
+    apply selective instrumentation (e.g., via the PDT instrumenter).
+</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="COM"><h3>COM</h3></a>
+<dl>
+<dt>Description:</dt>
+<dd>
+    The COM designation applies to callpaths (rather than regions) and
+is used to signify common paths to OMP/MPI
+communication/synchronization routines and USR local computation, as
+reported by the <tt>cube3_score</tt> utility.  The
+associated regions provide context that is valuable for distinguishing
+instances of communication/synchronization routines and corresponding
+computation phases.  While they are typically compiler-instrumented USR
+regions, and can also be filtered from measurement at run-time, usually
+this is neither necessary nor desirable.
+<br>
+<div align="center">
+<img src="score_tree.png" alt="score tree">
+</div>
+</dd>
+</dl>
+
+
+<hr>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td><img src="logo_small.png" alt="SCALASCA"></td>
+<td>&nbsp;&nbsp;</td>
+<td>
+Copyright &copy; 1998-2013 Forschungszentrum J&uuml;lich GmbH
+</td>
+</tr>
+</table>
+</body>
+</html>

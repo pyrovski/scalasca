@@ -1,0 +1,38 @@
+#------------------------------------------------------------------------------
+# Pdtoolkit Support
+#------------------------------------------------------------------------------
+
+#PDTMPIINC =
+#PDTDIR    = /usr/local/pdtoolkit-3.14.1
+#PDTARCH   = NA
+#PDTBIN    = $(PDTDIR)/$(PDTARCH)/bin
+
+#------------------------------------------------------------------------------
+# SLOG2 Support
+#------------------------------------------------------------------------------
+
+#SLOG2DIR    = /home/user/sources/slog2sdk-1.2.6
+
+#------------------------------------------------------------------------------
+# SIONLIB Support 
+#------------------------------------------------------------------------------
+#SIONLIB             = sion
+#SIONLIB_CONFIG      = /path_to_sionlib/bin/sionconfig
+#SIONLIB_P64	     = --64 
+#SIONLIB_P32	     = --32 
+#SIONLIB_P	     =
+#SIONLIB_PREC        = $(SIONLIB_P$(PREC))
+#SIONLIB_SKfe	     = --fe 
+#SIONLIB_SKbe	     = --be 
+#SIONLIB_SKmic	     = --mic 
+#SIONLIB_SK	     =
+#SIONLIB_SYSKIND     = $(SIONLIB_SK$(SYSKIND))
+#SIONLIB_DIR         = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --path`
+#SIONLIB_CFLAGS_MPI  = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --cflags --mpi` -DUSE_SIONLIB -DSION_DEBUG -DSION_MPI
+#SIONLIB_CFLAGS_OMPI = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --cflags --mpi` -DUSE_SIONLIB -DSION_DEBUG -DSION_OMPI
+#SIONLIB_CFLAGS_OMP  = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --cflags --ser` -DUSE_SIONLIB -DSION_DEBUG -DSION_OMP
+#SIONLIB_CFLAGS_SER  = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --cflags --ser` -DUSE_SIONLIB -DSION_DEBUG
+#SIONLIB_LIB         = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --libs --mpi`
+#SIONLIB_LIBSER      = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --libs --ser`
+#SIONLIB_LIBSERGCC   = `$(SIONLIB_CONFIG) $(SIONLIB_PREC) $(SIONLIB_SYSKIND) --libs --ser --gcc`
+

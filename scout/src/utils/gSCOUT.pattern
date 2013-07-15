@@ -1,0 +1,13 @@
+#****************************************************************************
+#*  KOJAK                                                                  **
+#****************************************************************************
+#*  Copyright (c) 2006-2013                                                     **
+#*  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#*                                                                         **
+#*  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************
+
+
+INCLUDE "General.pattern"
+INCLUDE "MPI.pattern"
+INCLUDE "Grid.pattern"

@@ -1,0 +1,391 @@
+#------------------------------------------------------------------------------
+# Dependencies
+# (automatically generated using 'make depend')
+#------------------------------------------------------------------------------
+
+EventSet.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/RemoteEvent.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	EventSet.cpp \
+	EventSet.h \
+	MpiComm.h \
+	MpiMessage.h
+LocalData.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/RemoteEvent.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	LocalData.cpp \
+	LocalData.h \
+	MpiComm.h \
+	MpiMessage.h
+MpiCancelled_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiCancelled_rep.cpp \
+	MpiCancelled_rep.h \
+	MpiRequest_rep.h
+MpiCartesian.o: \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiCartesian.cpp \
+	MpiCartesian.h
+MpiCollExit_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/Exit_rep.h \
+	$(PB_DIR)/Flow_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiCollExit_rep.cpp \
+	MpiCollExit_rep.h \
+	MpiComm.h
+MpiComm.o: \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiComm.cpp \
+	MpiComm.h \
+	MpiGroup.h
+MpiDefsFactory.o: \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/DefsFactory.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiCartesian.h \
+	MpiComm.h \
+	MpiDefsFactory.cpp \
+	MpiDefsFactory.h \
+	MpiGroup.h \
+	MpiWindow.h
+MpiEventFactory.o: \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/EventFactory.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/Exit_rep.h \
+	$(PB_DIR)/Flow_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaGetEnd_rep.h \
+	$(PB_DIR)/RmaGetStart_rep.h \
+	$(PB_DIR)/RmaPutEnd_rep.h \
+	$(PB_DIR)/RmaPutStart_rep.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/Rma_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiCancelled_rep.h \
+	MpiCollExit_rep.h \
+	MpiComm.h \
+	MpiEventFactory.cpp \
+	MpiEventFactory.h \
+	MpiGroup.h \
+	MpiP2P_rep.h \
+	MpiReceiveComplete_rep.h \
+	MpiReceiveRequest_rep.h \
+	MpiReceive_rep.h \
+	MpiRequestTested_rep.h \
+	MpiRequest_rep.h \
+	MpiRmaCollExit_rep.h \
+	MpiRmaExit_rep.h \
+	MpiRmaGetEnd_rep.h \
+	MpiRmaGetStart_rep.h \
+	MpiRmaLock_rep.h \
+	MpiRmaPutEnd_rep.h \
+	MpiRmaPutStart_rep.h \
+	MpiRmaUnlock_rep.h \
+	MpiSendComplete_rep.h \
+	MpiSendRequest_rep.h \
+	MpiSend_rep.h \
+	MpiWindow.h
+MpiGroup.o: \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiGroup.cpp \
+	MpiGroup.h
+MpiMessage.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiComm.h \
+	MpiMessage.cpp \
+	MpiMessage.h
+MpiP2P_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiComm.h \
+	MpiP2P_rep.cpp \
+	MpiP2P_rep.h
+MpiReceiveComplete_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiP2P_rep.h \
+	MpiReceiveComplete_rep.cpp \
+	MpiReceiveComplete_rep.h \
+	MpiReceive_rep.h
+MpiReceiveRequest_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiReceiveRequest_rep.cpp \
+	MpiReceiveRequest_rep.h \
+	MpiRequest_rep.h
+MpiReceive_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiP2P_rep.h \
+	MpiReceive_rep.cpp \
+	MpiReceive_rep.h
+MpiRequestTested_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRequestTested_rep.cpp \
+	MpiRequestTested_rep.h \
+	MpiRequest_rep.h
+MpiRequest_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRequest_rep.cpp \
+	MpiRequest_rep.h
+MpiRmaCollExit_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/Exit_rep.h \
+	$(PB_DIR)/Flow_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRmaCollExit_rep.cpp \
+	MpiRmaCollExit_rep.h \
+	MpiWindow.h
+MpiRmaExit_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/Exit_rep.h \
+	$(PB_DIR)/Flow_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiGroup.h \
+	MpiRmaExit_rep.cpp \
+	MpiRmaExit_rep.h \
+	MpiWindow.h
+MpiRmaGetEnd_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/RmaGetEnd_rep.h \
+	$(PB_DIR)/Rma_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRmaGetEnd_rep.cpp \
+	MpiRmaGetEnd_rep.h
+MpiRmaGetStart_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaGetStart_rep.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/Rma_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRmaGetStart_rep.cpp \
+	MpiRmaGetStart_rep.h \
+	MpiWindow.h
+MpiRmaLock_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRmaLock_rep.cpp \
+	MpiRmaLock_rep.h \
+	MpiWindow.h
+MpiRmaPutEnd_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/RmaPutEnd_rep.h \
+	$(PB_DIR)/Rma_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRmaPutEnd_rep.cpp \
+	MpiRmaPutEnd_rep.h
+MpiRmaPutStart_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaPutStart_rep.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/Rma_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRmaPutStart_rep.cpp \
+	MpiRmaPutStart_rep.h \
+	MpiWindow.h
+MpiRmaUnlock_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRmaUnlock_rep.cpp \
+	MpiRmaUnlock_rep.h \
+	MpiWindow.h
+MpiSendComplete_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiRequest_rep.h \
+	MpiSendComplete_rep.cpp \
+	MpiSendComplete_rep.h
+MpiSendRequest_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiP2P_rep.h \
+	MpiSendRequest_rep.cpp \
+	MpiSendRequest_rep.h \
+	MpiSend_rep.h
+MpiSend_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiP2P_rep.h \
+	MpiSend_rep.cpp \
+	MpiSend_rep.h
+MpiWindow.o: \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiComm.h \
+	MpiWindow.cpp \
+	MpiWindow.h
+RemoteData.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RemoteEvent.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiComm.h \
+	MpiMessage.h \
+	RemoteData.cpp \
+	RemoteData.h
+RemoteEventSet.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/RemoteEvent.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiComm.h \
+	MpiMessage.h \
+	RemoteEventSet.cpp \
+	RemoteEventSet.h
+pearl_mpi.o: \
+	$(EPK_DIR)/elg_error.h \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Calltree.h \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/DefsFactory.h \
+	$(PB_DIR)/EventFactory.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/SmallObjAllocator.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiDefsFactory.h \
+	MpiEventFactory.h \
+	MpiMessage.h \
+	pearl_mpi.cpp

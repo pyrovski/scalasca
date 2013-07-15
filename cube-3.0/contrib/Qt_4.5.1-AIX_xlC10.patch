@@ -1,0 +1,77 @@
+diff -cr qt-x11-opensource-src-4.5.1.orig/src/gui/painting/qdrawhelper.cpp qt-x11-opensource-src-4.5.1/src/gui/painting/qdrawhelper.cpp
+*** qt-x11-opensource-src-4.5.1.orig/src/gui/painting/qdrawhelper.cpp	Wed Apr 22 01:57:41 2009
+--- qt-x11-opensource-src-4.5.1/src/gui/painting/qdrawhelper.cpp	Mon Jun 22 15:07:58 2009
+***************
+*** 4622,4628 ****
+  
+          if (SRC::hasAlpha()) {
+              while (length >= 4) {
+!                 const quint32 alpha = BYTE_MUL(uint(alpha_4(src)), uint(coverage));
+                  if (alpha)
+                      interpolate_pixel_4(dest, src, alpha);
+                  length -= 4;
+--- 4622,4628 ----
+  
+          if (SRC::hasAlpha()) {
+              while (length >= 4) {
+!                 const quint32 alpha = QT_PREPEND_NAMESPACE(BYTE_MUL)(uint(alpha_4(src)), uint(coverage));
+                  if (alpha)
+                      interpolate_pixel_4(dest, src, alpha);
+                  length -= 4;
+diff -cr qt-x11-opensource-src-4.5.1.orig/src/gui/painting/qpathclipper.cpp qt-x11-opensource-src-4.5.1/src/gui/painting/qpathclipper.cpp
+*** qt-x11-opensource-src-4.5.1.orig/src/gui/painting/qpathclipper.cpp	Wed Apr 22 01:57:41 2009
+--- qt-x11-opensource-src-4.5.1/src/gui/painting/qpathclipper.cpp	Mon Jun 22 15:08:38 2009
+***************
+*** 1635,1641 ****
+  template <typename InputIterator>
+  InputIterator qFuzzyFind(InputIterator first, InputIterator last, qreal val)
+  {
+!     while (first != last && !qFuzzyCompare(qreal(*first), qreal(val)))
+          ++first;
+      return first;
+  }
+--- 1635,1641 ----
+  template <typename InputIterator>
+  InputIterator qFuzzyFind(InputIterator first, InputIterator last, qreal val)
+  {
+!     while (first != last && !QT_PREPEND_NAMESPACE(qFuzzyCompare)(qreal(*first), qreal(val)))
+          ++first;
+      return first;
+  }
+diff -cr qt-x11-opensource-src-4.5.1.orig/src/gui/painting/qrasterizer.cpp qt-x11-opensource-src-4.5.1/src/gui/painting/qrasterizer.cpp
+*** qt-x11-opensource-src-4.5.1.orig/src/gui/painting/qrasterizer.cpp	Wed Apr 22 01:57:41 2009
+--- qt-x11-opensource-src-4.5.1/src/gui/painting/qrasterizer.cpp	Mon Jun 22 15:09:29 2009
+***************
+*** 319,325 ****
+                  QScanConverter::Line *l = &d.m_lines.at(line);
+                  d.m_active.resize(d.m_active.size() + 1);
+                  int j;
+!                 for (j = d.m_active.size() - 2; j >= 0 && xOrder(l, d.m_active.at(j)); --j)
+                      d.m_active.at(j+1) = d.m_active.at(j);
+                  d.m_active.at(j+1) = l;
+              } else {
+--- 319,325 ----
+                  QScanConverter::Line *l = &d.m_lines.at(line);
+                  d.m_active.resize(d.m_active.size() + 1);
+                  int j;
+!                 for (j = d.m_active.size() - 2; j >= 0 && QT_PREPEND_NAMESPACE(xOrder)(l, d.m_active.at(j)); --j)
+                      d.m_active.at(j+1) = d.m_active.at(j);
+                  d.m_active.at(j+1) = l;
+              } else {
+***************
+*** 334,340 ****
+              for (int i = 1; i < numActive; ++i) {
+                  QScanConverter::Line *l = d.m_active.at(i);
+                  int j;
+!                 for (j = i-1; j >= 0 && xOrder(l, d.m_active.at(j)); --j)
+                      d.m_active.at(j+1) = d.m_active.at(j);
+                  d.m_active.at(j+1) = l;
+              }
+--- 334,340 ----
+              for (int i = 1; i < numActive; ++i) {
+                  QScanConverter::Line *l = d.m_active.at(i);
+                  int j;
+!                 for (j = i-1; j >= 0 && QT_PREPEND_NAMESPACE(xOrder)(l, d.m_active.at(j)); --j)
+                      d.m_active.at(j+1) = d.m_active.at(j);
+                  d.m_active.at(j+1) = l;
+              }

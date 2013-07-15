@@ -1,0 +1,121 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  Copyright (c) 2009-2013                                                **
+**  German Research School for Simulation Sciences GmbH                    **
+**                                                                         **
+**  Copyright (c) 2003-2008                                                **
+**  University of Tennessee, Innovative Computing Laboratory               **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+The SCALASCA project (Scalable performance Analysis of Large-Scale parallel
+Applications) is the successor of the KOJAK project (Kit for Objective
+Judgment and Knowledge-based detection of performance bottlenecks).
+
+The projects aim to develop a generic automatic performance analysis
+environment for parallel applications.  Performance problems are specified
+in terms of execution patterns that represent situations of inefficient
+behavior.  These patterns are input for an analysis process that recognizes
+and quantifies the inefficient behavior in event traces.  Mechanisms that
+hide the complex relationships within event pattern specifications allow a
+simple description of inefficient behavior on a high level of abstraction.
+
+
+== Tool Install/Administration Documentation ==
+
+* Installation instructions for Scalasca (INSTALL) & CUBE (CubeInstall.pdf):
+
+The CUBE GUI and tools may be installed with Scalasca, though a separate
+installation is generally recommended (often on a separate system).
+Installation requirements (such as package dependencies) and options are
+documented for supported platforms.
+
+
+== Generic User Documentation ==
+
+Scalasca user documentation for a specific installation is installed into the
+$SCALASCA_ROOT/doc subdirectory. Documentation for the latest release can also
+be browsed from the website http://www.scalasca.org/download/documentation
+(where a flyer and technical papers are also available).
+
+* Scalasca User Guide (manuals/UserGuide.pdf): 
+
+A short introduction to parallel performance analysis and Scalasca; the basic
+instrumentation, measurement, analysis and examination steps and Scalasca
+commands demonstrated with an example application; and more in-depth reference
+material.  Beginners are encouraged to start with the first two chapters,
+and consult the later chapters as they require more advanced capabilities.
+The tools for processing and GUI for interactively examining Scalasca
+analysis reports are covered by the separate CUBE User Guide.
+
+* CUBE User Guide (manuals/CubeGuide.pdf):
+
+Reference for using the CUBE GUI and associated report algebra utilities and
+tools, as well as developer chapters covering the CUBE file format and API. 
+On-line help, as well as context-sensitive help, are provided within the GUI
+itself, and should assist beginners and more advanced users alike.
+
+* Scalasca analysis report performance properties (scalasca_patterns.html) &
+  region descriptions (scalasca_regions.html):
+
+Scalasca-specific analysis documentation, generally accessed via the "Online
+description" context menus of the Scalasca analysis report explorer (CUBE).
+
+* Scalasca Quick Reference (manuals/QuickReference.pdf):
+
+6-page review of the main steps and commands for Scalasca usage.  Generally
+also accessible via the "scalasca -h" command from a Scalasca installation.
+After basic familiarisation with Scalasca usage, this short documentation
+should provide brief reminders of common commands and options.
+
+* Scalasca open issues & limitations (OPEN_ISSUES):
+
+Compendium of known limitations and unimplemented features that may affect
+Scalasca usability on various platforms or with certain applications, with
+suggested workarounds where appropriate.  Although issues may be uncommon
+and/or quite technically complex, users are encouraged to briefly review
+this document, particularly if they believe they have encountered a problem
+when using Scalasca, prior to contacting user support.
+
+
+== (Tool) Developer Documentation ==
+
+* Manuals for Scalasca components (e.g., CUBE)
+
+The CUBE User Guide includes sections for tools developers and various other
+Scalasca components also come with separate manuals that are either installed
+or available with the Scalasca installation package.  Source-code documentation
+is also provided.  Anyone interested in using or developing Scalasca components
+is recommended to contact the Scalasca development team.
+
+
+== Example/Test/Tutorial Material ==
+
+* Scalasca examples ($SCALASCA_ROOT/example)
+
+This subdirectory of the Scalasca installation contains several files
+which can be used to test Scalasca and/or explore different features.
+See the associated README.example for details.
+
+* VI-HPS tutorial (http://www.vi-hps.org/training/material#tutorials)
+
+Tutorials using the NPB example codes (primarily BT) are available on
+the VI-HPS ISO disk image (Linux Live DVD/USB) or for separate download
+covering use of Scalasca and other tools.
+
+
+
+* For further more detailed information see the project webpages
+
+  http://www.scalasca.org/
+
+* For help, reporting bugs, and making comments or suggestions send e-mail
+
+  mailto:scalasca@fz-juelich.de
+
+

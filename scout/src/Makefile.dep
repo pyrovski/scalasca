@@ -1,0 +1,1060 @@
+#------------------------------------------------------------------------------
+# Dependencies
+# (automatically generated using 'make depend')
+#------------------------------------------------------------------------------
+
+AnalyzeTask.ser.o: \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/ReplayTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	AnalyzeTask.cpp \
+	AnalyzeTask.h \
+	CbData.h \
+	CheckedTask.h \
+	PatternDetectionTask.h \
+	TaskData.h \
+	scout_types.h
+CbData.mpi.o: \
+	$(PM_DIR)/EventSet.h \
+	$(PM_DIR)/RemoteEventSet.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/RemoteEvent.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	CbData.cpp \
+	CbData.h \
+	scout_types.h
+CbData.ser.o: \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	CbData.cpp \
+	CbData.h \
+	scout_types.h
+CheckedTask.hyb.o: \
+	$(EPK_DIR)/elg_error.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.cpp \
+	CheckedTask.h
+CheckedTask.mpi.o: \
+	$(EPK_DIR)/elg_error.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.cpp \
+	CheckedTask.h
+CheckedTask.omp.o: \
+	$(EPK_DIR)/elg_error.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.cpp \
+	CheckedTask.h
+CheckedTask.ser.o: \
+	$(EPK_DIR)/elg_error.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.cpp \
+	CheckedTask.h
+Logging.omp.o: \
+	Logging.cpp \
+	Logging.h
+Logging.ser.o: \
+	Logging.cpp \
+	Logging.h
+MpiDatatypes.mpi.o: \
+	$(CFG_DIR)/epk_defs_mpi.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiDatatypes.cpp \
+	MpiDatatypes.h \
+	scout_types.h
+MpiOperators.mpi.o: \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiOperators.cpp \
+	MpiOperators.h \
+	scout_types.h
+MpiPattern.hyb.o: \
+	$(PM_DIR)/MpiMessage.h \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiPattern.cpp \
+	MpiPattern.h \
+	Pattern.h \
+	Predicates.h \
+	scout_types.h
+MpiPattern.mpi.o: \
+	$(PM_DIR)/MpiMessage.h \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/pearl_types.h \
+	MpiPattern.cpp \
+	MpiPattern.h \
+	Pattern.h \
+	Predicates.h \
+	scout_types.h
+OmpPattern.ser.o: \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpPattern.cpp \
+	OmpPattern.h \
+	Pattern.h \
+	Predicates.h
+Pattern.hyb.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	Pattern.cpp \
+	Pattern.h \
+	Patterns_gen.h \
+	ReportData.h
+Pattern.mpi.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	Pattern.cpp \
+	Pattern.h \
+	Patterns_gen.h \
+	ReportData.h
+Pattern.omp.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	Pattern.cpp \
+	Pattern.h \
+	Patterns_gen.h \
+	ReportData.h
+Pattern.ser.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	Pattern.cpp \
+	Pattern.h \
+	Patterns_gen.h \
+	ReportData.h
+PatternDetectionTask.ser.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/ReplayTask.h \
+	$(PR_DIR)/Task.h \
+	CbData.h \
+	Pattern.h \
+	PatternDetectionTask.cpp \
+	PatternDetectionTask.h \
+	Patterns_gen.h \
+	ReportData.h \
+	StatisticsTask.h \
+	TaskData.h \
+	scout_types.h \
+	user_events.h
+Patterns_gen.hyb.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PM_DIR)/EventSet.h \
+	$(PM_DIR)/MpiComm.h \
+	$(PM_DIR)/MpiGroup.h \
+	$(PM_DIR)/MpiMessage.h \
+	$(PM_DIR)/MpiWindow.h \
+	$(PM_DIR)/RemoteEventSet.h \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/RemoteEvent.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/ReplayTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/pearl_replay.h \
+	CbData.h \
+	MpiDatatypes.h \
+	MpiOperators.h \
+	MpiPattern.h \
+	OmpPattern.h \
+	Pattern.h \
+	PatternDetectionTask.h \
+	Patterns_gen.cpp \
+	Patterns_gen.h \
+	Predicates.h \
+	Quantile.h \
+	ReportData.h \
+	Roles.h \
+	scout_types.h \
+	user_events.h
+Patterns_gen.mpi.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PM_DIR)/EventSet.h \
+	$(PM_DIR)/MpiComm.h \
+	$(PM_DIR)/MpiGroup.h \
+	$(PM_DIR)/MpiMessage.h \
+	$(PM_DIR)/MpiWindow.h \
+	$(PM_DIR)/RemoteEventSet.h \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/Comm.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/RemoteEvent.h \
+	$(PB_DIR)/RmaWindow.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/ReplayTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/pearl_replay.h \
+	CbData.h \
+	MpiDatatypes.h \
+	MpiOperators.h \
+	MpiPattern.h \
+	Pattern.h \
+	PatternDetectionTask.h \
+	Patterns_gen.cpp \
+	Patterns_gen.h \
+	Predicates.h \
+	Quantile.h \
+	ReportData.h \
+	Roles.h \
+	scout_types.h \
+	user_events.h
+Patterns_gen.omp.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/ReplayTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/pearl_replay.h \
+	CbData.h \
+	MpiPattern.h \
+	OmpPattern.h \
+	Pattern.h \
+	PatternDetectionTask.h \
+	Patterns_gen.cpp \
+	Patterns_gen.h \
+	Predicates.h \
+	Quantile.h \
+	ReportData.h \
+	Roles.h \
+	scout_types.h \
+	user_events.h
+Patterns_gen.ser.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/ReplayTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/pearl_replay.h \
+	CbData.h \
+	MpiPattern.h \
+	Pattern.h \
+	PatternDetectionTask.h \
+	Patterns_gen.cpp \
+	Patterns_gen.h \
+	Predicates.h \
+	Quantile.h \
+	ReportData.h \
+	Roles.h \
+	scout_types.h \
+	user_events.h
+PreprocessTask.hyb.o: \
+	$(PB_DIR)/pearl.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.h \
+	PreprocessTask.cpp \
+	PreprocessTask.h \
+	TaskData.h
+PreprocessTask.mpi.o: \
+	$(PB_DIR)/pearl.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.h \
+	PreprocessTask.cpp \
+	PreprocessTask.h \
+	TaskData.h
+PreprocessTask.omp.o: \
+	$(PB_DIR)/pearl.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.h \
+	PreprocessTask.cpp \
+	PreprocessTask.h \
+	TaskData.h
+PreprocessTask.ser.o: \
+	$(PB_DIR)/pearl.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.h \
+	PreprocessTask.cpp \
+	PreprocessTask.h \
+	TaskData.h
+Quantile.ser.o: \
+	Quantile.cpp \
+	Quantile.h
+ReadDefinitionsTask.mpi.o: \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.h \
+	ReadDefinitionsTask.cpp \
+	ReadDefinitionsTask.h \
+	TaskData.h
+ReadDefinitionsTask.ser.o: \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	CheckedTask.h \
+	ReadDefinitionsTask.cpp \
+	ReadDefinitionsTask.h \
+	TaskData.h
+ReadTraceTask.hyb.o: \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Task.h \
+	ReadTraceTask.cpp \
+	ReadTraceTask.h \
+	TaskData.h
+ReadTraceTask.mpi.o: \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Task.h \
+	ReadTraceTask.cpp \
+	ReadTraceTask.h \
+	TaskData.h
+ReadTraceTask.omp.o: \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Task.h \
+	ReadTraceTask.cpp \
+	ReadTraceTask.h \
+	TaskData.h
+ReadTraceTask.ser.o: \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Task.h \
+	ReadTraceTask.cpp \
+	ReadTraceTask.h \
+	TaskData.h
+ReportWriterTask.hyb.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/Callsite.h \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/Machine.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Node.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	AnalyzeTask.h \
+	CbData.h \
+	ReportData.h \
+	ReportWriterTask.cpp \
+	ReportWriterTask.h \
+	TaskData.h \
+	scout_types.h
+ReportWriterTask.mpi.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/Callsite.h \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/Machine.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Node.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	AnalyzeTask.h \
+	CbData.h \
+	ReportData.h \
+	ReportWriterTask.cpp \
+	ReportWriterTask.h \
+	TaskData.h \
+	scout_types.h
+ReportWriterTask.omp.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/Callsite.h \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/Machine.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Node.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	AnalyzeTask.h \
+	CbData.h \
+	ReportData.h \
+	ReportWriterTask.cpp \
+	ReportWriterTask.h \
+	TaskData.h \
+	scout_types.h
+ReportWriterTask.ser.o: \
+	$(CUBE_DIR)/cartesian.h \
+	$(CUBE_DIR)/cnode.h \
+	$(CUBE_DIR)/cube.h \
+	$(CUBE_DIR)/machine.h \
+	$(CUBE_DIR)/metric.h \
+	$(CUBE_DIR)/node.h \
+	$(CUBE_DIR)/process.h \
+	$(CUBE_DIR)/region.h \
+	$(CUBE_DIR)/thread.h \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/Callsite.h \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/Machine.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Node.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	AnalyzeTask.h \
+	CbData.h \
+	ReportData.h \
+	ReportWriterTask.cpp \
+	ReportWriterTask.h \
+	TaskData.h \
+	scout_types.h
+StatisticsTask.hyb.o: \
+	$(EPK_DIR)/epk_memory.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/Task.h \
+	Logging.h \
+	StatisticsTask.cpp \
+	StatisticsTask.h \
+	SynchronizeTask.h \
+	TaskData.h \
+	user_events.h
+StatisticsTask.mpi.o: \
+	$(EPK_DIR)/epk_memory.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/Task.h \
+	Logging.h \
+	StatisticsTask.cpp \
+	StatisticsTask.h \
+	SynchronizeTask.h \
+	TaskData.h \
+	user_events.h
+StatisticsTask.omp.o: \
+	$(EPK_DIR)/epk_memory.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/Task.h \
+	Logging.h \
+	StatisticsTask.cpp \
+	StatisticsTask.h \
+	TaskData.h \
+	user_events.h
+StatisticsTask.ser.o: \
+	$(EPK_DIR)/epk_memory.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/Task.h \
+	Logging.h \
+	StatisticsTask.cpp \
+	StatisticsTask.h \
+	TaskData.h \
+	user_events.h
+SynchronizeTask.mpi.o: \
+	$(CLC_DIR)/AmortData.h \
+	$(CLC_DIR)/Clock.h \
+	$(CLC_DIR)/Controller.h \
+	$(CLC_DIR)/IntervalStat.h \
+	$(CLC_DIR)/Latency.h \
+	$(CLC_DIR)/Network.h \
+	$(CLC_DIR)/RuntimeStat.h \
+	$(CLC_DIR)/StatData.h \
+	$(CLC_DIR)/Synchronizer.h \
+	$(CLC_DIR)/TimeStat.h \
+	$(CLC_DIR)/clc_types.h \
+	$(PB_DIR)/CountedPtr.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/Machine.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Node.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/Callback.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CallbackManager.h \
+	$(PR_DIR)/Task.h \
+	SynchronizeTask.cpp \
+	SynchronizeTask.h \
+	TaskData.h
+TaskData.ser.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	TaskData.cpp \
+	TaskData.h
+TimedPhase.ser.o: \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	Logging.h \
+	TimedPhase.cpp \
+	TimedPhase.h \
+	Timer.h
+Timer.mpi.o: \
+	Timer.cpp \
+	Timer.h
+Timer.omp.o: \
+	Timer.cpp \
+	Timer.h
+Timer.ser.o: \
+	Timer.cpp \
+	Timer.h
+scout.hyb.o: \
+	$(CFG_DIR)/epk_defs_mpi.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	AnalyzeTask.h \
+	CbData.h \
+	CheckedTask.h \
+	Logging.h \
+	MpiDatatypes.h \
+	MpiOperators.h \
+	PreprocessTask.h \
+	ReadDefinitionsTask.h \
+	ReadTraceTask.h \
+	ReportWriterTask.h \
+	StatisticsTask.h \
+	SynchronizeTask.h \
+	TaskData.h \
+	TimedPhase.h \
+	Timer.h \
+	scout.cpp \
+	scout_types.h
+scout.mpi.o: \
+	$(CFG_DIR)/epk_defs_mpi.h \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	AnalyzeTask.h \
+	CbData.h \
+	CheckedTask.h \
+	Logging.h \
+	MpiDatatypes.h \
+	MpiOperators.h \
+	PreprocessTask.h \
+	ReadDefinitionsTask.h \
+	ReadTraceTask.h \
+	ReportWriterTask.h \
+	StatisticsTask.h \
+	SynchronizeTask.h \
+	TaskData.h \
+	TimedPhase.h \
+	Timer.h \
+	scout.cpp \
+	scout_types.h
+scout.omp.o: \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	AnalyzeTask.h \
+	CbData.h \
+	CheckedTask.h \
+	Logging.h \
+	PreprocessTask.h \
+	ReadDefinitionsTask.h \
+	ReadTraceTask.h \
+	ReportWriterTask.h \
+	StatisticsTask.h \
+	TaskData.h \
+	TimedPhase.h \
+	Timer.h \
+	scout.cpp \
+	scout_types.h
+scout.ser.o: \
+	$(EPK_DIR)/elg_error.h \
+	$(EPK_DIR)/epk_archive.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/Location.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Process.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Thread.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	$(PR_DIR)/CallbackData.h \
+	$(PR_DIR)/CompoundTask.h \
+	$(PR_DIR)/Task.h \
+	$(PR_DIR)/TaskWrapper.h \
+	AnalyzeTask.h \
+	CbData.h \
+	CheckedTask.h \
+	Logging.h \
+	PreprocessTask.h \
+	ReadDefinitionsTask.h \
+	ReadTraceTask.h \
+	ReportWriterTask.h \
+	StatisticsTask.h \
+	TaskData.h \
+	TimedPhase.h \
+	Timer.h \
+	scout.cpp \
+	scout_types.h

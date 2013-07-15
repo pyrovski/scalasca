@@ -1,0 +1,28 @@
+#------------------------------------------------------------------------------
+# Dependencies
+# (automatically generated using 'make depend')
+#------------------------------------------------------------------------------
+
+HybridEventFactory.o: \
+	$(PM_DIR)/MpiEventFactory.h \
+	$(PO_DIR)/OmpEventFactory.h \
+	$(PB_DIR)/EventFactory.h \
+	$(PB_DIR)/pearl_types.h \
+	HybridEventFactory.cpp \
+	HybridEventFactory.h
+pearl_hybrid.o: \
+	$(PM_DIR)/MpiDefsFactory.h \
+	$(PM_DIR)/MpiEventFactory.h \
+	$(PO_DIR)/OmpEventFactory.h \
+	$(PO_DIR)/OmpSmallObjAllocator.h \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/DefsFactory.h \
+	$(PB_DIR)/EventFactory.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/SmallObjAllocator.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_types.h \
+	HybridEventFactory.h \
+	pearl_hybrid.cpp

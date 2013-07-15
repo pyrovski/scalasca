@@ -1,0 +1,138 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.mic-be)
+#------------------------------------------------------------------------------
+
+CFGKEY = linux-intel-intel2-mic
+CONFIG = Linux Intel Xeon Phi cluster with Intel compilers and intel2 MPI
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC   = 64
+PFLAG  =
+AFLAG  =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = mic
+#PLAT_LDIR = -DPFORM_LDIR=\"/tmp\"
+MACHINE   = -DMACHINE=\"Linux\ Intel\ Xeon\ Phi\ \(MIC\)\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = icc
+PLAT_CFLAGS =
+
+OPTFLAGS = -mmic
+CC       = icc
+CFLAGS   = $(OPTFLAGS) -Wall -Wno-unknown-pragmas -w1
+CXX      = icpc
+CXXFLAGS = $(OPTFLAGS) -Wall -Wno-unknown-pragmas -w1 -O3 -mieee-fp
+F77      = ifort
+F90      = $(F77)
+FFLAGS   = $(OPTFLAGS) -warn all
+FPP      = -fpp2
+FDOPT    = -D
+LDFLAGS  = $(OPTFLAGS)
+UTILLIB  =
+FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+MPICC     = mpiicc
+MPICXX    = mpiicpc
+MPIF90    = mpiifort
+MPILIB    =
+PMPILIB   = 
+FMPILIB   = -lepk.ad.fmpi
+FMPIOBJ   = libepk.ad.fmpi.a
+MPIEXTRA  = -DMPICH_IGNORE_CXX_SEEK -DHAS_MPI2_1SIDED -DNO_MPI_EXTRA
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = $(CC)
+OMPCXX     = $(CXX)
+OMPF90     = $(F90)
+OMPFLAG    = -openmp
+OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+HYBCC      = $(MPICC)
+HYBCXX     = $(MPICXX)
+HYBF90     = $(MPIF90)
+HYBFLAG    = $(OMPFLAG)
+HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+#METR       = papi
+#METRDIR    = /usr/local/papi
+#METRINC    = -I$(METRDIR)/include
+#METRLIB32  = -lpapi
+#METRLIB64  = -lpapi
+#METRLDIR32 = $(METRDIR)/lib
+#METRLDIR64 = $(METRDIR)/lib
+#METRLIB    = -L$(METRLDIR$(PREC)) -Wl,-rpath,$(METRLDIR$(PREC)) $(METRLIB$(PREC))
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS = -O3
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+#ECXX         = g++
+#ECXXLIBS     = -lstdc++
+#ECXX_AR      = ar
+#ECXX_ARFLAGS = -rcs
+
+BINUTILS     = /opt/binutils
+LIBERTY      = -L$(BINUTILS)/lib64 -L$(BINUTILS)/lib -liberty
+
+ECXX         = icpc
+ECXXLIBS     =
+ECXX_AR      = ar
+ECXX_ARFLAGS = -rcs
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = intel
+CINSTFLAG = -tcollect
+LINSTFLAG = $(CINSTFLAG)
+DEMANGLE  = -DGNU_DEMANGLE -I$(BINUTILS)/include
+BFDLIB    = -L$(BINUTILS)/lib64 -L$(BINUTILS)/lib -lbfd $(LIBERTY)
+EXTRAOBJS =
+KINST_EXTRA = kinst-intel
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#VTF3LIB     = -L$(VTF3DIR)/i386_linux/lib -lvtf3
+#INST_VTF3   = install-vtf3

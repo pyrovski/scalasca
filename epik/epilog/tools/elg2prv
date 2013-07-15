@@ -1,0 +1,49 @@
+#!/bin/sh
+
+trap 'rm -f ${dir}/${base}.tmp >/dev/null 2>&1' EXIT
+trap "exit 2" HUP INT QUIT PIPE TERM
+
+TDIR=${TMPDIR:-.}
+ARGS=""
+base=""
+dir="."
+
+for arg in "$@"
+do
+  case ${arg} in
+    -m)
+      ARGS="${ARGS} ${arg}"
+      ;;
+    -*)
+      echo "Warning: Unknown option ${arg} ignored"
+      ;;
+    *.elg)
+      dir="`dirname $1`/"
+      base=`basename ${arg} .elg`
+      ;;
+    */)
+      dir=$1
+      base="epik"
+      ;;
+    *)
+      dir="$1/"
+      base="epik"
+      ;;
+  esac
+done
+
+if [ $# -eq 0  -o  -z "${base}" ]
+then
+  echo "usage: elg2pv [<options>] (<infile>.elg | <experiment_archive>)"
+  echo "options:  -m  do not generate MPI related states"
+  exit 1
+fi
+
+eval elg_paraver ${ARGS} ${dir}${base}.elg || exit 0
+if [ "x${ELG_VERBOSE}" = "x1" -o "x${ELG_VERBOSE}" = "xyes" -o \
+     "x${ELG_VERBOSE}" = "xtrue" ]
+then
+  echo "EPILOG: Sorting paraver trace file ${base}.prv ..."
+fi
+sort -T ${TDIR} -n -t : -k 6,7 ${dir}${base}.tmp >> ${dir}${base}.prv
+exit 0

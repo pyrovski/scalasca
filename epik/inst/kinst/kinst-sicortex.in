@@ -1,0 +1,479 @@
+#!/bin/sh
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+if [ $# -eq 0 ]
+then
+  echo "usage: $0 <compile-or-link-command>"
+  exit 1
+fi
+
+# INITIALIZATION
+# -- Variables marked #FE# are relevant on frontend (used in Makefile.cross)
+OCC="pathcc"
+
+# OPARI2
+OPARI2="@OPARI2DIR@/bin/opari2"
+OPARI2_CONFIG="@OPARI2DIR@/bin/opari2-config"
+POMP2INC="-I@OPARI2DIR@/include -I@INCDIR@"
+OOINC=${POMP2INC}
+OPARI2OPTS="--disable=region --task=abort"
+
+DELETE=rm
+
+PREC=${OBJECT_MODE:-@PREC@}
+PFLAG=""
+
+FPP=" @FPP@"
+FTR="tr f F"
+
+SEQELGLIB=-lelg.ser
+OMPELGLIB=-lelg.omp
+MPIELGLIB=-lelg.mpi
+HYBELGLIB=-lelg.ompi
+
+INSTMODE=${SKIN_MODE:-"AUTO"}
+ADDLIBS=no
+COMPONLY=no
+COMPINST=${SKIN_COMP:-"all"}
+USEOPARI=no
+USESOMP=no
+USESMPI=no
+USESOTF=no
+USEAPI=no
+EXEARG=no
+COMP=""
+FLIB=""
+ULIB="-lcubew3 @BFDLIB@"
+
+MFILESsrc=""
+MFILESobj=""
+
+OBJFILES=""
+EXEFILE="a.out"
+
+UNMODSRC=""
+
+#V=yes
+
+# PROCESS COMMAND LINE
+# - collect source files for opari instrumentation (OFILES)
+# - collect compiler output files so they can correctly renamed (MFILESobj)
+# - collect opari output files so they can deleted after use (MFILESsrc)
+# - make compiler to compile instrumented files (NEWFILE)
+# - add opari and scalasca include directory before first file (POMP2INC)
+# - collect special arguments to opari (everything up to "--")
+for origarg in "-mode=${INSTMODE}" "$@"
+do
+  # Escape special characters in arguments
+  #   -e 's/^x//'              Removes the 'x' at the beginning
+  #   -e 's/\\\\/\\\\\\\\/g'   Replaces '\' by '\\'
+  #   -e 's/"/\\\"/g'          Replaces '"' by '\"'
+  #   -e 's/'\''/\\\'\''/g'    Replaces ''' by '\''
+  #   -e 's/ /\\\ /g'          Replaces ' ' by '\ '
+  #   -e 's/(/\\\(/g'          Replaces '(' by '\('
+  #   -e 's/)/\\\)/g'          Replaces ')' by '\)'
+  arg=`echo "x$origarg" | sed -e 's/^x//' \
+                              -e 's/\\\\/\\\\\\\\/g' \
+                              -e 's/"/\\\"/g' \
+                              -e 's/'\''/\\\'\''/g' \
+                              -e 's/ /\\\ /g' \
+                              -e 's/(/\\\(/g' \
+                              -e 's/)/\\\)/g'`
+  if [ ${EXEARG} = "yes" ]
+  then
+    EXEARG=no
+    EXEFILE="${arg}"
+    ARGS="${ARGS} ${arg}"
+  else
+    case ${arg} in
+    *.c|*.C|*.cc|*.CC|*.cpp|*.CPP|*.cxx|*.CXX|*.f|*.F|*.for|*.FOR|*.ftn|*.FTN|*.f90|*.F90|*.f95|*.F95)
+           case ${arg} in
+           -*) ARGS="${ARGS} ${arg}"
+               ;;
+           *)  if [ ${INSTMODE} != "NONE" -a ${USEOPARI} = "yes" ]
+               then
+                 BASE=`echo ${arg} | sed -e 's/\.[^\.]*$//'`
+                 SUF=`echo ${arg} | sed -e 's/.*\./\./' | ${FTR}`
+                 NEWFILE=${BASE}.mod${SUF}
+                 OFILES="${OFILES} $arg"
+                 MFILESobj="${MFILESobj} `basename ${BASE}.mod.o`"
+                 MFILESsrc="${MFILESsrc} ${NEWFILE} ${arg}.opari.inc"
+                 ARGS="${ARGS} ${POMP2INC} ${NEWFILE}"
+                 POMP2INC=""
+               else
+                 ARGS="${ARGS} ${arg}"
+                 if [ -z "${UNMODSRC}" ]; then UNMODSRC="${arg}"
+                 else UNMODSRC="${UNMODSRC}, ${arg}"; fi
+               fi
+               ;;
+           esac
+           ;;
+    *.o)   OBJFILES="${OBJFILES} ${arg}"
+           ARGS="${ARGS} ${arg}"
+           ;;
+    --)    OPARI2OPTS="${OPARI2OPTS} ${COMP} ${ARGS}"
+           ARGS=""
+           COMP=""
+           ;;
+    -comp=*)
+           COMPINST=`echo $arg | sed -e 's/-comp=//'`
+           ;;
+    -mode=*)
+           MODE=`echo $arg | sed -e 's/-mode=//' | tr a-z A-Z`
+           case ${MODE} in
+           AUTO|AUTOMATIC) # default: determine variant automatically
+              ;;
+           NONE) # disable all instrumentation and measurement preparation
+              INSTMODE="NONE"
+              ;;
+           MPI)
+              INSTMODE="MPI"
+              USESMPI="yes"
+              USESOMP="no"
+              ;;
+           OMP|OPENMP)
+              INSTMODE="OMP"
+              USESMPI="no"
+              USESOMP="yes"
+              USEOPARI="yes"
+              ;;
+           OMPI|OMP[+,/]MPI|OPENMP[+,/]MPI|MPI[+,/]OPENMP|MPI[+,/]OMP|HYB|HYBRID)
+              INSTMODE="OMP+MPI"
+              USESMPI="yes"
+              USESOMP="yes"
+              USEOPARI="yes"
+              ;;
+           SER|SERIAL|SEQ|SEQUENTIAL)
+              INSTMODE="serial"
+              USESMPI="no"
+              USESOMP="no"
+              ;;
+           *)
+              echo "ERROR: Unsupported instrumentation measurement mode: $MODE"
+              exit 44
+              ;;
+           esac
+           ;;
+    -pdt|-tau|-opt[A-Z]*)
+           echo "ERROR: PDT/TAU instrumentation not supported for this platform"
+           echo "       Contact scalasca@fz-juelich.de in case of interest"
+           exit 43
+           ;;
+    -nosrc) OPARI2OPTS="${OPARI2OPTS} --nosrc"
+           FPP=""
+           FTR="cat"
+           ;;
+    -otf)  if [ -z "@OTFLIB@" ]
+           then
+             echo "ERROR: OTF generation not supported by this installation of KOJAK/SCALASCA"
+             exit 42
+           else
+             SEQELGLIB=-lelg.otf
+             OMPELGLIB=-lelg.otf.omp
+             MPIELGLIB=-lelg.otf.mpi
+             HYBELGLIB=-lelg.otf.ompi
+             USESOTF=yes
+           fi
+           ;;
+    -user) USEAPI=yes
+           ;;
+    -pomp) USEOPARI=yes OPARI2OPTS="--task=abort"
+           ;;
+    -mp|-openmp|-fopenmp) #USESOMP#
+           if [ "${INSTMODE}" = "AUTO" ]; then
+             USESOMP=yes USEOPARI=yes
+             if [ -n  "${UNMODSRC}" ]; then
+               echo "Warning: OpenMP instrumentation ignored for: ${UNMODSRC}"
+             fi
+           fi
+           ARGS="${ARGS} ${arg}"
+           ;;
+    -lscmpi*) #USESMPI#
+           if [ "${INSTMODE}" = "AUTO" ]; then
+             USESMPI=yes
+             ULIB="${ULIB} ${arg}"
+             ADDLIBS=yes
+           fi
+           ;;
+    -l*)   if [ ${ADDLIBS} = "yes" ]
+           then
+             ULIB="${ULIB} ${arg}"
+           else
+             ARGS="${ARGS} ${arg}"
+           fi
+           ;;
+    -o)    EXEARG=yes;
+           ARGS="${ARGS} ${arg}"
+           ;;
+    -@)    V=yes
+           ;;
+    -c)    COMPONLY=yes
+           ARGS="${ARGS} ${arg}"
+           ;;
+    -E|-P|-EP) INSTMODE="NONE"
+           USEOPARI=no
+           ARGS="${ARGS} ${arg}"
+           ;;
+    -mabi=64|-64) PREC=64
+           PFLAG=${arg}
+           ARGS="${ARGS} ${arg}"
+           ;;
+    -mabi=n32|-n32) PREC=32
+           PFLAG=${arg}
+           ARGS="${ARGS} ${arg}"
+           ;;
+    *)     if [ -z "${COMP}" ]
+           then
+             COMP=${arg}
+           else
+             ARGS="${ARGS} ${arg}"
+           fi
+           ;;
+    esac
+  fi
+done
+
+# No instrumentation, execute "original" command line
+if [ "${INSTMODE}" = "NONE" ]
+then
+  [ -n "${V}" ] && echo "+++ ${COMP} ${ARGS}"
+  eval ${COMP} ${ARGS} || exit
+  exit 0
+fi
+
+# Determine plain compiler name and make sure Fortran can handle C preprocessor
+BCOMP=`basename ${COMP}`
+if [ ${USEOPARI} = "yes" ]
+then
+  case ${BCOMP} in
+  *f*) COMP="${COMP}${FPP}"
+       ;;
+  esac
+fi
+
+# Determine whether Fortran wrapper library is required
+case ${BCOMP} in
+*f*) FLIB="@FMPILIB@"
+     ;;
+esac
+
+if [ "${PREC}" = "@PREC@" ]
+then
+  # -- note: "then" block needs to be marked with #COPY# for 32/64 combine
+  if [ ${USESOTF} = "yes" ]; then ULIB="${ULIB} @OTFLIB@"; fi  #COPY#
+  ELGLIB="-L@LIBDIR@"                                          #COPY#
+  EXTRALIBS="${ULIB} @METRLIB@ @SIONLIB@ @UTILLIB@"            #COPY#
+else
+  echo "ERROR: ${PREC}bit-mode (${PFLAG}) not supported by this installation of KOJAK/SCALASCA"
+  exit 32
+fi
+
+# DETERMINE INSTRUMENTATION MODE
+if [ "${INSTMODE}" = "AUTO" ]; then
+  # - determine whether MPI is used (by checking COMP)
+  case ${BCOMP} in
+  mp*) USESMPI=yes
+       ;;
+  esac
+fi
+
+# - select the right EPILOG library depending on OpenMP/MPI usage
+if [ ${USESOMP} = "yes" ]
+then
+  if [ ${USESMPI} = "yes" ]
+  then
+    VARIANT="OMP+MPI"
+    ELIB="${ELGLIB} ${FLIB} ${HYBELGLIB} @PMPILIB@ ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${HYBELGLIB} | cut -c3-`.a
+  else
+    VARIANT="OMP"
+    ELIB="${ELGLIB} ${OMPELGLIB} ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${OMPELGLIB} | cut -c3-`.a
+  fi
+else
+  if [ ${USESMPI} = "yes" ]
+  then
+    VARIANT="MPI"
+    ELIB="${ELGLIB} ${FLIB} ${MPIELGLIB} @PMPILIB@ ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${MPIELGLIB} | cut -c3-`.a
+  else
+    VARIANT="serial"
+    ELIB="${ELGLIB} ${SEQELGLIB} ${EXTRALIBS}"
+    LIBA=`echo ${ELGLIB} | cut -c3-`/lib`echo ${SEQELGLIB} | cut -c3-`.a
+  fi
+fi
+
+# verify measurement library/support exists
+if [ ! -f ${LIBA} ]
+then
+  [ -n "${V}" ] && echo "INFO: ${LIBA} not found!"
+  echo "ERROR: ${VARIANT} mode not supported by this installation of Scalasca!"
+  exit 66
+else
+  [ -n "${V}" ] && echo "INFO: ${VARIANT} instrumentation mode ..."
+fi
+
+# PREPARE PARSING SETUP
+# Don't use macros in OpenMP directives for PathScale compiler
+PATHSCALE=`${COMP} -v 2>&1 | grep -c ^PathScale`
+if [ ${PATHSCALE} -gt 0 ]; then
+  OPARI2OPTS="--nodecl ${OPARI2OPTS}"
+fi
+
+if [ ${USESOMP} = "no" ]
+then
+  # enable only POMP instrumentation for non-OpenMP
+  OPARI2OPTS="--disable omp ${OPARI2OPTS}"
+fi
+
+# INSTRUMENTATION
+if [ ${COMPONLY} = "no" -a ${USEOPARI} = "yes" ]; then
+  cat /dev/null > pompregions_$$_src.txt
+fi
+# - run opari on every collected source file
+for ofile in ${OFILES}
+do
+    cat /dev/null > pompregions_$$_src.txt
+    [ -n "${V}" ] && echo "+++ ${OPARI2} $ofile"
+    eval ${OPARI2} $ofile || exit
+
+    if [ ${COMPONLY} = "no" ]; then
+      # Collect POMP2_Init_reg routines (Fortran: mangled name: small_!)
+      case ${ofile} in
+      *.c|*.C|*.cc|*.CC|*.cpp|*.CPP|*.cxx|*.CXX)
+        grep -i 'void POMP2_Init_reg' ${ofile}.opari.inc | \
+        sed -e 's/^.*POMP2/POMP2/' -e 's/()//' >> pompregions_$$_src.txt
+        ;;
+      *)
+        BASE=`echo ${ofile} | sed -e 's/\.[^\.]*$//'`
+        SUF=`echo ${ofile} | sed -e 's/.*\./\./' | ${FTR}`
+        NEWFILE=${BASE}.mod${SUF}
+        grep 'subroutine POMP2_Init_reg' ${NEWFILE} | \
+        sed -e 's/^.*POMP2/POMP2/' -e 's/()/_/' | \
+        tr '[A-Z]' '[a-z]' >> pompregions_$$_src.txt
+        ;;
+      esac
+    fi
+done
+
+# AUTOMATIC FUNCTION INSTRUMENTATION
+if [ "${COMPINST}" != "none" ]; then
+  IOPT="-g -finstrument-functions"
+  if [ "${COMPINST}" != "all" ]; then
+    IOPT="${IOPT} ${COMPINST}"
+  fi
+fi
+
+# enable manual user instrumentation macros
+if [ ${USEAPI} = "yes" ]
+then
+  DOPT="-D"
+  case ${BCOMP} in
+  *f*) DOPT="@FDOPT@" ;;
+  esac
+  IOPT="${IOPT} ${DOPT}EPIK ${POMP2INC}"
+fi
+
+# EXECUTING MODIFIED COMMAND
+if [ ${COMPONLY} = "yes" ]
+then
+  # COMPILATION ONLY
+  [ -n "${V}" ] && echo "+++ ${COMP} ${IOPT} ${ARGS}"
+  eval ${COMP} ${IOPT} ${ARGS} || exit
+else
+  # COMPILATION + LINKING
+
+  # - include OPARI processing when required or directed
+  OREGFILE=""
+  if [ ${USEOPARI} = "yes" ]
+  then
+    # Create opari2 initialization file and compile
+    if [ -z "${OBJFILES}" ]
+    then
+      # no object files: create initialization file from sources
+      [ -n "${V}" ] && echo "+++ awk -f `${OPARI2_CONFIG} --awk-script` pompregions_$$_src.txt"
+      awk -f `${OPARI2_CONFIG} --awk-script` pompregions_$$_src.txt > pompregions_$$.c
+    else
+      [ -n "${V}" ] && echo "+++" ${OPARI2_CONFIG} --create-pomp2-regions ${OBJFILES} 
+      eval `${OPARI2_CONFIG} --create-pomp2-regions ${OBJFILES}` > pompregions_$$.c || exit
+    fi
+    [ -n "${V}" ] && echo "+++ ${OCC} pompregions_$$.c -c"
+    eval ${OCC} pompregions_$$.c -c || exit
+    grep -i "extern void POMP2_Init_reg" pompregions_$$.c | sort \
+         > pompregions_$$_1.txt
+    OREGFILE="pompregions_$$.o"
+  fi
+
+  [ -n "${V}" ] && echo "INFO: Linking executable for ${VARIANT} measurement ..."
+
+  # MODIFIED COMPILING/LINKING STEP
+  [ -n "${V}" ] && echo "+++ ${COMP} ${IOPT} ${OREGFILE} ${ARGS} ${ELIB}"
+  eval ${COMP} ${IOPT} ${OREGFILE} ${ARGS} ${ELIB} || exit
+
+  if [ ${USEOPARI} = "yes" ]
+  then
+    # FIND OPARI2 INITILIAZATIONS IN EXECUTABLE, RECREATE INITIALIZATION FILE
+    [ -n "${V}" ] && echo "+++" ${OPARI2_CONFIG} --create-pomp2-regions ${EXEFILE} 
+    eval `${OPARI2_CONFIG} --create-pomp2-regions ${EXEFILE}` > pompregions_$$.c || exit
+    grep -i "extern void POMP2_Init_reg" pompregions_$$.c | sort \
+         > pompregions_$$_2.txt
+
+    if diff pompregions_$$_1.txt pompregions_$$_2.txt > /dev/null 2>&1
+    then
+      [ -n "${V}" ] && echo "+++ ignoring relink"
+    else
+      [ -n "${V}" ] && echo "+++ ${OCC} pompregions_$$.c -c"
+      eval ${OCC} pompregions_$$.c -c || exit
+      OREGFILE="pompregions_$$.o"
+
+      # RELINK 
+      [ -n "${V}" ] && echo "+++ ${COMP} ${IOPT} ${OREGFILE} ${ARGS} ${ELIB}"
+      eval ${COMP} ${IOPT} ${OREGFILE} ${ARGS} ${ELIB} || exit
+    fi
+  fi
+
+  # Report successful build of instrumented executable
+  echo "INFO: Instrumented executable for ${VARIANT} measurement"
+
+  if [ ${USEOPARI} = "yes" ]
+  then
+    if [ ! -s pompregions_$$_2.txt ]
+    then
+      echo "WARNING: No POMP2 instrumented regions defined!"
+    fi
+
+    # CLEANUP INTERMEDIATE FILES (in non-verbose mode)
+    if [ -z "${V}" ]
+    then
+      ${DELETE} -f pompregions_$$*
+    fi
+  fi
+fi
+
+# RENAME COMPILER OUTPUT TO ORIGINAL FILE NAME
+for mfile in ${MFILESobj}
+do
+  if [ -f ${mfile} ]
+  then
+    TARGET=`echo ${mfile} | sed -e 's/\.mod//'`
+    [ -n "${V}" ] && echo "+++ mv ${mfile} ${TARGET}"
+    eval mv ${mfile} ${TARGET}
+  fi
+done
+
+# DELETE INTERMEDIATE OPARI OUTPUT (in non-verbose mode)
+for mfile in ${MFILESsrc}
+do
+  if [ -f ${mfile} ]
+  then
+    [ -z "${V}" ] && ${DELETE} ${mfile}
+  fi
+done
+exit 0

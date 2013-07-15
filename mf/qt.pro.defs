@@ -1,0 +1,48 @@
+#------------------------------------------------------------------------------
+# Dynamic loading (experimental)
+#------------------------------------------------------------------------------
+
+#DL_DEFINES = WITH_DYNLOAD
+
+#------------------------------------------------------------------------------
+# Experimental views
+#------------------------------------------------------------------------------
+
+#VIEW_DEFINES = WITH_EXPERIMENTAL_VIEWS
+#VIEW_HEADERS = display/2DPlotWidget.h display/ColorMapPlotWidget.h
+#VIEW_SOURCES = display/2DPlotWidget.cpp display/ColorMapPlotWidget.cpp
+
+#------------------------------------------------------------------------------
+# DBUS configuration (needed for cube3-qt <-> Vampir integration)
+#------------------------------------------------------------------------------
+
+#VAMPIR_DEFINES = WITH_VAMPIR
+#VAMPIR_DBUS_INCLUDEPATH = /usr/include/dbus-1.0 /usr/lib/dbus-1.0/include
+#VAMPIR_DBUS_LIBS = -L/usr/lib -ldbus-1
+#VAMPIR_HEADERS = display/VampirConnecter.h display/VampirConnectionDialog.h
+#VAMPIR_SOURCES = display/VampirConnecter.cpp
+
+#------------------------------------------------------------------------------
+# Paraver configuration (needed for cube3-qt <-> paraver integration)
+#------------------------------------------------------------------------------
+
+#PV_DEFINES = WITH_PARAVER
+#PV_DEF_CFG = /usr/local/paraver/etc/cfgs/General/views/state_as_is.cfg
+#PV_HEADERS = display/ParaverConnecter.h
+#PV_SOURCES = display/ParaverConnecter.cpp
+
+#------------------------------------------------------------------------------
+# Generic Trace Browsing configuration (needed for paraver AND Vampir)
+#------------------------------------------------------------------------------
+
+#TB_HEADERS = display/VisualizationConnecter.h
+#TB_SOURCES = display/MainWidgetTraceBrowser.cpp
+
+#------------------------------------------------------------------------------
+# FIXED: DO NOT CHANGE ANYTHING BELOW THIS LINE
+DEFINES += $$DL_DEFINES $$VIEW_DEFINES \
+           $$VAMPIR_DEFINES $$PV_DEFINES PV_DEF_CFG=$$PV_DEF_CFG
+INCLUDEPATH += $$VAMPIR_DBUS_INCLUDEPATH
+LIBS += $$VAMPIR_DBUS_LIBS
+HEADERS += $$VIEW_HEADERS $$TB_HEADERS $$VAMPIR_HEADERS $$PV_HEADERS
+SOURCES += $$VIEW_SOURCES $$TB_SOURCES $$VAMPIR_SOURCES $$PV_SOURCES

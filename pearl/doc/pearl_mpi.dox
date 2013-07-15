@@ -1,0 +1,57 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+
+/*
+ *---------------------------------------------------------------------------
+ *
+ * PEARL.mpi
+ *
+ *---------------------------------------------------------------------------
+ */
+
+
+//--- Library description ---------------------------------------------------
+
+/**
+@defgroup PEARL_mpi PEARL.mpi
+@ingroup  PEARL
+@brief    MPI-related part of the PEARL library
+
+This part of the PEARL library provides all functions and classes that are
+specific to the handling traces of MPI-based programs, including traces of
+hybrid OpenMP/MPI applications.
+
+The following code snippet shows the basic steps required to load and set up
+the PEARL data structures to handle pure MPI traces (for information on how
+to handle serial, pure OpenMP or hybrid OpenMP/MPI traces, see the @ref
+PEARL_base, @ref PEARL_omp, and @ref PEARL_hybrid parts of PEARL).
+
+@code
+  // Initialize MPI, etc.
+  ...
+  // Initialize PEARL
+  PEARL_mpi_init();
+
+  // Load global definitions & trace data
+  GlobalDefs defs(archive_name);
+  LocalTrace trace(archive_name, mpi_rank);
+
+  // Preprocessing
+  PEARL_verify_calltree(defs, trace);
+  PEARL_mpi_unify_calltree(defs);
+  PEARL_preprocess_trace(defs, trace);
+  ...
+@endcode
+
+Note that all of the aforementioned function calls except PEARL_mpi_init()
+throw exceptions in case of errors. This has to be taken into account to
+avoid deadlocks (e.g., one process failing with an exception while the other
+processes wait in an MPI communication operation).
+*/

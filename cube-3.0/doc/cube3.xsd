@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+ 
+ <xs:annotation>
+   <xs:documentation xml:lang="en">
+     XML schema for CUBE project in ICL at UTK,
+     http://icl.cs.utk.edu.
+
+     Authors: Farzona Pulatova, Fengguang Song, Felix Wolf. 
+              (fpulatov,song,fwolf)@cs.utk.edu
+     Copyright 2006-2008 University of Tennessee
+     All rights reserved
+   </xs:documentation>
+ </xs:annotation>
+
+ <!-- ***************************************************************
+               Global Declaration
+ 
+      Description: 3 elements are declared.
+      1) <cube/>
+      2) <name/>
+      3) <descr/> 
+      *************************************************************** --> 
+
+ <xs:element name="cube" type="CUBEType">
+
+   <!-- ********************************************
+            Constraints in <metrics/>
+
+        Description: we define one key:
+        1) Metric key: each metric element has
+           a unique id.
+        ******************************************** -->
+   
+   <!-- *** Metric key *** -->
+   <xs:key name="keyMetric">
+     <xs:selector xpath=".//metric"/>
+     <xs:field xpath="@id"/>
+   </xs:key>
+ 
+   <!-- *** cnode key *** -->
+   <xs:key name="keyCnode">
+     <xs:selector xpath=".//cnode"/>
+     <xs:field xpath="@id"/>
+   </xs:key>
+   <!-- *** region key *** -->
+   <xs:key name="keyRegion">
+     <xs:selector xpath=".//region"/>
+     <xs:field xpath="@id"/>
+   </xs:key>
+        
+  <!-- ********************************************
+            Constraints in <system/>
+
+       Descriptions: we define 4 uniques.
+
+       1) machine unique: each machine has a unique id.
+       2) node unique: each node has a unique id.
+       3) process unique: each process has a unique id.
+       4) thread unique: each thread has a unique id.
+
+       ******************************************** -->
+
+   <!-- *** machine unique *** -->   
+   <xs:unique name="uniMachine">
+     <xs:selector xpath="system/machine"/>
+     <xs:field xpath="@id"/>
+   </xs:unique>   
+   <!-- *** node unique *** -->
+   <xs:unique name="uniNode">
+     <xs:selector xpath="system/machine/node"/>
+     <xs:field xpath="@id"/>
+   </xs:unique>   
+   <!-- *** process unique *** -->
+   <xs:unique name="uniProcess">
+     <xs:selector xpath="system/machine/node/process"/>
+     <xs:field xpath="@id"/>
+   </xs:unique>   
+   <!-- *** thread unique *** -->
+   <xs:unique name="uniThread">
+     <xs:selector xpath="system/machine/node/process/thread"/>
+     <xs:field xpath="@id"/>
+   </xs:unique>   
+         
+   <!-- ********************************************
+            Constraints in <severity/>
+
+       Description: there're two keyref defined here.
+         -The first one restricts that each matrix element 
+           corresponds to an existing metric.
+         -The second one restricts that each row of a matrix
+           points to an existing cnode.
+       ******************************************** -->  
+
+   <xs:keyref name="refMetric" refer="keyMetric">
+     <xs:selector xpath="severity/matrix"/>
+     <xs:field    xpath="@metricId"/>
+   </xs:keyref>    
+   <!-- *** refkey to a cnode          *** -->
+   <xs:keyref name="refCnode" refer="keyCnode">
+     <xs:selector xpath="severity/matrix/row"/>
+     <xs:field    xpath="@cnodeId"/>
+   </xs:keyref>
+
+ </xs:element>
+
+ <!-- ********************************************************* 
+      ***************** END of "cube" Element *****************
+      ********************************************************* -->
+
+
+ <!-- ***************************************
+         global element declaration: 
+         name and description. 
+      *************************************** -->
+
+ <xs:element name = "name" type="xs:string"/>
+
+ <xs:simpleType name="ENTITY">
+    <xs:restriction base="xs:string">
+       <xs:whiteSpace value="replace"/>
+    </xs:restriction>
+ </xs:simpleType>
+
+
+ <!-- *********************************************************
+                    CUBE Type
+
+      Description: <cube/> is the root element of any CUBE xml
+                   document. A cube element has child elements
+                   of <metrics/>, <program/>, <system/>, and
+                   <severity/> in that order.
+
+      ********************************************************* -->
+
+ <xs:complexType name="CUBEType">
+   <xs:sequence>
+     <xs:element name="attr" minOccurs="0"> 
+       <!-- Anonymous type: descr items of the cube data-->
+       <xs:complexType>
+         <xs:attribute name="key" type="xs:string" use="required"/>
+         <xs:attribute name="value" type="xs:string" use="required"/>
+       </xs:complexType>
+     </xs:element>
+     <xs:element name="doc" minOccurs="0" maxOccurs="1">
+       <xs:complexType>
+         <xs:sequence>
+           <xs:element name="mirrors" type="MirrorsType" minOccurs="1"/>
+         </xs:sequence>
+       </xs:complexType>
+     </xs:element>
+     <xs:element name="metrics" type="MetricsType"/>
+     <xs:element name="program" type="ProgramType"/>
+     <xs:element name="system" type="LocationsType"/>
+     <xs:element name="severity" type="SeverityType"/>
+   </xs:sequence>
+   <xs:attribute name="version" type="xs:string" use="required"/>
+ </xs:complexType>
+ 
+
+<!-- *******************************************************************
+        MirrorsType: stores the local mirror of some urls
+     **************************************************************** -->
+
+<xs:complexType name="MirrorsType">
+  <xs:sequence>
+    <xs:element name="murl" type="xs:string" minOccurs="0"  maxOccurs="unbounded"/>    
+  </xs:sequence>
+</xs:complexType>
+
+
+ <!-- ***************************************************************
+
+           Definitions for The 3 Performance Dimensions 
+
+      *************************************************************** -->
+ 
+
+
+ <!-- ***************************************************
+                 Metrics Type           
+     
+      Description: a <metrics/> element consists of a set of
+      metric elements which are roots of metric trees.
+ 
+      Metric Type is defined as:
+      1) a disp_name element.
+      2) a uniq_name element.
+      3) a dtype element
+      4) a uom element, which is an enumeration type.
+      5) a val optional element.
+      6) a url element.
+      7) a description element.
+      8) a list of child metrics of current metric.
+         "uom" = "unit of measurement".
+
+      ***************************************************-->
+
+ <!-- *** Metric Type  *** -->        
+ <xs:complexType name="MetricType">
+   <xs:sequence>
+     <xs:element name="disp_name"/>
+     <xs:element name="uniq_name"/>
+     <xs:element name="dtype" type="xs:string" minOccurs="0"/>
+     <xs:element name="uom">
+       <xs:simpleType>
+         <xs:restriction base="xs:string">
+           <xs:enumeration value="sec"/>
+           <xs:enumeration value="occ"/>
+           <xs:enumeration value="rate"/>
+           <xs:enumeration value="bytes"/>
+	   <xs:enumeration value=""/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+     <xs:element name="val" type="xs:string" minOccurs="0"/>
+     <xs:element name="url" type="xs:string" minOccurs="0"/>
+     <xs:element name="descr" type="ENTITY" minOccurs="0"/>
+     <!-- child metric elments -->
+     <xs:element name="metric" type="MetricType" 
+                 minOccurs="0" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
+ </xs:complexType>     
+
+ <xs:complexType name="MetricsType">
+   <xs:sequence>
+     <!-- *** a set of root metric elements *** -->
+     <xs:element name="metric" type="MetricType"
+                 minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>
+ </xs:complexType>
+
+
+
+
+ <!-- *************************************************************
+
+                    Program Type  (Call Tree Dimension)            
+      
+      Description: a <program/> element corresponds to the 2nd dimension
+      of the performance space. It's composed of regions, cnodes
+      in trees.
+
+      Region and Cnode have separate domains for their id's.
+      In each domain, the id's start from '0'.
+      ************************************************************* -->
+
+ <xs:complexType name="ProgramType">
+   <xs:sequence>
+     <xs:element name="region" type="RegionType" maxOccurs="unbounded"/>
+     <xs:element name="cnode" type="CnodeType" maxOccurs="unbounded"/>
+   </xs:sequence>   
+ </xs:complexType>
+
+ <!-- *** Region Type *** -->
+ <xs:complexType name="RegionType">
+   <xs:sequence>
+       <xs:element name="name" type="ENTITY" minOccurs="0"/>
+       <xs:element name="url" type="ENTITY" minOccurs="0"/>
+       <xs:element name="descr" type="ENTITY" minOccurs="0"/>
+   </xs:sequence>
+   <!-- begin, and end are both line numbers -->
+   <xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
+   <xs:attribute name="mod" type="xs:string" use="optional"/>
+   <xs:attribute name="begin" type="LineNumber" use="optional"/>
+   <xs:attribute name="end" type="LineNumber" use="optional"/>
+ </xs:complexType>
+
+ <!-- *** Cnode Type *** -->
+ <xs:complexType name="CnodeType">
+   <xs:sequence>
+     <!-- child cnode elements -->
+     <xs:element name="cnode" type="CnodeType" 
+                 minOccurs="0" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:attribute name="id" type="xs:nonNegativeInteger" use="required"/>
+   <xs:attribute name="line" type="LineNumber" use="optional"/>
+   <xs:attribute name="mod" type="xs:string" use="optional"/>
+   <xs:attribute name="calleeId" type="xs:positiveInteger" use="required"/>
+
+ </xs:complexType>
+
+ <!-- *******************************************************************
+
+                     Locations Type 
+
+      Description: A <system/> element corresponds to the 3rd dimension of
+      extended performance space. It consists of 
+      a set of machine elements, a set of node elements, process elements, 
+      and a set of thread elements, distributed in a forest structure.
+      The top level (roots) are <machine/> elements.
+
+      Note: here we have a machine domain, node domain, process
+      domain, and a thread domain. 
+
+      "thread id" is used by the 3D severity matrix.
+      *******************************************************************-->
+ <!-- Topology Type -->
+ <xs:complexType name="TopoType">
+   <xs:sequence>
+     <xs:element name="cart" type="CartesianType" maxOccurs="unbounded" minOccurs="0"/>
+   </xs:sequence>
+ </xs:complexType>
+ <!-- Cartesian Type -->
+ <xs:simpleType name="ListOfIntegers">
+   <xs:list itemType="xs:nonNegativeInteger"/>
+ </xs:simpleType>
+ <xs:complexType name="CartesianType">
+   <xs:sequence>
+     <xs:element name="dim" maxOccurs="unbounded">
+       <xs:complexType>
+         <xs:attribute name="size" type="xs:positiveInteger" use="required"/>
+         <xs:attribute name="periodic" type="xs:boolean" use="required"/>
+       </xs:complexType>
+     </xs:element>
+     <xs:element name="coord" maxOccurs="unbounded">
+       <xs:complexType>
+         <xs:simpleContent>
+          <xs:extension base="ListOfIntegers">
+            <!-- coord should have exactly one of these 5 Id's -->
+            <xs:attribute name="thrdId" type="xs:nonNegativeInteger" 
+                                       use="optional"/>
+            <xs:attribute name="procId" type="xs:nonNegativeInteger" 
+                                       use="optional"/>
+            <xs:attribute name="machId" type="xs:nonNegativeInteger" 
+                                       use="optional"/>
+            <xs:attribute name="nodeId" type="xs:nonNegativeInteger" 
+                                       use="optional"/>
+          </xs:extension>
+         </xs:simpleContent>
+       </xs:complexType>
+     </xs:element>
+   </xs:sequence>
+   <xs:attribute name="ndims" type="xs:positiveInteger" use="required"/>
+ </xs:complexType>
+ <!-- Location Dimension Type -->
+ <xs:complexType name="LocationsType">
+   <xs:sequence>
+     <xs:element name="machine" type="MachineType" maxOccurs="unbounded"/>
+     <xs:element name="topologies" type="TopoType" minOccurs="0"/>
+   </xs:sequence>
+ </xs:complexType>
+
+
+ <!-- *** Machine Type *** -->
+ <xs:complexType name="MachineType">
+   <xs:sequence>
+     <xs:element ref="name"/>
+     <xs:element name="descr" minOccurs="0"/>
+     <xs:element name="node" type="NodeType" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:attributeGroup ref="LocationIDs"/>
+ </xs:complexType>
+ 
+ <!-- *** Node Type *** -->
+ <xs:complexType name="NodeType">
+   <xs:sequence>
+     <xs:element ref="name"/>
+     <xs:element name="process" type="ProcessType"
+                 maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:attributeGroup ref="LocationIDs"/>
+ </xs:complexType> 
+
+ <!-- *** Process Type *** -->
+ <xs:complexType name="ProcessType">
+   <xs:sequence>
+     <xs:element ref="name"/>
+     <xs:element name="rank" type="xs:nonNegativeInteger"/>
+     <xs:element name="thread" type="ThreadType" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:attributeGroup ref="LocationIDs"/>
+ </xs:complexType> 
+
+ <xs:complexType name="ThreadType">
+   <xs:sequence>
+     <xs:element ref="name"/>
+     <xs:element name="rank" type="xs:nonNegativeInteger"/>
+   </xs:sequence>
+   <!-- id is used as the 3rd index of the severity matrix:
+        matrix[b,n,l]=severity. --> 
+   <xs:attributeGroup ref="LocationIDs"/>
+ </xs:complexType> 
+ 
+ <!-- attribute group for location dimension -->
+ <xs:attributeGroup name="LocationIDs">
+   <!-- <xs:attribute name="id" type="xs:nonNegativeInteger"
+                 use="required"/> -->
+   <xs:attribute name="Id" type="xs:nonNegativeInteger"
+                 use = "required"/>
+ </xs:attributeGroup>
+ <!-- ******************************************************************
+
+                     3D Severity Matrix Type 
+      
+      Description: A <severity/> has a list of <matrix/> elements, each
+      of which also consists of a list of <row/> elments. <row> is of
+      list type.
+ 
+      Each <matrix> has an attribute "metricId" pointing to an existing 
+      metric node of trees. Similarly, each <row> has an attribute
+      "cnodeId" referring to a cnode.    
+
+      Note:the index of a severity in a <row/> refers to a thread whose 
+      id == index, for instance, the 2nd value corresponds to the
+      thread whose "id"=2.
+         
+
+      ****************************************************************** -->  
+
+ <xs:complexType name="SeverityType">
+   <xs:sequence>
+     <xs:element name="matrix" type="MatrixType" 
+               minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>
+ </xs:complexType>
+ 
+ <!-- *** Matrix Type *** -->
+ <xs:complexType name="MatrixType">
+   <xs:sequence>
+     <xs:element name="row" type="RowType"
+                 minOccurs="0" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:attribute name="metricId" type="xs:nonNegativeInteger" use="required"/>
+ </xs:complexType>
+
+ <!-- *** Row Type *** -->
+ <xs:complexType name="RowType">
+    <xs:simpleContent>
+       <xs:extension base="listOfDoubles">	 
+       <xs:attribute name="cnodeId" type="xs:nonNegativeInteger" 
+                                       use="required"/>
+       </xs:extension>
+    </xs:simpleContent>
+ </xs:complexType>
+
+ 
+ 
+ 
+ <!-- *** base type of RowType ** -->
+<!--  <xs:simpleType name="decimal"> -->
+<!--    <xs:list itemType="nonNegativeDecimal"/> -->
+<!--  </xs:simpleType>  -->
+
+ <!-- *** nonNegativeDecimal Type ***
+   "decimal has a lexical representation consisting of a finite-length
+    sequence of decimal digits (#x30-#x39) separated by a period as a
+    decimal indicator." 
+    Integer is a derived type of decimal, so integer is also valid here.
+ *** -->
+
+<xs:simpleType name="nonNegativeDecimal">
+    <xs:restriction base="xs:decimal">
+	<xs:minInclusive value="0"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="LineNumber">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="-1"/><!-- *** special value "-1" stands for not defined line number *** -->
+    </xs:restriction>
+</xs:simpleType>
+
+ 
+<xs:simpleType name='listOfFloats'>
+    <xs:list itemType='xs:float'/>
+</xs:simpleType>
+  
+<xs:simpleType name='listOfDoubles'>
+    <xs:list itemType='xs:double'/>
+</xs:simpleType>
+
+<xs:simpleType name='listOfDecimals'>
+    <xs:list itemType='xs:decimal'/>
+</xs:simpleType>
+
+ 
+ 
+
+ 
+</xs:schema>
+

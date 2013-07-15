@@ -1,0 +1,293 @@
+#------------------------------------------------------------------------------
+# General Settings
+#------------------------------------------------------------------------------
+
+SHELL  = /bin/sh
+TOPDIR = .
+
+include Makefile.defs
+include mf/common.defs
+
+.PHONY: all all-64 all-fe all-be all- all-epik-config \
+        all-utils all-opari2 all-epik all-cube3-libs all-cube3-libc \
+        all-cube3-libcpp all-cube3-tools all-cube3-guiqt all-earl all-expert \
+        all-pearl all-silas all-salsa all-clc all-scout \
+        install install-64 install-fe install-be install- install-epik-config \
+        install-utils install-epik install-cube3-libs install-cube3-libc \
+        install-cube3-libcpp install-cube3-tools \
+        install-cube3-guiqt install-links install-earl install-expert \
+        install-pearl install-salsa install-silas install-clc install-scout install-examples \
+        install-config clean targets-endmarker
+
+
+# EARL version
+EVER=-2.0
+# EXPERT version
+XVER=-3.0
+
+
+#------------------------------------------------------------------------------
+# Rules
+#------------------------------------------------------------------------------
+
+all: all-epik-config all-utils \
+     all-$(OMPTRGT) all-cube3-libc all-epik \
+     all-cube3-libcpp all-cube3-tools $(CUBE_BUILD_TARGETS) \
+     all-earl all-expert \
+     $(MPI_BUILD_TARGETS) \
+     all-scout all-silas \
+     targets-endmarker
+
+all-64: all-epik-config all-utils \
+        all-$(OMPTRGT) all-cube3-libc all-epik \
+        all-cube3-libcpp all-cube3-tools $(CUBE_BUILD_TARGETS64) \
+        all-earl all-expert \
+        $(MPI_BUILD_TARGETS) \
+        all-scout all-silas \
+        targets-endmarker
+
+all-fe: all-epik-config all-utils \
+        all-$(OMPTRGT) all-cube3-libc all-epik \
+        all-cube3-libcpp all-cube3-tools $(CUBE_BUILD_TARGETS) \
+        $(MPI_BUILD_TARGETS) \
+        targets-endmarker
+
+all-be: all-epik-config all-utils \
+        all-cube3-libc all-epik \
+        all-cube3-libcpp \
+        $(MPI_BUILD_TARGETS) \
+        all-scout all-silas \
+        targets-endmarker
+
+
+all-epik-config:
+	@if test -d epik/config; then (cd epik/config; $(MAKE) all ); fi
+
+all-utils: all-epik-config
+	@if test -d epik/utils; then (cd epik/utils; $(MAKE) all ); fi
+	@if test -d utils; then (cd utils; $(MAKE) all ); fi
+
+all-opari2:
+	@echo
+	@echo "++++++++++ OPARI2 ++++++++++++++++++++++++++++++"
+	@if test -f opari2/COPYING; then ( cd opari2/src/opari; $(MAKE) all ); fi
+
+all-epik: all-utils
+	@if test -d epik; then ( cd epik; $(MAKE) all ); fi
+
+all-earl: all-epik-config
+	@echo
+	@echo "++++++++++ EARL$(EVER) +++++++++++++++++++++++++++"
+	@if test -d earl$(EVER); then ( cd earl$(EVER)/src; $(MAKE) all ); fi
+
+all-expert: all-cube3-libcpp all-epik
+	@echo
+	@echo "++++++++++ EXPERT$(XVER) +++++++++++++++++++++++++"
+	@if test -d expert$(XVER); then ( cd expert$(XVER)/src; $(MAKE) all ); fi
+
+all-pearl: all-cube3-libc all-epik
+	@if test -d pearl; then ( cd pearl; $(MAKE) all ); fi
+
+all-salsa: all-pearl
+	@if test -d salsa; then ( cd salsa; $(MAKE) all ); fi
+
+all-silas: all-pearl
+	@if test -d silas; then ( cd silas; $(MAKE) all ); fi
+
+all-clc: all-pearl
+	@if test -d clc; then ( cd clc; $(MAKE) all ); fi
+
+all-scout: all-pearl all-clc all-cube3-libc
+	@if test -d scout; then ( cd scout; $(MAKE) all ); fi
+
+all-cube3-libs: all-cube3-libc all-cube3-libcpp
+
+all-cube3-libc:
+	@echo
+	@echo "++++++++++ CUBE-3 writer (C-version) ++++++++++"
+	@if test -d cube-3.0/src/cubew; then ( cd cube-3.0/src/cubew; $(MAKE) all ); fi
+
+all-cube3-libcpp:
+	@echo
+	@echo "++++++++++ CUBE3LIB ++++++++++++++++++++++++++++"
+	@if test -d cube-3.0/src/cube; then ( cd cube-3.0/src/cube; $(MAKE) all ); fi
+
+all-cube3-tools: all-cube3-libs
+	@if test -d cube-3.0/src/tools; then ( cd cube-3.0/src/tools; $(MAKE) all ); fi
+
+all-cube3-guiqt: all-cube3-libs
+	@echo
+	@echo "++++++++++ CUBE3GUI (Qt version) +++++++++++++++"
+	@if test -d cube-3.0/src/GUI-qt; then ( cd cube-3.0/src/GUI-qt; $(MAKE) all ); fi
+
+all-:
+
+
+install: install-epik-config install-utils \
+         install-$(OMPTRGT) install-epik \
+         install-earl install-expert \
+         install-cube3-libs install-cube3-tools $(CUBE_INSTALL_TARGETS) \
+         $(MPI_INSTALL_TARGETS) \
+         install-scout install-silas \
+         install-examples install-doc install-config install-links \
+         targets-endmarker
+
+install-64: install-epik-config install-utils \
+            install-$(OMPTRGT) install-epik \
+            install-earl install-expert \
+            install-cube3-libs install-cube3-tools $(CUBE_INSTALL_TARGETS64) \
+            $(MPI_INSTALL_TARGETS) \
+            install-scout install-silas \
+            install-links \
+            targets-endmarker
+
+install-fe: install-epik-config install-utils \
+            install-$(OMPTRGT) install-epik \
+            install-cube3-libs install-cube3-tools $(CUBE_INSTALL_TARGETS) \
+            $(MPI_INSTALL_TARGETS) \
+            install-links \
+            targets-endmarker
+
+install-be: install-epik-config install-utils install-epik \
+            install-cube3-libs \
+            $(MPI_INSTALL_TARGETS) \
+            install-scout install-silas \
+            install-examples install-doc install-config \
+            targets-endmarker
+
+
+install-epik-config:
+	@if test -d epik/config; then ( cd epik/config; $(MAKE) install ); fi
+
+install-utils:
+	@if test -d utils; then ( cd utils; $(MAKE) install ); fi
+
+install-opari2:
+	@echo
+	@echo "++++++++++ OPARI2 ++++++++++++++++++++++++++++++"
+	@if test -f opari2/COPYING; then ( cd opari2/src/opari; $(MAKE) install ); fi
+
+install-epik:
+	@if test -d epik; then ( cd epik; $(MAKE) install ); fi
+
+install-earl:
+	@echo
+	@echo "++++++++++ EARL$(EVER) +++++++++++++++++++++++++++"
+	@if test -d earl$(EVER); then ( cd earl$(EVER)/src; $(MAKE) install ); fi
+
+install-expert:
+	@echo
+	@echo "++++++++++ EXPERT$(XVER) +++++++++++++++++++++++++"
+	@if test -f expert$(XVER)/src/expert; then ( cd expert$(XVER)/src; $(MAKE) install ); fi
+
+install-pearl:
+	@if test -d pearl; then ( cd pearl; $(MAKE) install ); fi
+
+install-salsa:
+	@if test -d salsa; then ( cd salsa; $(MAKE) install ); fi
+
+install-silas:
+	@if test -d silas; then ( cd silas; $(MAKE) install ); fi
+
+install-clc:
+	@if test -d clc; then ( cd clc; $(MAKE) install ); fi
+
+install-scout: install-pearl install-clc
+	@if test -d scout; then ( cd scout; $(MAKE) install ); fi
+
+install-cube3-libs: install-cube3-libc install-cube3-libcpp
+
+install-cube3-libc:
+	@echo
+	@echo "++++++++++ CUBE-3 writer (C-version) ++++++++++"
+	@if test -d cube-3.0/src/cubew; then ( cd cube-3.0/src/cubew; $(MAKE) install ); fi
+
+install-cube3-libcpp:
+	@echo
+	@echo "++++++++++ CUBE3LIB ++++++++++++++++++++++++++++"
+	@if test -d cube-3.0/src/cube; then ( cd cube-3.0/src/cube; $(MAKE) install ); fi
+
+install-cube3-tools:
+	@if test -d cube-3.0/src/tools; then ( cd cube-3.0/src/tools; $(MAKE) install ); fi
+
+install-cube3-guiqt:
+	@echo
+	@echo "++++++++++ CUBE3GUI (Qt version) +++++++++++++++"
+	@if test -d cube-3.0/src/GUI-qt; then ( cd cube-3.0/src/GUI-qt; $(MAKE) install ); fi
+
+install-examples:
+	@echo
+	@echo "++++++++++ EXAMPLES +++++++++++++++++++++++++++"
+	$(MKDIR) -m 755 ${PREFIX}/example
+	@list='example/*'; for p in $$list; do \
+		echo "$(INSTALL) -c -m 644 $$p ${PREFIX}/example" ; \
+		eval "$(INSTALL) -c -m 644 $$p ${PREFIX}/example" ; \
+	done
+	@if test -f ../Makefile.defs.be; then \
+		$(INSTALL) -c -m 644 ../Makefile.defs.be ${PREFIX}/example/Makefile.defs; \
+	else \
+		sed -e 's/DEFAULTPREC/PREC/' ../Makefile.defs > ${PREFIX}/example/Makefile.defs; \
+		chmod 644 ${PREFIX}/example/Makefile.defs; \
+	fi
+	-gunzip -c example/EXAMPLE.tgz | \
+		( cd ${PREFIX}/example; tar xpvf - ; chmod -R go+rX epik_* )
+	@rm -f ${PREFIX}/example/EXAMPLE.tgz
+
+install-doc:
+	@echo
+	@echo "++++++++++ DOCUMENTATION ++++++++++++++++++++++"
+	$(MKDIR) -m 755 ${DOCDIR}/html
+	$(MKDIR) -m 755 ${DOCDIR}/manuals
+	$(INSTALL) -c -m 644 COPYRIGHT              $(DOCDIR)
+	$(INSTALL) -c -m 644 LICENSE                $(DOCDIR)
+	$(INSTALL) -c -m 644 README.1st             $(DOCDIR)
+	$(INSTALL) -c -m 644 OPEN_ISSUES            $(DOCDIR)
+	$(INSTALL) -c -m 644 doc/UserGuide.pdf      $(DOCDIR)/manuals
+	$(INSTALL) -c -m 644 doc/QuickReference.pdf $(DOCDIR)/manuals
+	$(INSTALL) -c -m 644 doc/index.html         $(DOCDIR)/html
+
+install-config:
+	$(MKDIR) -m 755 ${DOCDIR}
+	@if test -f ../Makefile.defs.be; then \
+		$(INSTALL) -c -m 644 ../Makefile.defs.be ${DOCDIR}/Makefile.defs.used; \
+	else \
+		$(INSTALL) -c -m 644 ../Makefile.defs ${DOCDIR}/Makefile.defs.used; \
+	fi
+	@if test -f ../configure.log; then \
+		echo "$(INSTALL) -c -m 644 ../configure.log ${DOCDIR}/configure.cmd.used"; \
+		eval "$(INSTALL) -c -m 644 ../configure.log ${DOCDIR}"/configure.cmd.used; fi
+
+install-links:
+	@if test -f $(BINDIR)/cube3-qt; then \
+		ln -f -s $(BINDIR)/cube3-qt $(BINDIR)/cube3 ; \
+	fi
+
+install-:
+
+
+targets-endmarker:
+
+
+clean:
+	@if test -d utils; then ( cd utils; $(MAKE) clean ); fi
+	@echo
+	@echo "++++++++++ OPARI2 ++++++++++++++++++++++++++++++"
+	@if test -f opari2/COPYING; then ( cd opari2/src/opari; $(MAKE) clean ); fi
+	@if test -d epik; then ( cd epik; $(MAKE) clean ); fi
+	@echo
+	@echo "++++++++++ EARL$(EVER) +++++++++++++++++++++++++++"
+	@if test -d earl$(EVER); then ( cd earl$(EVER)/src; $(MAKE) clean ); fi
+	@echo
+	@echo "++++++++++ EXPERT$(XVER) +++++++++++++++++++++++++"
+	@if test -d expert$(XVER); then ( cd expert$(XVER)/src; $(MAKE) clean ); fi
+	@if test -d pearl; then ( cd pearl; $(MAKE) clean ); fi
+	@if test -d clc; then ( cd clc; $(MAKE) clean ); fi
+	@if test -d salsa; then ( cd salsa; $(MAKE) clean ); fi
+	@if test -d scout; then ( cd scout; $(MAKE) clean ); fi
+	@if test -d silas; then ( cd silas; $(MAKE) clean ); fi
+	@echo
+	@echo "++++++++++ CUBE3 ++++++++++++++++++++++++++++++"
+	@if test -d cube-3.0/src/cube; then ( cd cube-3.0/src/cube; $(MAKE) clean ); fi
+	@if test -d cube-3.0/src/cubew; then ( cd cube-3.0/src/cubew; $(MAKE) clean ); fi
+	@if test -d cube-3.0/src/tools; then ( cd cube-3.0/src/tools; $(MAKE) clean ); fi
+	@if test -d cube-3.0/src/GUI-qt; then ( cd cube-3.0/src/GUI-qt; $(MAKE) clean ); fi

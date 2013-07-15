@@ -1,0 +1,2339 @@
+#include "epk_defs_mpi.h"
+
+#ifndef HAS_MPI_ABORT
+  #define HAS_MPI_ABORT
+#else
+  #undef HAS_MPI_ABORT
+#endif
+#if defined(HAS_MPI_ABORT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Abort' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_ADDRESS
+  #define HAS_MPI_ADDRESS
+#else
+  #undef HAS_MPI_ADDRESS
+#endif
+#if defined(HAS_MPI_ADDRESS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Address' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_ALLGATHER
+  #define HAS_MPI_ALLGATHER
+#else
+  #undef HAS_MPI_ALLGATHER
+#endif
+#if defined(HAS_MPI_ALLGATHER) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Allgather' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_ALLGATHERV
+  #define HAS_MPI_ALLGATHERV
+#else
+  #undef HAS_MPI_ALLGATHERV
+#endif
+#if defined(HAS_MPI_ALLGATHERV) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Allgatherv' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_ALLREDUCE
+  #define HAS_MPI_ALLREDUCE
+#else
+  #undef HAS_MPI_ALLREDUCE
+#endif
+#if defined(HAS_MPI_ALLREDUCE) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Allreduce' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_ALLTOALL
+  #define HAS_MPI_ALLTOALL
+#else
+  #undef HAS_MPI_ALLTOALL
+#endif
+#if defined(HAS_MPI_ALLTOALL) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Alltoall' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_ALLTOALLV
+  #define HAS_MPI_ALLTOALLV
+#else
+  #undef HAS_MPI_ALLTOALLV
+#endif
+#if defined(HAS_MPI_ALLTOALLV) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Alltoallv' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_ATTR_DELETE
+  #define HAS_MPI_ATTR_DELETE
+#else
+  #undef HAS_MPI_ATTR_DELETE
+#endif
+#if defined(HAS_MPI_ATTR_DELETE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Attr_delete' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_ATTR_GET
+  #define HAS_MPI_ATTR_GET
+#else
+  #undef HAS_MPI_ATTR_GET
+#endif
+#if defined(HAS_MPI_ATTR_GET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Attr_get' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_ATTR_PUT
+  #define HAS_MPI_ATTR_PUT
+#else
+  #undef HAS_MPI_ATTR_PUT
+#endif
+#if defined(HAS_MPI_ATTR_PUT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Attr_put' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_BARRIER
+  #define HAS_MPI_BARRIER
+#else
+  #undef HAS_MPI_BARRIER
+#endif
+#if defined(HAS_MPI_BARRIER) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Barrier' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_BCAST
+  #define HAS_MPI_BCAST
+#else
+  #undef HAS_MPI_BCAST
+#endif
+#if defined(HAS_MPI_BCAST) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Bcast' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_BSEND
+  #define HAS_MPI_BSEND
+#else
+  #undef HAS_MPI_BSEND
+#endif
+#if defined(HAS_MPI_BSEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Bsend' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_BSEND_INIT
+  #define HAS_MPI_BSEND_INIT
+#else
+  #undef HAS_MPI_BSEND_INIT
+#endif
+#if defined(HAS_MPI_BSEND_INIT) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Bsend_init' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_BUFFER_ATTACH
+  #define HAS_MPI_BUFFER_ATTACH
+#else
+  #undef HAS_MPI_BUFFER_ATTACH
+#endif
+#if defined(HAS_MPI_BUFFER_ATTACH) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Buffer_attach' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_BUFFER_DETACH
+  #define HAS_MPI_BUFFER_DETACH
+#else
+  #undef HAS_MPI_BUFFER_DETACH
+#endif
+#if defined(HAS_MPI_BUFFER_DETACH) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Buffer_detach' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_CANCEL
+  #define HAS_MPI_CANCEL
+#else
+  #undef HAS_MPI_CANCEL
+#endif
+#if defined(HAS_MPI_CANCEL) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cancel' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_CART_COORDS
+  #define HAS_MPI_CART_COORDS
+#else
+  #undef HAS_MPI_CART_COORDS
+#endif
+#if defined(HAS_MPI_CART_COORDS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cart_coords' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_CART_CREATE
+  #define HAS_MPI_CART_CREATE
+#else
+  #undef HAS_MPI_CART_CREATE
+#endif
+#if defined(HAS_MPI_CART_CREATE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cart_create' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_CART_GET
+  #define HAS_MPI_CART_GET
+#else
+  #undef HAS_MPI_CART_GET
+#endif
+#if defined(HAS_MPI_CART_GET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cart_get' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_CART_MAP
+  #define HAS_MPI_CART_MAP
+#else
+  #undef HAS_MPI_CART_MAP
+#endif
+#if defined(HAS_MPI_CART_MAP) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cart_map' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_CART_RANK
+  #define HAS_MPI_CART_RANK
+#else
+  #undef HAS_MPI_CART_RANK
+#endif
+#if defined(HAS_MPI_CART_RANK) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cart_rank' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_CART_SHIFT
+  #define HAS_MPI_CART_SHIFT
+#else
+  #undef HAS_MPI_CART_SHIFT
+#endif
+#if defined(HAS_MPI_CART_SHIFT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cart_shift' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_CART_SUB
+  #define HAS_MPI_CART_SUB
+#else
+  #undef HAS_MPI_CART_SUB
+#endif
+#if defined(HAS_MPI_CART_SUB)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cart_sub' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_CARTDIM_GET
+  #define HAS_MPI_CARTDIM_GET
+#else
+  #undef HAS_MPI_CARTDIM_GET
+#endif
+#if defined(HAS_MPI_CARTDIM_GET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Cartdim_get' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_COMM_COMPARE
+  #define HAS_MPI_COMM_COMPARE
+#else
+  #undef HAS_MPI_COMM_COMPARE
+#endif
+#if defined(HAS_MPI_COMM_COMPARE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_compare' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_CREATE
+  #define HAS_MPI_COMM_CREATE
+#else
+  #undef HAS_MPI_COMM_CREATE
+#endif
+#if defined(HAS_MPI_COMM_CREATE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_create' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_DUP
+  #define HAS_MPI_COMM_DUP
+#else
+  #undef HAS_MPI_COMM_DUP
+#endif
+#if defined(HAS_MPI_COMM_DUP)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_dup' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_FREE
+  #define HAS_MPI_COMM_FREE
+#else
+  #undef HAS_MPI_COMM_FREE
+#endif
+#if defined(HAS_MPI_COMM_FREE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_free' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_GROUP
+  #define HAS_MPI_COMM_GROUP
+#else
+  #undef HAS_MPI_COMM_GROUP
+#endif
+#if defined(HAS_MPI_COMM_GROUP)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_group' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_RANK
+  #define HAS_MPI_COMM_RANK
+#else
+  #undef HAS_MPI_COMM_RANK
+#endif
+#if defined(HAS_MPI_COMM_RANK) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MINI) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_rank' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_REMOTE_GROUP
+  #define HAS_MPI_COMM_REMOTE_GROUP
+#else
+  #undef HAS_MPI_COMM_REMOTE_GROUP
+#endif
+#if defined(HAS_MPI_COMM_REMOTE_GROUP)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_remote_group' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_REMOTE_SIZE
+  #define HAS_MPI_COMM_REMOTE_SIZE
+#else
+  #undef HAS_MPI_COMM_REMOTE_SIZE
+#endif
+#if defined(HAS_MPI_COMM_REMOTE_SIZE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MINI) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_remote_size' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_SIZE
+  #define HAS_MPI_COMM_SIZE
+#else
+  #undef HAS_MPI_COMM_SIZE
+#endif
+#if defined(HAS_MPI_COMM_SIZE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MINI) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_size' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_SPLIT
+  #define HAS_MPI_COMM_SPLIT
+#else
+  #undef HAS_MPI_COMM_SPLIT
+#endif
+#if defined(HAS_MPI_COMM_SPLIT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_split' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_COMM_TEST_INTER
+  #define HAS_MPI_COMM_TEST_INTER
+#else
+  #undef HAS_MPI_COMM_TEST_INTER
+#endif
+#if defined(HAS_MPI_COMM_TEST_INTER) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Comm_test_inter' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_DIMS_CREATE
+  #define HAS_MPI_DIMS_CREATE
+#else
+  #undef HAS_MPI_DIMS_CREATE
+#endif
+#if defined(HAS_MPI_DIMS_CREATE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Dims_create' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_ERRHANDLER_CREATE
+  #define HAS_MPI_ERRHANDLER_CREATE
+#else
+  #undef HAS_MPI_ERRHANDLER_CREATE
+#endif
+#if defined(HAS_MPI_ERRHANDLER_CREATE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Errhandler_create' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ERRHANDLER_FREE
+  #define HAS_MPI_ERRHANDLER_FREE
+#else
+  #undef HAS_MPI_ERRHANDLER_FREE
+#endif
+#if defined(HAS_MPI_ERRHANDLER_FREE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Errhandler_free' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ERRHANDLER_GET
+  #define HAS_MPI_ERRHANDLER_GET
+#else
+  #undef HAS_MPI_ERRHANDLER_GET
+#endif
+#if defined(HAS_MPI_ERRHANDLER_GET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Errhandler_get' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ERRHANDLER_SET
+  #define HAS_MPI_ERRHANDLER_SET
+#else
+  #undef HAS_MPI_ERRHANDLER_SET
+#endif
+#if defined(HAS_MPI_ERRHANDLER_SET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Errhandler_set' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ERROR_CLASS
+  #define HAS_MPI_ERROR_CLASS
+#else
+  #undef HAS_MPI_ERROR_CLASS
+#endif
+#if defined(HAS_MPI_ERROR_CLASS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Error_class' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ERROR_STRING
+  #define HAS_MPI_ERROR_STRING
+#else
+  #undef HAS_MPI_ERROR_STRING
+#endif
+#if defined(HAS_MPI_ERROR_STRING) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Error_string' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_FINALIZE
+  #define HAS_MPI_FINALIZE
+#else
+  #undef HAS_MPI_FINALIZE
+#endif
+#if defined(HAS_MPI_FINALIZE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Finalize' of group 'env' not found.
+#endif
+#ifndef HAS_MPI_GATHER
+  #define HAS_MPI_GATHER
+#else
+  #undef HAS_MPI_GATHER
+#endif
+#if defined(HAS_MPI_GATHER) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Gather' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_GATHERV
+  #define HAS_MPI_GATHERV
+#else
+  #undef HAS_MPI_GATHERV
+#endif
+#if defined(HAS_MPI_GATHERV) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Gatherv' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_GET_COUNT
+  #define HAS_MPI_GET_COUNT
+#else
+  #undef HAS_MPI_GET_COUNT
+#endif
+#if defined(HAS_MPI_GET_COUNT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Get_count' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_GET_ELEMENTS
+  #define HAS_MPI_GET_ELEMENTS
+#else
+  #undef HAS_MPI_GET_ELEMENTS
+#endif
+#if defined(HAS_MPI_GET_ELEMENTS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Get_elements' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_GET_PROCESSOR_NAME
+  #define HAS_MPI_GET_PROCESSOR_NAME
+#else
+  #undef HAS_MPI_GET_PROCESSOR_NAME
+#endif
+#if defined(HAS_MPI_GET_PROCESSOR_NAME) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Get_processor_name' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_GET_VERSION
+  #define HAS_MPI_GET_VERSION
+#else
+  #undef HAS_MPI_GET_VERSION
+#endif
+#if defined(HAS_MPI_GET_VERSION) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.2 function call 'MPI_Get_version' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_GRAPH_CREATE
+  #define HAS_MPI_GRAPH_CREATE
+#else
+  #undef HAS_MPI_GRAPH_CREATE
+#endif
+#if defined(HAS_MPI_GRAPH_CREATE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Graph_create' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_GRAPH_GET
+  #define HAS_MPI_GRAPH_GET
+#else
+  #undef HAS_MPI_GRAPH_GET
+#endif
+#if defined(HAS_MPI_GRAPH_GET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Graph_get' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_GRAPH_MAP
+  #define HAS_MPI_GRAPH_MAP
+#else
+  #undef HAS_MPI_GRAPH_MAP
+#endif
+#if defined(HAS_MPI_GRAPH_MAP) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Graph_map' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_GRAPH_NEIGHBORS
+  #define HAS_MPI_GRAPH_NEIGHBORS
+#else
+  #undef HAS_MPI_GRAPH_NEIGHBORS
+#endif
+#if defined(HAS_MPI_GRAPH_NEIGHBORS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Graph_neighbors' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_GRAPH_NEIGHBORS_COUNT
+  #define HAS_MPI_GRAPH_NEIGHBORS_COUNT
+#else
+  #undef HAS_MPI_GRAPH_NEIGHBORS_COUNT
+#endif
+#if defined(HAS_MPI_GRAPH_NEIGHBORS_COUNT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Graph_neighbors_count' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_GRAPHDIMS_GET
+  #define HAS_MPI_GRAPHDIMS_GET
+#else
+  #undef HAS_MPI_GRAPHDIMS_GET
+#endif
+#if defined(HAS_MPI_GRAPHDIMS_GET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Graphdims_get' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_GROUP_COMPARE
+  #define HAS_MPI_GROUP_COMPARE
+#else
+  #undef HAS_MPI_GROUP_COMPARE
+#endif
+#if defined(HAS_MPI_GROUP_COMPARE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_compare' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_DIFFERENCE
+  #define HAS_MPI_GROUP_DIFFERENCE
+#else
+  #undef HAS_MPI_GROUP_DIFFERENCE
+#endif
+#if defined(HAS_MPI_GROUP_DIFFERENCE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_difference' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_EXCL
+  #define HAS_MPI_GROUP_EXCL
+#else
+  #undef HAS_MPI_GROUP_EXCL
+#endif
+#if defined(HAS_MPI_GROUP_EXCL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_excl' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_FREE
+  #define HAS_MPI_GROUP_FREE
+#else
+  #undef HAS_MPI_GROUP_FREE
+#endif
+#if defined(HAS_MPI_GROUP_FREE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_free' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_INCL
+  #define HAS_MPI_GROUP_INCL
+#else
+  #undef HAS_MPI_GROUP_INCL
+#endif
+#if defined(HAS_MPI_GROUP_INCL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_incl' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_INTERSECTION
+  #define HAS_MPI_GROUP_INTERSECTION
+#else
+  #undef HAS_MPI_GROUP_INTERSECTION
+#endif
+#if defined(HAS_MPI_GROUP_INTERSECTION)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_intersection' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_RANGE_EXCL
+  #define HAS_MPI_GROUP_RANGE_EXCL
+#else
+  #undef HAS_MPI_GROUP_RANGE_EXCL
+#endif
+#if defined(HAS_MPI_GROUP_RANGE_EXCL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_range_excl' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_RANGE_INCL
+  #define HAS_MPI_GROUP_RANGE_INCL
+#else
+  #undef HAS_MPI_GROUP_RANGE_INCL
+#endif
+#if defined(HAS_MPI_GROUP_RANGE_INCL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_range_incl' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_RANK
+  #define HAS_MPI_GROUP_RANK
+#else
+  #undef HAS_MPI_GROUP_RANK
+#endif
+#if defined(HAS_MPI_GROUP_RANK) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MINI) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_rank' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_SIZE
+  #define HAS_MPI_GROUP_SIZE
+#else
+  #undef HAS_MPI_GROUP_SIZE
+#endif
+#if defined(HAS_MPI_GROUP_SIZE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MINI) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_size' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_TRANSLATE_RANKS
+  #define HAS_MPI_GROUP_TRANSLATE_RANKS
+#else
+  #undef HAS_MPI_GROUP_TRANSLATE_RANKS
+#endif
+#if defined(HAS_MPI_GROUP_TRANSLATE_RANKS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_translate_ranks' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_GROUP_UNION
+  #define HAS_MPI_GROUP_UNION
+#else
+  #undef HAS_MPI_GROUP_UNION
+#endif
+#if defined(HAS_MPI_GROUP_UNION)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Group_union' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_IBSEND
+  #define HAS_MPI_IBSEND
+#else
+  #undef HAS_MPI_IBSEND
+#endif
+#if defined(HAS_MPI_IBSEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Ibsend' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_INIT
+  #define HAS_MPI_INIT
+#else
+  #undef HAS_MPI_INIT
+#endif
+#if defined(HAS_MPI_INIT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Init' of group 'env' not found.
+#endif
+#ifndef HAS_MPI_INITIALIZED
+  #define HAS_MPI_INITIALIZED
+#else
+  #undef HAS_MPI_INITIALIZED
+#endif
+#if defined(HAS_MPI_INITIALIZED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ENV)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Initialized' of group 'env' not found.
+#endif
+#ifndef HAS_MPI_INTERCOMM_CREATE
+  #define HAS_MPI_INTERCOMM_CREATE
+#else
+  #undef HAS_MPI_INTERCOMM_CREATE
+#endif
+#if defined(HAS_MPI_INTERCOMM_CREATE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Intercomm_create' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_INTERCOMM_MERGE
+  #define HAS_MPI_INTERCOMM_MERGE
+#else
+  #undef HAS_MPI_INTERCOMM_MERGE
+#endif
+#if defined(HAS_MPI_INTERCOMM_MERGE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Intercomm_merge' of group 'cg' not found.
+#endif
+#ifndef HAS_MPI_IPROBE
+  #define HAS_MPI_IPROBE
+#else
+  #undef HAS_MPI_IPROBE
+#endif
+#if defined(HAS_MPI_IPROBE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Iprobe' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_IRECV
+  #define HAS_MPI_IRECV
+#else
+  #undef HAS_MPI_IRECV
+#endif
+#if defined(HAS_MPI_IRECV) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Irecv' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_IRSEND
+  #define HAS_MPI_IRSEND
+#else
+  #undef HAS_MPI_IRSEND
+#endif
+#if defined(HAS_MPI_IRSEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Irsend' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_ISEND
+  #define HAS_MPI_ISEND
+#else
+  #undef HAS_MPI_ISEND
+#endif
+#if defined(HAS_MPI_ISEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Isend' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_ISSEND
+  #define HAS_MPI_ISSEND
+#else
+  #undef HAS_MPI_ISSEND
+#endif
+#if defined(HAS_MPI_ISSEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Issend' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_KEYVAL_CREATE
+  #define HAS_MPI_KEYVAL_CREATE
+#else
+  #undef HAS_MPI_KEYVAL_CREATE
+#endif
+#if defined(HAS_MPI_KEYVAL_CREATE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Keyval_create' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_KEYVAL_FREE
+  #define HAS_MPI_KEYVAL_FREE
+#else
+  #undef HAS_MPI_KEYVAL_FREE
+#endif
+#if defined(HAS_MPI_KEYVAL_FREE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Keyval_free' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_OP_CREATE
+  #define HAS_MPI_OP_CREATE
+#else
+  #undef HAS_MPI_OP_CREATE
+#endif
+#if defined(HAS_MPI_OP_CREATE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Op_create' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_OP_FREE
+  #define HAS_MPI_OP_FREE
+#else
+  #undef HAS_MPI_OP_FREE
+#endif
+#if defined(HAS_MPI_OP_FREE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Op_free' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_PACK
+  #define HAS_MPI_PACK
+#else
+  #undef HAS_MPI_PACK
+#endif
+#if defined(HAS_MPI_PACK) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Pack' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_PACK_SIZE
+  #define HAS_MPI_PACK_SIZE
+#else
+  #undef HAS_MPI_PACK_SIZE
+#endif
+#if defined(HAS_MPI_PACK_SIZE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Pack_size' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_PCONTROL
+  #define HAS_MPI_PCONTROL
+#else
+  #undef HAS_MPI_PCONTROL
+#endif
+#if defined(HAS_MPI_PCONTROL) && ! defined(NO_MPI_PERF) && ! defined(NO_MPI_EXTRA)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Pcontrol' of group 'perf' not found.
+#endif
+#ifndef HAS_MPI_PROBE
+  #define HAS_MPI_PROBE
+#else
+  #undef HAS_MPI_PROBE
+#endif
+#if defined(HAS_MPI_PROBE) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Probe' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_RECV
+  #define HAS_MPI_RECV
+#else
+  #undef HAS_MPI_RECV
+#endif
+#if defined(HAS_MPI_RECV) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Recv' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_RECV_INIT
+  #define HAS_MPI_RECV_INIT
+#else
+  #undef HAS_MPI_RECV_INIT
+#endif
+#if defined(HAS_MPI_RECV_INIT) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Recv_init' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_REDUCE
+  #define HAS_MPI_REDUCE
+#else
+  #undef HAS_MPI_REDUCE
+#endif
+#if defined(HAS_MPI_REDUCE) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Reduce' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_REDUCE_SCATTER
+  #define HAS_MPI_REDUCE_SCATTER
+#else
+  #undef HAS_MPI_REDUCE_SCATTER
+#endif
+#if defined(HAS_MPI_REDUCE_SCATTER) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Reduce_scatter' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_REQUEST_FREE
+  #define HAS_MPI_REQUEST_FREE
+#else
+  #undef HAS_MPI_REQUEST_FREE
+#endif
+#if defined(HAS_MPI_REQUEST_FREE) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Request_free' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_RSEND
+  #define HAS_MPI_RSEND
+#else
+  #undef HAS_MPI_RSEND
+#endif
+#if defined(HAS_MPI_RSEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Rsend' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_RSEND_INIT
+  #define HAS_MPI_RSEND_INIT
+#else
+  #undef HAS_MPI_RSEND_INIT
+#endif
+#if defined(HAS_MPI_RSEND_INIT) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Rsend_init' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_SCAN
+  #define HAS_MPI_SCAN
+#else
+  #undef HAS_MPI_SCAN
+#endif
+#if defined(HAS_MPI_SCAN) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Scan' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_SCATTER
+  #define HAS_MPI_SCATTER
+#else
+  #undef HAS_MPI_SCATTER
+#endif
+#if defined(HAS_MPI_SCATTER) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Scatter' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_SCATTERV
+  #define HAS_MPI_SCATTERV
+#else
+  #undef HAS_MPI_SCATTERV
+#endif
+#if defined(HAS_MPI_SCATTERV) && ! defined(NO_MPI_COLL)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Scatterv' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_SEND
+  #define HAS_MPI_SEND
+#else
+  #undef HAS_MPI_SEND
+#endif
+#if defined(HAS_MPI_SEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Send' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_SEND_INIT
+  #define HAS_MPI_SEND_INIT
+#else
+  #undef HAS_MPI_SEND_INIT
+#endif
+#if defined(HAS_MPI_SEND_INIT) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Send_init' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_SENDRECV
+  #define HAS_MPI_SENDRECV
+#else
+  #undef HAS_MPI_SENDRECV
+#endif
+#if defined(HAS_MPI_SENDRECV) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Sendrecv' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_SENDRECV_REPLACE
+  #define HAS_MPI_SENDRECV_REPLACE
+#else
+  #undef HAS_MPI_SENDRECV_REPLACE
+#endif
+#if defined(HAS_MPI_SENDRECV_REPLACE) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Sendrecv_replace' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_SSEND
+  #define HAS_MPI_SSEND
+#else
+  #undef HAS_MPI_SSEND
+#endif
+#if defined(HAS_MPI_SSEND) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Ssend' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_SSEND_INIT
+  #define HAS_MPI_SSEND_INIT
+#else
+  #undef HAS_MPI_SSEND_INIT
+#endif
+#if defined(HAS_MPI_SSEND_INIT) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Ssend_init' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_START
+  #define HAS_MPI_START
+#else
+  #undef HAS_MPI_START
+#endif
+#if defined(HAS_MPI_START) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Start' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_STARTALL
+  #define HAS_MPI_STARTALL
+#else
+  #undef HAS_MPI_STARTALL
+#endif
+#if defined(HAS_MPI_STARTALL) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Startall' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_TEST
+  #define HAS_MPI_TEST
+#else
+  #undef HAS_MPI_TEST
+#endif
+#if defined(HAS_MPI_TEST) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Test' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_TEST_CANCELLED
+  #define HAS_MPI_TEST_CANCELLED
+#else
+  #undef HAS_MPI_TEST_CANCELLED
+#endif
+#if defined(HAS_MPI_TEST_CANCELLED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Test_cancelled' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_TESTALL
+  #define HAS_MPI_TESTALL
+#else
+  #undef HAS_MPI_TESTALL
+#endif
+#if defined(HAS_MPI_TESTALL) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Testall' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_TESTANY
+  #define HAS_MPI_TESTANY
+#else
+  #undef HAS_MPI_TESTANY
+#endif
+#if defined(HAS_MPI_TESTANY) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Testany' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_TESTSOME
+  #define HAS_MPI_TESTSOME
+#else
+  #undef HAS_MPI_TESTSOME
+#endif
+#if defined(HAS_MPI_TESTSOME) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Testsome' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_TOPO_TEST
+  #define HAS_MPI_TOPO_TEST
+#else
+  #undef HAS_MPI_TOPO_TEST
+#endif
+#if defined(HAS_MPI_TOPO_TEST) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Topo_test' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_TYPE_COMMIT
+  #define HAS_MPI_TYPE_COMMIT
+#else
+  #undef HAS_MPI_TYPE_COMMIT
+#endif
+#if defined(HAS_MPI_TYPE_COMMIT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_commit' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CONTIGUOUS
+  #define HAS_MPI_TYPE_CONTIGUOUS
+#else
+  #undef HAS_MPI_TYPE_CONTIGUOUS
+#endif
+#if defined(HAS_MPI_TYPE_CONTIGUOUS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_contiguous' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_EXTENT
+  #define HAS_MPI_TYPE_EXTENT
+#else
+  #undef HAS_MPI_TYPE_EXTENT
+#endif
+#if defined(HAS_MPI_TYPE_EXTENT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_extent' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_FREE
+  #define HAS_MPI_TYPE_FREE
+#else
+  #undef HAS_MPI_TYPE_FREE
+#endif
+#if defined(HAS_MPI_TYPE_FREE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_free' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_HINDEXED
+  #define HAS_MPI_TYPE_HINDEXED
+#else
+  #undef HAS_MPI_TYPE_HINDEXED
+#endif
+#if defined(HAS_MPI_TYPE_HINDEXED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_hindexed' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_HVECTOR
+  #define HAS_MPI_TYPE_HVECTOR
+#else
+  #undef HAS_MPI_TYPE_HVECTOR
+#endif
+#if defined(HAS_MPI_TYPE_HVECTOR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_hvector' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_INDEXED
+  #define HAS_MPI_TYPE_INDEXED
+#else
+  #undef HAS_MPI_TYPE_INDEXED
+#endif
+#if defined(HAS_MPI_TYPE_INDEXED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_indexed' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_LB
+  #define HAS_MPI_TYPE_LB
+#else
+  #undef HAS_MPI_TYPE_LB
+#endif
+#if defined(HAS_MPI_TYPE_LB) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_lb' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_SIZE
+  #define HAS_MPI_TYPE_SIZE
+#else
+  #undef HAS_MPI_TYPE_SIZE
+#endif
+#if defined(HAS_MPI_TYPE_SIZE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_size' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_STRUCT
+  #define HAS_MPI_TYPE_STRUCT
+#else
+  #undef HAS_MPI_TYPE_STRUCT
+#endif
+#if defined(HAS_MPI_TYPE_STRUCT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_struct' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_UB
+  #define HAS_MPI_TYPE_UB
+#else
+  #undef HAS_MPI_TYPE_UB
+#endif
+#if defined(HAS_MPI_TYPE_UB) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_ub' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_VECTOR
+  #define HAS_MPI_TYPE_VECTOR
+#else
+  #undef HAS_MPI_TYPE_VECTOR
+#endif
+#if defined(HAS_MPI_TYPE_VECTOR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Type_vector' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_UNPACK
+  #define HAS_MPI_UNPACK
+#else
+  #undef HAS_MPI_UNPACK
+#endif
+#if defined(HAS_MPI_UNPACK) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Unpack' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_WAIT
+  #define HAS_MPI_WAIT
+#else
+  #undef HAS_MPI_WAIT
+#endif
+#if defined(HAS_MPI_WAIT) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Wait' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_WAITALL
+  #define HAS_MPI_WAITALL
+#else
+  #undef HAS_MPI_WAITALL
+#endif
+#if defined(HAS_MPI_WAITALL) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Waitall' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_WAITANY
+  #define HAS_MPI_WAITANY
+#else
+  #undef HAS_MPI_WAITANY
+#endif
+#if defined(HAS_MPI_WAITANY) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Waitany' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_WAITSOME
+  #define HAS_MPI_WAITSOME
+#else
+  #undef HAS_MPI_WAITSOME
+#endif
+#if defined(HAS_MPI_WAITSOME) && ! defined(NO_MPI_P2P)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Waitsome' of group 'p2p' not found.
+#endif
+#ifndef HAS_MPI_WTICK
+  #define HAS_MPI_WTICK
+#else
+  #undef HAS_MPI_WTICK
+#endif
+#if defined(HAS_MPI_WTICK) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MINI) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Wtick' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_WTIME
+  #define HAS_MPI_WTIME
+#else
+  #undef HAS_MPI_WTIME
+#endif
+#if defined(HAS_MPI_WTIME) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MINI) && ! defined(NO_MPI_EXT)
+Error: PMPI symbol for MPI 1.0 function call 'MPI_Wtime' of group 'ext' not found.
+#endif
+
+#ifndef HAS_MPI_ACCUMULATE
+  #define HAS_MPI_ACCUMULATE
+#else
+  #undef HAS_MPI_ACCUMULATE
+#endif
+#if defined(HAS_MPI_ACCUMULATE) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Accumulate' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_ADD_ERROR_CLASS
+  #define HAS_MPI_ADD_ERROR_CLASS
+#else
+  #undef HAS_MPI_ADD_ERROR_CLASS
+#endif
+#if defined(HAS_MPI_ADD_ERROR_CLASS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Add_error_class' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ADD_ERROR_CODE
+  #define HAS_MPI_ADD_ERROR_CODE
+#else
+  #undef HAS_MPI_ADD_ERROR_CODE
+#endif
+#if defined(HAS_MPI_ADD_ERROR_CODE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Add_error_code' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ADD_ERROR_STRING
+  #define HAS_MPI_ADD_ERROR_STRING
+#else
+  #undef HAS_MPI_ADD_ERROR_STRING
+#endif
+#if defined(HAS_MPI_ADD_ERROR_STRING) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Add_error_string' of group 'err' not found.
+#endif
+#ifndef HAS_MPI_ALLOC_MEM
+  #define HAS_MPI_ALLOC_MEM
+#else
+  #undef HAS_MPI_ALLOC_MEM
+#endif
+#if defined(HAS_MPI_ALLOC_MEM) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Alloc_mem' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_ALLTOALLW
+  #define HAS_MPI_ALLTOALLW
+#else
+  #undef HAS_MPI_ALLTOALLW
+#endif
+#if defined(HAS_MPI_ALLTOALLW) && ! defined(NO_MPI_COLL)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Alltoallw' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_CLOSE_PORT
+  #define HAS_MPI_CLOSE_PORT
+#else
+  #undef HAS_MPI_CLOSE_PORT
+#endif
+#if defined(HAS_MPI_CLOSE_PORT) && ! defined(NO_MPI_SPAWN) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Close_port' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_COMM_ACCEPT
+  #define HAS_MPI_COMM_ACCEPT
+#else
+  #undef HAS_MPI_COMM_ACCEPT
+#endif
+#if defined(HAS_MPI_COMM_ACCEPT) && ! defined(NO_MPI_SPAWN)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_accept' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_COMM_CALL_ERRHANDLER
+  #define HAS_MPI_COMM_CALL_ERRHANDLER
+#else
+  #undef HAS_MPI_COMM_CALL_ERRHANDLER
+#endif
+#if defined(HAS_MPI_COMM_CALL_ERRHANDLER) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_call_errhandler' of group 'cg_err' not found.
+#endif
+#ifndef HAS_MPI_COMM_CONNECT
+  #define HAS_MPI_COMM_CONNECT
+#else
+  #undef HAS_MPI_COMM_CONNECT
+#endif
+#if defined(HAS_MPI_COMM_CONNECT) && ! defined(NO_MPI_SPAWN)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_connect' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_COMM_CREATE_ERRHANDLER
+  #define HAS_MPI_COMM_CREATE_ERRHANDLER
+#else
+  #undef HAS_MPI_COMM_CREATE_ERRHANDLER
+#endif
+#if defined(HAS_MPI_COMM_CREATE_ERRHANDLER) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_create_errhandler' of group 'cg_err' not found.
+#endif
+#ifndef HAS_MPI_COMM_CREATE_KEYVAL
+  #define HAS_MPI_COMM_CREATE_KEYVAL
+#else
+  #undef HAS_MPI_COMM_CREATE_KEYVAL
+#endif
+#if defined(HAS_MPI_COMM_CREATE_KEYVAL) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_create_keyval' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_COMM_DELETE_ATTR
+  #define HAS_MPI_COMM_DELETE_ATTR
+#else
+  #undef HAS_MPI_COMM_DELETE_ATTR
+#endif
+#if defined(HAS_MPI_COMM_DELETE_ATTR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_delete_attr' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_COMM_DISCONNECT
+  #define HAS_MPI_COMM_DISCONNECT
+#else
+  #undef HAS_MPI_COMM_DISCONNECT
+#endif
+#if defined(HAS_MPI_COMM_DISCONNECT) && ! defined(NO_MPI_SPAWN) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_disconnect' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_COMM_FREE_KEYVAL
+  #define HAS_MPI_COMM_FREE_KEYVAL
+#else
+  #undef HAS_MPI_COMM_FREE_KEYVAL
+#endif
+#if defined(HAS_MPI_COMM_FREE_KEYVAL) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_free_keyval' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_COMM_GET_ATTR
+  #define HAS_MPI_COMM_GET_ATTR
+#else
+  #undef HAS_MPI_COMM_GET_ATTR
+#endif
+#if defined(HAS_MPI_COMM_GET_ATTR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_get_attr' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_COMM_GET_ERRHANDLER
+  #define HAS_MPI_COMM_GET_ERRHANDLER
+#else
+  #undef HAS_MPI_COMM_GET_ERRHANDLER
+#endif
+#if defined(HAS_MPI_COMM_GET_ERRHANDLER) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_get_errhandler' of group 'cg_err' not found.
+#endif
+#ifndef HAS_MPI_COMM_GET_NAME
+  #define HAS_MPI_COMM_GET_NAME
+#else
+  #undef HAS_MPI_COMM_GET_NAME
+#endif
+#if defined(HAS_MPI_COMM_GET_NAME) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_get_name' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_COMM_GET_PARENT
+  #define HAS_MPI_COMM_GET_PARENT
+#else
+  #undef HAS_MPI_COMM_GET_PARENT
+#endif
+#if defined(HAS_MPI_COMM_GET_PARENT) && ! defined(NO_MPI_SPAWN) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_get_parent' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_COMM_JOIN
+  #define HAS_MPI_COMM_JOIN
+#else
+  #undef HAS_MPI_COMM_JOIN
+#endif
+#if defined(HAS_MPI_COMM_JOIN) && ! defined(NO_MPI_SPAWN)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_join' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_COMM_SET_ATTR
+  #define HAS_MPI_COMM_SET_ATTR
+#else
+  #undef HAS_MPI_COMM_SET_ATTR
+#endif
+#if defined(HAS_MPI_COMM_SET_ATTR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_set_attr' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_COMM_SET_ERRHANDLER
+  #define HAS_MPI_COMM_SET_ERRHANDLER
+#else
+  #undef HAS_MPI_COMM_SET_ERRHANDLER
+#endif
+#if defined(HAS_MPI_COMM_SET_ERRHANDLER) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_set_errhandler' of group 'cg_err' not found.
+#endif
+#ifndef HAS_MPI_COMM_SET_NAME
+  #define HAS_MPI_COMM_SET_NAME
+#else
+  #undef HAS_MPI_COMM_SET_NAME
+#endif
+#if defined(HAS_MPI_COMM_SET_NAME) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_CG) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_set_name' of group 'cg_ext' not found.
+#endif
+#ifndef HAS_MPI_COMM_SPAWN
+  #define HAS_MPI_COMM_SPAWN
+#else
+  #undef HAS_MPI_COMM_SPAWN
+#endif
+#if defined(HAS_MPI_COMM_SPAWN) && ! defined(NO_MPI_SPAWN)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_spawn' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_COMM_SPAWN_MULTIPLE
+  #define HAS_MPI_COMM_SPAWN_MULTIPLE
+#else
+  #undef HAS_MPI_COMM_SPAWN_MULTIPLE
+#endif
+#if defined(HAS_MPI_COMM_SPAWN_MULTIPLE) && ! defined(NO_MPI_SPAWN)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Comm_spawn_multiple' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_DIST_GRAPH_CREATE
+  #define HAS_MPI_DIST_GRAPH_CREATE
+#else
+  #undef HAS_MPI_DIST_GRAPH_CREATE
+#endif
+#if defined(HAS_MPI_DIST_GRAPH_CREATE) && ! defined(NO_MPI_TOPO)
+Warning: PMPI symbol for MPI 2.2 function call 'MPI_Dist_graph_create' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_DIST_GRAPH_CREATE_ADJACENT
+  #define HAS_MPI_DIST_GRAPH_CREATE_ADJACENT
+#else
+  #undef HAS_MPI_DIST_GRAPH_CREATE_ADJACENT
+#endif
+#if defined(HAS_MPI_DIST_GRAPH_CREATE_ADJACENT) && ! defined(NO_MPI_TOPO)
+Warning: PMPI symbol for MPI 2.2 function call 'MPI_Dist_graph_create_adjacent' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_DIST_GRAPH_NEIGHBORS
+  #define HAS_MPI_DIST_GRAPH_NEIGHBORS
+#else
+  #undef HAS_MPI_DIST_GRAPH_NEIGHBORS
+#endif
+#if defined(HAS_MPI_DIST_GRAPH_NEIGHBORS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Warning: PMPI symbol for MPI 2.2 function call 'MPI_Dist_graph_neighbors' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_DIST_GRAPH_NEIGHBORS_COUNT
+  #define HAS_MPI_DIST_GRAPH_NEIGHBORS_COUNT
+#else
+  #undef HAS_MPI_DIST_GRAPH_NEIGHBORS_COUNT
+#endif
+#if defined(HAS_MPI_DIST_GRAPH_NEIGHBORS_COUNT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TOPO)
+Warning: PMPI symbol for MPI 2.2 function call 'MPI_Dist_graph_neighbors_count' of group 'topo' not found.
+#endif
+#ifndef HAS_MPI_EXSCAN
+  #define HAS_MPI_EXSCAN
+#else
+  #undef HAS_MPI_EXSCAN
+#endif
+#if defined(HAS_MPI_EXSCAN) && ! defined(NO_MPI_COLL)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Exscan' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_FILE_CALL_ERRHANDLER
+  #define HAS_MPI_FILE_CALL_ERRHANDLER
+#else
+  #undef HAS_MPI_FILE_CALL_ERRHANDLER
+#endif
+#if defined(HAS_MPI_FILE_CALL_ERRHANDLER) && ! defined(NO_MPI_IO) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_call_errhandler' of group 'io_err' not found.
+#endif
+#ifndef HAS_MPI_FILE_CLOSE
+  #define HAS_MPI_FILE_CLOSE
+#else
+  #undef HAS_MPI_FILE_CLOSE
+#endif
+#if defined(HAS_MPI_FILE_CLOSE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_close' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_CREATE_ERRHANDLER
+  #define HAS_MPI_FILE_CREATE_ERRHANDLER
+#else
+  #undef HAS_MPI_FILE_CREATE_ERRHANDLER
+#endif
+#if defined(HAS_MPI_FILE_CREATE_ERRHANDLER) && ! defined(NO_MPI_IO) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_create_errhandler' of group 'io_err' not found.
+#endif
+#ifndef HAS_MPI_FILE_DELETE
+  #define HAS_MPI_FILE_DELETE
+#else
+  #undef HAS_MPI_FILE_DELETE
+#endif
+#if defined(HAS_MPI_FILE_DELETE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_delete' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_AMODE
+  #define HAS_MPI_FILE_GET_AMODE
+#else
+  #undef HAS_MPI_FILE_GET_AMODE
+#endif
+#if defined(HAS_MPI_FILE_GET_AMODE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_amode' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_ATOMICITY
+  #define HAS_MPI_FILE_GET_ATOMICITY
+#else
+  #undef HAS_MPI_FILE_GET_ATOMICITY
+#endif
+#if defined(HAS_MPI_FILE_GET_ATOMICITY) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_atomicity' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_BYTE_OFFSET
+  #define HAS_MPI_FILE_GET_BYTE_OFFSET
+#else
+  #undef HAS_MPI_FILE_GET_BYTE_OFFSET
+#endif
+#if defined(HAS_MPI_FILE_GET_BYTE_OFFSET) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_byte_offset' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_ERRHANDLER
+  #define HAS_MPI_FILE_GET_ERRHANDLER
+#else
+  #undef HAS_MPI_FILE_GET_ERRHANDLER
+#endif
+#if defined(HAS_MPI_FILE_GET_ERRHANDLER) && ! defined(NO_MPI_IO) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_errhandler' of group 'io_err' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_GROUP
+  #define HAS_MPI_FILE_GET_GROUP
+#else
+  #undef HAS_MPI_FILE_GET_GROUP
+#endif
+#if defined(HAS_MPI_FILE_GET_GROUP) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_group' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_INFO
+  #define HAS_MPI_FILE_GET_INFO
+#else
+  #undef HAS_MPI_FILE_GET_INFO
+#endif
+#if defined(HAS_MPI_FILE_GET_INFO) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_info' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_POSITION
+  #define HAS_MPI_FILE_GET_POSITION
+#else
+  #undef HAS_MPI_FILE_GET_POSITION
+#endif
+#if defined(HAS_MPI_FILE_GET_POSITION) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_position' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_POSITION_SHARED
+  #define HAS_MPI_FILE_GET_POSITION_SHARED
+#else
+  #undef HAS_MPI_FILE_GET_POSITION_SHARED
+#endif
+#if defined(HAS_MPI_FILE_GET_POSITION_SHARED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_position_shared' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_SIZE
+  #define HAS_MPI_FILE_GET_SIZE
+#else
+  #undef HAS_MPI_FILE_GET_SIZE
+#endif
+#if defined(HAS_MPI_FILE_GET_SIZE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_size' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_TYPE_EXTENT
+  #define HAS_MPI_FILE_GET_TYPE_EXTENT
+#else
+  #undef HAS_MPI_FILE_GET_TYPE_EXTENT
+#endif
+#if defined(HAS_MPI_FILE_GET_TYPE_EXTENT) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_type_extent' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_GET_VIEW
+  #define HAS_MPI_FILE_GET_VIEW
+#else
+  #undef HAS_MPI_FILE_GET_VIEW
+#endif
+#if defined(HAS_MPI_FILE_GET_VIEW) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_get_view' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_IREAD
+  #define HAS_MPI_FILE_IREAD
+#else
+  #undef HAS_MPI_FILE_IREAD
+#endif
+#if defined(HAS_MPI_FILE_IREAD) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_iread' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_IREAD_AT
+  #define HAS_MPI_FILE_IREAD_AT
+#else
+  #undef HAS_MPI_FILE_IREAD_AT
+#endif
+#if defined(HAS_MPI_FILE_IREAD_AT) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_iread_at' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_IREAD_SHARED
+  #define HAS_MPI_FILE_IREAD_SHARED
+#else
+  #undef HAS_MPI_FILE_IREAD_SHARED
+#endif
+#if defined(HAS_MPI_FILE_IREAD_SHARED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_iread_shared' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_IWRITE
+  #define HAS_MPI_FILE_IWRITE
+#else
+  #undef HAS_MPI_FILE_IWRITE
+#endif
+#if defined(HAS_MPI_FILE_IWRITE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_iwrite' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_IWRITE_AT
+  #define HAS_MPI_FILE_IWRITE_AT
+#else
+  #undef HAS_MPI_FILE_IWRITE_AT
+#endif
+#if defined(HAS_MPI_FILE_IWRITE_AT) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_iwrite_at' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_IWRITE_SHARED
+  #define HAS_MPI_FILE_IWRITE_SHARED
+#else
+  #undef HAS_MPI_FILE_IWRITE_SHARED
+#endif
+#if defined(HAS_MPI_FILE_IWRITE_SHARED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_iwrite_shared' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_OPEN
+  #define HAS_MPI_FILE_OPEN
+#else
+  #undef HAS_MPI_FILE_OPEN
+#endif
+#if defined(HAS_MPI_FILE_OPEN) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_open' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_PREALLOCATE
+  #define HAS_MPI_FILE_PREALLOCATE
+#else
+  #undef HAS_MPI_FILE_PREALLOCATE
+#endif
+#if defined(HAS_MPI_FILE_PREALLOCATE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_preallocate' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ
+  #define HAS_MPI_FILE_READ
+#else
+  #undef HAS_MPI_FILE_READ
+#endif
+#if defined(HAS_MPI_FILE_READ) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_ALL
+  #define HAS_MPI_FILE_READ_ALL
+#else
+  #undef HAS_MPI_FILE_READ_ALL
+#endif
+#if defined(HAS_MPI_FILE_READ_ALL) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_all' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_ALL_BEGIN
+  #define HAS_MPI_FILE_READ_ALL_BEGIN
+#else
+  #undef HAS_MPI_FILE_READ_ALL_BEGIN
+#endif
+#if defined(HAS_MPI_FILE_READ_ALL_BEGIN) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_all_begin' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_ALL_END
+  #define HAS_MPI_FILE_READ_ALL_END
+#else
+  #undef HAS_MPI_FILE_READ_ALL_END
+#endif
+#if defined(HAS_MPI_FILE_READ_ALL_END) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_all_end' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_AT
+  #define HAS_MPI_FILE_READ_AT
+#else
+  #undef HAS_MPI_FILE_READ_AT
+#endif
+#if defined(HAS_MPI_FILE_READ_AT) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_at' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_AT_ALL
+  #define HAS_MPI_FILE_READ_AT_ALL
+#else
+  #undef HAS_MPI_FILE_READ_AT_ALL
+#endif
+#if defined(HAS_MPI_FILE_READ_AT_ALL) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_at_all' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_AT_ALL_BEGIN
+  #define HAS_MPI_FILE_READ_AT_ALL_BEGIN
+#else
+  #undef HAS_MPI_FILE_READ_AT_ALL_BEGIN
+#endif
+#if defined(HAS_MPI_FILE_READ_AT_ALL_BEGIN) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_at_all_begin' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_AT_ALL_END
+  #define HAS_MPI_FILE_READ_AT_ALL_END
+#else
+  #undef HAS_MPI_FILE_READ_AT_ALL_END
+#endif
+#if defined(HAS_MPI_FILE_READ_AT_ALL_END) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_at_all_end' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_ORDERED
+  #define HAS_MPI_FILE_READ_ORDERED
+#else
+  #undef HAS_MPI_FILE_READ_ORDERED
+#endif
+#if defined(HAS_MPI_FILE_READ_ORDERED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_ordered' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_ORDERED_BEGIN
+  #define HAS_MPI_FILE_READ_ORDERED_BEGIN
+#else
+  #undef HAS_MPI_FILE_READ_ORDERED_BEGIN
+#endif
+#if defined(HAS_MPI_FILE_READ_ORDERED_BEGIN) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_ordered_begin' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_ORDERED_END
+  #define HAS_MPI_FILE_READ_ORDERED_END
+#else
+  #undef HAS_MPI_FILE_READ_ORDERED_END
+#endif
+#if defined(HAS_MPI_FILE_READ_ORDERED_END) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_ordered_end' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_READ_SHARED
+  #define HAS_MPI_FILE_READ_SHARED
+#else
+  #undef HAS_MPI_FILE_READ_SHARED
+#endif
+#if defined(HAS_MPI_FILE_READ_SHARED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_read_shared' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_SEEK
+  #define HAS_MPI_FILE_SEEK
+#else
+  #undef HAS_MPI_FILE_SEEK
+#endif
+#if defined(HAS_MPI_FILE_SEEK) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_seek' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_SEEK_SHARED
+  #define HAS_MPI_FILE_SEEK_SHARED
+#else
+  #undef HAS_MPI_FILE_SEEK_SHARED
+#endif
+#if defined(HAS_MPI_FILE_SEEK_SHARED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_seek_shared' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_SET_ATOMICITY
+  #define HAS_MPI_FILE_SET_ATOMICITY
+#else
+  #undef HAS_MPI_FILE_SET_ATOMICITY
+#endif
+#if defined(HAS_MPI_FILE_SET_ATOMICITY) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_set_atomicity' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_SET_ERRHANDLER
+  #define HAS_MPI_FILE_SET_ERRHANDLER
+#else
+  #undef HAS_MPI_FILE_SET_ERRHANDLER
+#endif
+#if defined(HAS_MPI_FILE_SET_ERRHANDLER) && ! defined(NO_MPI_IO) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_set_errhandler' of group 'io_err' not found.
+#endif
+#ifndef HAS_MPI_FILE_SET_INFO
+  #define HAS_MPI_FILE_SET_INFO
+#else
+  #undef HAS_MPI_FILE_SET_INFO
+#endif
+#if defined(HAS_MPI_FILE_SET_INFO) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_set_info' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_SET_SIZE
+  #define HAS_MPI_FILE_SET_SIZE
+#else
+  #undef HAS_MPI_FILE_SET_SIZE
+#endif
+#if defined(HAS_MPI_FILE_SET_SIZE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_set_size' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_SET_VIEW
+  #define HAS_MPI_FILE_SET_VIEW
+#else
+  #undef HAS_MPI_FILE_SET_VIEW
+#endif
+#if defined(HAS_MPI_FILE_SET_VIEW) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_set_view' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_SYNC
+  #define HAS_MPI_FILE_SYNC
+#else
+  #undef HAS_MPI_FILE_SYNC
+#endif
+#if defined(HAS_MPI_FILE_SYNC) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_sync' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE
+  #define HAS_MPI_FILE_WRITE
+#else
+  #undef HAS_MPI_FILE_WRITE
+#endif
+#if defined(HAS_MPI_FILE_WRITE) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_ALL
+  #define HAS_MPI_FILE_WRITE_ALL
+#else
+  #undef HAS_MPI_FILE_WRITE_ALL
+#endif
+#if defined(HAS_MPI_FILE_WRITE_ALL) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_all' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_ALL_BEGIN
+  #define HAS_MPI_FILE_WRITE_ALL_BEGIN
+#else
+  #undef HAS_MPI_FILE_WRITE_ALL_BEGIN
+#endif
+#if defined(HAS_MPI_FILE_WRITE_ALL_BEGIN) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_all_begin' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_ALL_END
+  #define HAS_MPI_FILE_WRITE_ALL_END
+#else
+  #undef HAS_MPI_FILE_WRITE_ALL_END
+#endif
+#if defined(HAS_MPI_FILE_WRITE_ALL_END) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_all_end' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_AT
+  #define HAS_MPI_FILE_WRITE_AT
+#else
+  #undef HAS_MPI_FILE_WRITE_AT
+#endif
+#if defined(HAS_MPI_FILE_WRITE_AT) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_at' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_AT_ALL
+  #define HAS_MPI_FILE_WRITE_AT_ALL
+#else
+  #undef HAS_MPI_FILE_WRITE_AT_ALL
+#endif
+#if defined(HAS_MPI_FILE_WRITE_AT_ALL) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_at_all' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_AT_ALL_BEGIN
+  #define HAS_MPI_FILE_WRITE_AT_ALL_BEGIN
+#else
+  #undef HAS_MPI_FILE_WRITE_AT_ALL_BEGIN
+#endif
+#if defined(HAS_MPI_FILE_WRITE_AT_ALL_BEGIN) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_at_all_begin' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_AT_ALL_END
+  #define HAS_MPI_FILE_WRITE_AT_ALL_END
+#else
+  #undef HAS_MPI_FILE_WRITE_AT_ALL_END
+#endif
+#if defined(HAS_MPI_FILE_WRITE_AT_ALL_END) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_at_all_end' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_ORDERED
+  #define HAS_MPI_FILE_WRITE_ORDERED
+#else
+  #undef HAS_MPI_FILE_WRITE_ORDERED
+#endif
+#if defined(HAS_MPI_FILE_WRITE_ORDERED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_ordered' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_ORDERED_BEGIN
+  #define HAS_MPI_FILE_WRITE_ORDERED_BEGIN
+#else
+  #undef HAS_MPI_FILE_WRITE_ORDERED_BEGIN
+#endif
+#if defined(HAS_MPI_FILE_WRITE_ORDERED_BEGIN) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_ordered_begin' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_ORDERED_END
+  #define HAS_MPI_FILE_WRITE_ORDERED_END
+#else
+  #undef HAS_MPI_FILE_WRITE_ORDERED_END
+#endif
+#if defined(HAS_MPI_FILE_WRITE_ORDERED_END) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_ordered_end' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FILE_WRITE_SHARED
+  #define HAS_MPI_FILE_WRITE_SHARED
+#else
+  #undef HAS_MPI_FILE_WRITE_SHARED
+#endif
+#if defined(HAS_MPI_FILE_WRITE_SHARED) && ! defined(NO_MPI_IO)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_File_write_shared' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_FINALIZED
+  #define HAS_MPI_FINALIZED
+#else
+  #undef HAS_MPI_FINALIZED
+#endif
+#if defined(HAS_MPI_FINALIZED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ENV)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Finalized' of group 'env' not found.
+#endif
+#ifndef HAS_MPI_FREE_MEM
+  #define HAS_MPI_FREE_MEM
+#else
+  #undef HAS_MPI_FREE_MEM
+#endif
+#if defined(HAS_MPI_FREE_MEM) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Free_mem' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_GET
+  #define HAS_MPI_GET
+#else
+  #undef HAS_MPI_GET
+#endif
+#if defined(HAS_MPI_GET) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Get' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_GET_ADDRESS
+  #define HAS_MPI_GET_ADDRESS
+#else
+  #undef HAS_MPI_GET_ADDRESS
+#endif
+#if defined(HAS_MPI_GET_ADDRESS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Get_address' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_GREQUEST_COMPLETE
+  #define HAS_MPI_GREQUEST_COMPLETE
+#else
+  #undef HAS_MPI_GREQUEST_COMPLETE
+#endif
+#if defined(HAS_MPI_GREQUEST_COMPLETE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Grequest_complete' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_GREQUEST_START
+  #define HAS_MPI_GREQUEST_START
+#else
+  #undef HAS_MPI_GREQUEST_START
+#endif
+#if defined(HAS_MPI_GREQUEST_START) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Grequest_start' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_INFO_CREATE
+  #define HAS_MPI_INFO_CREATE
+#else
+  #undef HAS_MPI_INFO_CREATE
+#endif
+#if defined(HAS_MPI_INFO_CREATE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_create' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_DELETE
+  #define HAS_MPI_INFO_DELETE
+#else
+  #undef HAS_MPI_INFO_DELETE
+#endif
+#if defined(HAS_MPI_INFO_DELETE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_delete' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_DUP
+  #define HAS_MPI_INFO_DUP
+#else
+  #undef HAS_MPI_INFO_DUP
+#endif
+#if defined(HAS_MPI_INFO_DUP) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_dup' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_FREE
+  #define HAS_MPI_INFO_FREE
+#else
+  #undef HAS_MPI_INFO_FREE
+#endif
+#if defined(HAS_MPI_INFO_FREE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_free' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_GET
+  #define HAS_MPI_INFO_GET
+#else
+  #undef HAS_MPI_INFO_GET
+#endif
+#if defined(HAS_MPI_INFO_GET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_get' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_GET_NKEYS
+  #define HAS_MPI_INFO_GET_NKEYS
+#else
+  #undef HAS_MPI_INFO_GET_NKEYS
+#endif
+#if defined(HAS_MPI_INFO_GET_NKEYS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_get_nkeys' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_GET_NTHKEY
+  #define HAS_MPI_INFO_GET_NTHKEY
+#else
+  #undef HAS_MPI_INFO_GET_NTHKEY
+#endif
+#if defined(HAS_MPI_INFO_GET_NTHKEY) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_get_nthkey' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_GET_VALUELEN
+  #define HAS_MPI_INFO_GET_VALUELEN
+#else
+  #undef HAS_MPI_INFO_GET_VALUELEN
+#endif
+#if defined(HAS_MPI_INFO_GET_VALUELEN) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_get_valuelen' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INFO_SET
+  #define HAS_MPI_INFO_SET
+#else
+  #undef HAS_MPI_INFO_SET
+#endif
+#if defined(HAS_MPI_INFO_SET) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Info_set' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_INIT_THREAD
+  #define HAS_MPI_INIT_THREAD
+#else
+  #undef HAS_MPI_INIT_THREAD
+#endif
+#if defined(HAS_MPI_INIT_THREAD)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Init_thread' of group 'env' not found.
+#endif
+#ifndef HAS_MPI_IS_THREAD_MAIN
+  #define HAS_MPI_IS_THREAD_MAIN
+#else
+  #undef HAS_MPI_IS_THREAD_MAIN
+#endif
+#if defined(HAS_MPI_IS_THREAD_MAIN) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ENV)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Is_thread_main' of group 'env' not found.
+#endif
+#ifndef HAS_MPI_LOOKUP_NAME
+  #define HAS_MPI_LOOKUP_NAME
+#else
+  #undef HAS_MPI_LOOKUP_NAME
+#endif
+#if defined(HAS_MPI_LOOKUP_NAME) && ! defined(NO_MPI_SPAWN) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Lookup_name' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_OP_COMMUTATIVE
+  #define HAS_MPI_OP_COMMUTATIVE
+#else
+  #undef HAS_MPI_OP_COMMUTATIVE
+#endif
+#if defined(HAS_MPI_OP_COMMUTATIVE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.2 function call 'MPI_Op_commutative' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_OPEN_PORT
+  #define HAS_MPI_OPEN_PORT
+#else
+  #undef HAS_MPI_OPEN_PORT
+#endif
+#if defined(HAS_MPI_OPEN_PORT) && ! defined(NO_MPI_SPAWN) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Open_port' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_PACK_EXTERNAL
+  #define HAS_MPI_PACK_EXTERNAL
+#else
+  #undef HAS_MPI_PACK_EXTERNAL
+#endif
+#if defined(HAS_MPI_PACK_EXTERNAL) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Pack_external' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_PACK_EXTERNAL_SIZE
+  #define HAS_MPI_PACK_EXTERNAL_SIZE
+#else
+  #undef HAS_MPI_PACK_EXTERNAL_SIZE
+#endif
+#if defined(HAS_MPI_PACK_EXTERNAL_SIZE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Pack_external_size' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_PUBLISH_NAME
+  #define HAS_MPI_PUBLISH_NAME
+#else
+  #undef HAS_MPI_PUBLISH_NAME
+#endif
+#if defined(HAS_MPI_PUBLISH_NAME) && ! defined(NO_MPI_SPAWN) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Publish_name' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_PUT
+  #define HAS_MPI_PUT
+#else
+  #undef HAS_MPI_PUT
+#endif
+#if defined(HAS_MPI_PUT) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Put' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_QUERY_THREAD
+  #define HAS_MPI_QUERY_THREAD
+#else
+  #undef HAS_MPI_QUERY_THREAD
+#endif
+#if defined(HAS_MPI_QUERY_THREAD) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ENV)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Query_thread' of group 'env' not found.
+#endif
+#ifndef HAS_MPI_REDUCE_LOCAL
+  #define HAS_MPI_REDUCE_LOCAL
+#else
+  #undef HAS_MPI_REDUCE_LOCAL
+#endif
+#if defined(HAS_MPI_REDUCE_LOCAL) && ! defined(NO_MPI_COLL)
+Warning: PMPI symbol for MPI 2.2 function call 'MPI_Reduce_local' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_REDUCE_SCATTER_BLOCK
+  #define HAS_MPI_REDUCE_SCATTER_BLOCK
+#else
+  #undef HAS_MPI_REDUCE_SCATTER_BLOCK
+#endif
+#if defined(HAS_MPI_REDUCE_SCATTER_BLOCK) && ! defined(NO_MPI_COLL)
+Warning: PMPI symbol for MPI 2.2 function call 'MPI_Reduce_scatter_block' of group 'coll' not found.
+#endif
+#ifndef HAS_MPI_REGISTER_DATAREP
+  #define HAS_MPI_REGISTER_DATAREP
+#else
+  #undef HAS_MPI_REGISTER_DATAREP
+#endif
+#if defined(HAS_MPI_REGISTER_DATAREP) && ! defined(NO_MPI_IO) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Register_datarep' of group 'io' not found.
+#endif
+#ifndef HAS_MPI_REQUEST_GET_STATUS
+  #define HAS_MPI_REQUEST_GET_STATUS
+#else
+  #undef HAS_MPI_REQUEST_GET_STATUS
+#endif
+#if defined(HAS_MPI_REQUEST_GET_STATUS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Request_get_status' of group 'misc' not found.
+#endif
+#ifndef HAS_MPI_STATUS_SET_CANCELLED
+  #define HAS_MPI_STATUS_SET_CANCELLED
+#else
+  #undef HAS_MPI_STATUS_SET_CANCELLED
+#endif
+#if defined(HAS_MPI_STATUS_SET_CANCELLED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_MISC)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Status_set_cancelled' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_STATUS_SET_ELEMENTS
+  #define HAS_MPI_STATUS_SET_ELEMENTS
+#else
+  #undef HAS_MPI_STATUS_SET_ELEMENTS
+#endif
+#if defined(HAS_MPI_STATUS_SET_ELEMENTS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Status_set_elements' of group 'ext' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_DARRAY
+  #define HAS_MPI_TYPE_CREATE_DARRAY
+#else
+  #undef HAS_MPI_TYPE_CREATE_DARRAY
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_DARRAY) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_darray' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_F90_COMPLEX
+  #define HAS_MPI_TYPE_CREATE_F90_COMPLEX
+#else
+  #undef HAS_MPI_TYPE_CREATE_F90_COMPLEX
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_F90_COMPLEX) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_f90_complex' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_F90_INTEGER
+  #define HAS_MPI_TYPE_CREATE_F90_INTEGER
+#else
+  #undef HAS_MPI_TYPE_CREATE_F90_INTEGER
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_F90_INTEGER) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_f90_integer' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_F90_REAL
+  #define HAS_MPI_TYPE_CREATE_F90_REAL
+#else
+  #undef HAS_MPI_TYPE_CREATE_F90_REAL
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_F90_REAL) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_f90_real' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_HINDEXED
+  #define HAS_MPI_TYPE_CREATE_HINDEXED
+#else
+  #undef HAS_MPI_TYPE_CREATE_HINDEXED
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_HINDEXED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_hindexed' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_HVECTOR
+  #define HAS_MPI_TYPE_CREATE_HVECTOR
+#else
+  #undef HAS_MPI_TYPE_CREATE_HVECTOR
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_HVECTOR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_hvector' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_INDEXED_BLOCK
+  #define HAS_MPI_TYPE_CREATE_INDEXED_BLOCK
+#else
+  #undef HAS_MPI_TYPE_CREATE_INDEXED_BLOCK
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_INDEXED_BLOCK) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_indexed_block' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_KEYVAL
+  #define HAS_MPI_TYPE_CREATE_KEYVAL
+#else
+  #undef HAS_MPI_TYPE_CREATE_KEYVAL
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_KEYVAL) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_keyval' of group 'type_ext' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_RESIZED
+  #define HAS_MPI_TYPE_CREATE_RESIZED
+#else
+  #undef HAS_MPI_TYPE_CREATE_RESIZED
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_RESIZED) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_resized' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_STRUCT
+  #define HAS_MPI_TYPE_CREATE_STRUCT
+#else
+  #undef HAS_MPI_TYPE_CREATE_STRUCT
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_STRUCT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_struct' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_CREATE_SUBARRAY
+  #define HAS_MPI_TYPE_CREATE_SUBARRAY
+#else
+  #undef HAS_MPI_TYPE_CREATE_SUBARRAY
+#endif
+#if defined(HAS_MPI_TYPE_CREATE_SUBARRAY) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_create_subarray' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_DELETE_ATTR
+  #define HAS_MPI_TYPE_DELETE_ATTR
+#else
+  #undef HAS_MPI_TYPE_DELETE_ATTR
+#endif
+#if defined(HAS_MPI_TYPE_DELETE_ATTR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_delete_attr' of group 'type_ext' not found.
+#endif
+#ifndef HAS_MPI_TYPE_DUP
+  #define HAS_MPI_TYPE_DUP
+#else
+  #undef HAS_MPI_TYPE_DUP
+#endif
+#if defined(HAS_MPI_TYPE_DUP) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_dup' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_FREE_KEYVAL
+  #define HAS_MPI_TYPE_FREE_KEYVAL
+#else
+  #undef HAS_MPI_TYPE_FREE_KEYVAL
+#endif
+#if defined(HAS_MPI_TYPE_FREE_KEYVAL) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_free_keyval' of group 'type_ext' not found.
+#endif
+#ifndef HAS_MPI_TYPE_GET_ATTR
+  #define HAS_MPI_TYPE_GET_ATTR
+#else
+  #undef HAS_MPI_TYPE_GET_ATTR
+#endif
+#if defined(HAS_MPI_TYPE_GET_ATTR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_get_attr' of group 'type_ext' not found.
+#endif
+#ifndef HAS_MPI_TYPE_GET_CONTENTS
+  #define HAS_MPI_TYPE_GET_CONTENTS
+#else
+  #undef HAS_MPI_TYPE_GET_CONTENTS
+#endif
+#if defined(HAS_MPI_TYPE_GET_CONTENTS) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_get_contents' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_GET_ENVELOPE
+  #define HAS_MPI_TYPE_GET_ENVELOPE
+#else
+  #undef HAS_MPI_TYPE_GET_ENVELOPE
+#endif
+#if defined(HAS_MPI_TYPE_GET_ENVELOPE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_get_envelope' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_GET_EXTENT
+  #define HAS_MPI_TYPE_GET_EXTENT
+#else
+  #undef HAS_MPI_TYPE_GET_EXTENT
+#endif
+#if defined(HAS_MPI_TYPE_GET_EXTENT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_get_extent' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_GET_NAME
+  #define HAS_MPI_TYPE_GET_NAME
+#else
+  #undef HAS_MPI_TYPE_GET_NAME
+#endif
+#if defined(HAS_MPI_TYPE_GET_NAME) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_get_name' of group 'type_ext' not found.
+#endif
+#ifndef HAS_MPI_TYPE_GET_TRUE_EXTENT
+  #define HAS_MPI_TYPE_GET_TRUE_EXTENT
+#else
+  #undef HAS_MPI_TYPE_GET_TRUE_EXTENT
+#endif
+#if defined(HAS_MPI_TYPE_GET_TRUE_EXTENT) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_get_true_extent' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_MATCH_SIZE
+  #define HAS_MPI_TYPE_MATCH_SIZE
+#else
+  #undef HAS_MPI_TYPE_MATCH_SIZE
+#endif
+#if defined(HAS_MPI_TYPE_MATCH_SIZE) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_match_size' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_TYPE_SET_ATTR
+  #define HAS_MPI_TYPE_SET_ATTR
+#else
+  #undef HAS_MPI_TYPE_SET_ATTR
+#endif
+#if defined(HAS_MPI_TYPE_SET_ATTR) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_set_attr' of group 'type_ext' not found.
+#endif
+#ifndef HAS_MPI_TYPE_SET_NAME
+  #define HAS_MPI_TYPE_SET_NAME
+#else
+  #undef HAS_MPI_TYPE_SET_NAME
+#endif
+#if defined(HAS_MPI_TYPE_SET_NAME) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Type_set_name' of group 'type_ext' not found.
+#endif
+#ifndef HAS_MPI_UNPACK_EXTERNAL
+  #define HAS_MPI_UNPACK_EXTERNAL
+#else
+  #undef HAS_MPI_UNPACK_EXTERNAL
+#endif
+#if defined(HAS_MPI_UNPACK_EXTERNAL) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_TYPE)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Unpack_external' of group 'type' not found.
+#endif
+#ifndef HAS_MPI_UNPUBLISH_NAME
+  #define HAS_MPI_UNPUBLISH_NAME
+#else
+  #undef HAS_MPI_UNPUBLISH_NAME
+#endif
+#if defined(HAS_MPI_UNPUBLISH_NAME) && ! defined(NO_MPI_SPAWN) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Unpublish_name' of group 'spawn' not found.
+#endif
+#ifndef HAS_MPI_WIN_CALL_ERRHANDLER
+  #define HAS_MPI_WIN_CALL_ERRHANDLER
+#else
+  #undef HAS_MPI_WIN_CALL_ERRHANDLER
+#endif
+#if defined(HAS_MPI_WIN_CALL_ERRHANDLER) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_call_errhandler' of group 'rma_err' not found.
+#endif
+#ifndef HAS_MPI_WIN_COMPLETE
+  #define HAS_MPI_WIN_COMPLETE
+#else
+  #undef HAS_MPI_WIN_COMPLETE
+#endif
+#if defined(HAS_MPI_WIN_COMPLETE) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_complete' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_CREATE
+  #define HAS_MPI_WIN_CREATE
+#else
+  #undef HAS_MPI_WIN_CREATE
+#endif
+#if defined(HAS_MPI_WIN_CREATE) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_create' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_CREATE_ERRHANDLER
+  #define HAS_MPI_WIN_CREATE_ERRHANDLER
+#else
+  #undef HAS_MPI_WIN_CREATE_ERRHANDLER
+#endif
+#if defined(HAS_MPI_WIN_CREATE_ERRHANDLER) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_create_errhandler' of group 'rma_err' not found.
+#endif
+#ifndef HAS_MPI_WIN_CREATE_KEYVAL
+  #define HAS_MPI_WIN_CREATE_KEYVAL
+#else
+  #undef HAS_MPI_WIN_CREATE_KEYVAL
+#endif
+#if defined(HAS_MPI_WIN_CREATE_KEYVAL) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_create_keyval' of group 'rma_ext' not found.
+#endif
+#ifndef HAS_MPI_WIN_DELETE_ATTR
+  #define HAS_MPI_WIN_DELETE_ATTR
+#else
+  #undef HAS_MPI_WIN_DELETE_ATTR
+#endif
+#if defined(HAS_MPI_WIN_DELETE_ATTR) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_delete_attr' of group 'rma_ext' not found.
+#endif
+#ifndef HAS_MPI_WIN_FENCE
+  #define HAS_MPI_WIN_FENCE
+#else
+  #undef HAS_MPI_WIN_FENCE
+#endif
+#if defined(HAS_MPI_WIN_FENCE) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_fence' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_FREE
+  #define HAS_MPI_WIN_FREE
+#else
+  #undef HAS_MPI_WIN_FREE
+#endif
+#if defined(HAS_MPI_WIN_FREE) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_free' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_FREE_KEYVAL
+  #define HAS_MPI_WIN_FREE_KEYVAL
+#else
+  #undef HAS_MPI_WIN_FREE_KEYVAL
+#endif
+#if defined(HAS_MPI_WIN_FREE_KEYVAL) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_free_keyval' of group 'rma_ext' not found.
+#endif
+#ifndef HAS_MPI_WIN_GET_ATTR
+  #define HAS_MPI_WIN_GET_ATTR
+#else
+  #undef HAS_MPI_WIN_GET_ATTR
+#endif
+#if defined(HAS_MPI_WIN_GET_ATTR) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_get_attr' of group 'rma_ext' not found.
+#endif
+#ifndef HAS_MPI_WIN_GET_ERRHANDLER
+  #define HAS_MPI_WIN_GET_ERRHANDLER
+#else
+  #undef HAS_MPI_WIN_GET_ERRHANDLER
+#endif
+#if defined(HAS_MPI_WIN_GET_ERRHANDLER) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_get_errhandler' of group 'rma_err' not found.
+#endif
+#ifndef HAS_MPI_WIN_GET_GROUP
+  #define HAS_MPI_WIN_GET_GROUP
+#else
+  #undef HAS_MPI_WIN_GET_GROUP
+#endif
+#if defined(HAS_MPI_WIN_GET_GROUP) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_get_group' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_GET_NAME
+  #define HAS_MPI_WIN_GET_NAME
+#else
+  #undef HAS_MPI_WIN_GET_NAME
+#endif
+#if defined(HAS_MPI_WIN_GET_NAME) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_get_name' of group 'rma_ext' not found.
+#endif
+#ifndef HAS_MPI_WIN_LOCK
+  #define HAS_MPI_WIN_LOCK
+#else
+  #undef HAS_MPI_WIN_LOCK
+#endif
+#if defined(HAS_MPI_WIN_LOCK) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_lock' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_POST
+  #define HAS_MPI_WIN_POST
+#else
+  #undef HAS_MPI_WIN_POST
+#endif
+#if defined(HAS_MPI_WIN_POST) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_post' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_SET_ATTR
+  #define HAS_MPI_WIN_SET_ATTR
+#else
+  #undef HAS_MPI_WIN_SET_ATTR
+#endif
+#if defined(HAS_MPI_WIN_SET_ATTR) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_set_attr' of group 'rma_ext' not found.
+#endif
+#ifndef HAS_MPI_WIN_SET_ERRHANDLER
+  #define HAS_MPI_WIN_SET_ERRHANDLER
+#else
+  #undef HAS_MPI_WIN_SET_ERRHANDLER
+#endif
+#if defined(HAS_MPI_WIN_SET_ERRHANDLER) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_ERR)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_set_errhandler' of group 'rma_err' not found.
+#endif
+#ifndef HAS_MPI_WIN_SET_NAME
+  #define HAS_MPI_WIN_SET_NAME
+#else
+  #undef HAS_MPI_WIN_SET_NAME
+#endif
+#if defined(HAS_MPI_WIN_SET_NAME) && ! defined(NO_MPI_RMA) && ! defined(NO_MPI_EXTRA) && ! defined(NO_MPI_EXT)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_set_name' of group 'rma_ext' not found.
+#endif
+#ifndef HAS_MPI_WIN_START
+  #define HAS_MPI_WIN_START
+#else
+  #undef HAS_MPI_WIN_START
+#endif
+#if defined(HAS_MPI_WIN_START) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_start' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_TEST
+  #define HAS_MPI_WIN_TEST
+#else
+  #undef HAS_MPI_WIN_TEST
+#endif
+#if defined(HAS_MPI_WIN_TEST) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_test' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_UNLOCK
+  #define HAS_MPI_WIN_UNLOCK
+#else
+  #undef HAS_MPI_WIN_UNLOCK
+#endif
+#if defined(HAS_MPI_WIN_UNLOCK) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_unlock' of group 'rma' not found.
+#endif
+#ifndef HAS_MPI_WIN_WAIT
+  #define HAS_MPI_WIN_WAIT
+#else
+  #undef HAS_MPI_WIN_WAIT
+#endif
+#if defined(HAS_MPI_WIN_WAIT) && ! defined(NO_MPI_RMA)
+Warning: PMPI symbol for MPI 2.0 function call 'MPI_Win_wait' of group 'rma' not found.
+#endif

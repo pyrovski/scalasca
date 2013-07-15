@@ -1,0 +1,513 @@
+/* -- automatically generated -- do not change ------------------------------ */
+/* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
+
+
+void shmem_character_get(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_CHARACTER_GET]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*1);
+  pshmem_character_get(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_CHARACTER_GET]);
+#endif
+}
+
+void shmem_character_put(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_CHARACTER_PUT]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*1);
+  pshmem_character_put(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_CHARACTER_PUT]);
+#endif
+}
+
+void shmem_logical_get(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_LOGICAL_GET]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_logical_get(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_LOGICAL_GET]);
+#endif
+}
+
+void shmem_logical_put(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_LOGICAL_PUT]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_logical_put(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_LOGICAL_PUT]);
+#endif
+}
+
+void shmem_integer_get(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_INTEGER_GET]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_integer_get(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_INTEGER_GET]);
+#endif
+}
+
+void shmem_integer_put(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_INTEGER_PUT]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_integer_put(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_INTEGER_PUT]);
+#endif
+}
+
+void shmem_real_get(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_REAL_GET]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_real_get(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_REAL_GET]);
+#endif
+}
+
+void shmem_real_put(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_REAL_PUT]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_real_put(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_REAL_PUT]);
+#endif
+}
+
+void shmem_double_get(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_DOUBLE_GET]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_double_get(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_DOUBLE_GET]);
+#endif
+}
+
+void shmem_double_put(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_DOUBLE_PUT]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_double_put(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_DOUBLE_PUT]);
+#endif
+}
+
+void shmem_complex_get(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COMPLEX_GET]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_complex_get(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_COMPLEX_GET]);
+#endif
+}
+
+void shmem_complex_put(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COMPLEX_PUT]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_complex_put(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_COMPLEX_PUT]);
+#endif
+}
+
+void shmem_get(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_GET]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_get(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_GET]);
+#endif
+}
+
+void shmem_put(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_PUT]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_put(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_PUT]);
+#endif
+}
+
+void shmem_broadcast(void* target, void* source, int* nlong, int* PE_root, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_BROADCAST]);
+#endif
+  TRACE_OFF();
+  pshmem_broadcast(target, source, nlong, PE_root, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_BROADCAST],*PE_root, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_collect(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COLLECT]);
+#endif
+  TRACE_OFF();
+  pshmem_collect(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_COLLECT],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_fcollect(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_FCOLLECT]);
+#endif
+  TRACE_OFF();
+  pshmem_fcollect(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_FCOLLECT],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_get32(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_GET32]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_get32(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_GET32]);
+#endif
+}
+
+void shmem_put32(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_PUT32]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_put32(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_PUT32]);
+#endif
+}
+
+void shmem_broadcast32(void* target, void* source, int* nlong, int* PE_root, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_BROADCAST32]);
+#endif
+  TRACE_OFF();
+  pshmem_broadcast32(target, source, nlong, PE_root, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_BROADCAST32],*PE_root, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_collect32(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COLLECT32]);
+#endif
+  TRACE_OFF();
+  pshmem_collect32(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_COLLECT32],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_fcollect32(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_FCOLLECT32]);
+#endif
+  TRACE_OFF();
+  pshmem_fcollect32(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_FCOLLECT32],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_get64(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_GET64]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_get64(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_GET64]);
+#endif
+}
+
+void shmem_put64(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_PUT64]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_put64(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_PUT64]);
+#endif
+}
+
+void shmem_broadcast64(void* target, void* source, int* nlong, int* PE_root, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_BROADCAST64]);
+#endif
+  TRACE_OFF();
+  pshmem_broadcast64(target, source, nlong, PE_root, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_BROADCAST64],*PE_root, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_collect64(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COLLECT64]);
+#endif
+  TRACE_OFF();
+  pshmem_collect64(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_COLLECT64],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_fcollect64(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_FCOLLECT64]);
+#endif
+  TRACE_OFF();
+  pshmem_fcollect64(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_FCOLLECT64],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_get128(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_GET128]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*16);
+  pshmem_get128(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_GET128]);
+#endif
+}
+
+void shmem_put128(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_PUT128]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*16);
+  pshmem_put128(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_PUT128]);
+#endif
+}
+
+void shmem_broadcast128(void* target, void* source, int* nlong, int* PE_root, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_BROADCAST128]);
+#endif
+  TRACE_OFF();
+  pshmem_broadcast128(target, source, nlong, PE_root, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_BROADCAST128],*PE_root, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_collect128(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COLLECT128]);
+#endif
+  TRACE_OFF();
+  pshmem_collect128(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_COLLECT128],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_fcollect128(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_FCOLLECT128]);
+#endif
+  TRACE_OFF();
+  pshmem_fcollect128(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_FCOLLECT128],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_get4(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_GET4]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_get4(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_GET4]);
+#endif
+}
+
+void shmem_put4(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_PUT4]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*4);
+  pshmem_put4(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_PUT4]);
+#endif
+}
+
+void shmem_broadcast4(void* target, void* source, int* nlong, int* PE_root, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_BROADCAST4]);
+#endif
+  TRACE_OFF();
+  pshmem_broadcast4(target, source, nlong, PE_root, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_BROADCAST4],*PE_root, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_collect4(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COLLECT4]);
+#endif
+  TRACE_OFF();
+  pshmem_collect4(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_COLLECT4],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_fcollect4(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_FCOLLECT4]);
+#endif
+  TRACE_OFF();
+  pshmem_fcollect4(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_FCOLLECT4],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_get8(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_GET8]);
+#endif
+  esd_get_1ts_remote(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_get8(target, source, len, pe);
+  esd_get_1te(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_GET8]);
+#endif
+}
+
+void shmem_put8(void* target, void* source, int* len, int* pe)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_PUT8]);
+#endif
+  esd_put_1ts(*pe, EPK_NEXT_SHM_ID, (*len)*8);
+  pshmem_put8(target, source, len, pe);
+  esd_put_1te_remote(*pe, EPK_CURR_SHM_ID);
+#ifndef EPK_CSITE_INST
+  esd_exit(epk_shm_regid[EPK__SHMEM_PUT8]);
+#endif
+}
+
+void shmem_broadcast8(void* target, void* source, int* nlong, int* PE_root, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_BROADCAST8]);
+#endif
+  TRACE_OFF();
+  pshmem_broadcast8(target, source, nlong, PE_root, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_BROADCAST8],*PE_root, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_collect8(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_COLLECT8]);
+#endif
+  TRACE_OFF();
+  pshmem_collect8(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_COLLECT8],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}
+
+void shmem_fcollect8(void* target, void* source, int* nlong, int* PE_start, int* logPE_stride, int* PE_size, long* pSync)
+{
+#ifndef EPK_CSITE_INST
+  esd_enter(epk_shm_regid[EPK__SHMEM_FCOLLECT8]);
+#endif
+  TRACE_OFF();
+  pshmem_fcollect8(target, source, nlong, PE_start, logPE_stride, PE_size, pSync);
+  TRACE_ON();
+  esd_collexit(epk_shm_regid[EPK__SHMEM_FCOLLECT8],ELG_NO_ID, epk_shmem_create_com(*PE_start, *logPE_stride, *PE_size), 0, 0);
+}

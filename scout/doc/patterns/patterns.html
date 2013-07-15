@@ -1,0 +1,2655 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Performance properties</title>
+</head>
+<body>
+<h2>Performance properties</h2>
+
+<a name="time"><h3>Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Total time spent for program execution including the idle times of CPUs
+    reserved for slave threads during OpenMP sequential execution. This
+    pattern assumes that every thread of a process allocated a separate CPU
+    during the entire runtime of the process.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree hierarchy to break down total time into
+    constituent parts which will help determine how much of it is due to
+    local/serial computation versus MPI and/or OpenMP parallelization
+    costs, and how much of that time is wasted waiting for other processes
+    or threads due to ineffective load balance or due to insufficient
+    parallelism.
+    </dd><p><dd>
+    Expand the call tree to identify important callpaths and routines where
+    most time is spent, and examine the times for each process or thread to
+    locate load imbalance.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#execution">Execution Time</a>, <a href="#overhead">Overhead Time</a>, <a href="#omp_idle_threads">OpenMP Idle threads Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="visits"><h3>Visits</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of times a call path has been visited. Visit counts for MPI
+    routine call paths directly relate to the number of MPI <a href="#comms">Communications</a> and
+    <a href="#syncs">Synchronizations</a>. Visit counts for OpenMP operations and parallel regions
+    (loops) directly relate to the number of times they were executed.
+    Routines which were not instrumented, or were filtered during
+    measurement, do not appear on recorded call paths. Similarly, routines
+    are not shown if the compiler optimizer successfully in-lined them
+    prior to automatic instrumentation.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Call paths that are frequently visited (and thereby have high exclusive
+    Visit counts) can be expected to have an important role in application
+    execution performance (e.g., <a href="#execution">Execution Time</a>). Very frequently executed
+    routines, which are relatively short and quick to execute, may have an
+    adverse impact on measurement quality. This can be due to
+    instrumentation preventing in-lining and other compiler optimizations
+    and/or overheads associated with measurement such as reading timers and
+    hardware counters on routine entry and exit. When such routines consist
+    solely of local/sequential computation (i.e., neither communication nor
+    synchronization), they should be eliminated to improve the quality of
+    the parallel measurement and analysis. One approach is to specify the
+    names of such routines in a <em>filter</em> file for subsequent
+    measurements to ignore, and thereby considerably reduce their
+    measurement impact. Alternatively, <em>selective instrumentation</em>
+    can be employed to entirely avoid instrumenting such routines and
+    thereby remove all measurement impact. In both cases, uninstrumented
+    and filtered routines will not appear in the measurement and analysis,
+    much as if they had been "in-lined" into their calling routine.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="execution"><h3>Execution Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent on program execution but without the idle times of slave
+    threads during OpenMP sequential execution.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the call tree to determine important callpaths and routines
+    where most exclusive execution time is spent, and examine the time for
+    each process or thread on those callpaths looking for significant
+    variations which might indicate the origin of load imbalance.
+    </dd><p><dd>
+    Where exclusive execution time on each process/thread is unexpectedly
+    slow, profiling with PAPI preset or platform-specific hardware counters
+    may help to understand the origin. Serial program profiling tools
+    (e.g., gprof) may also be helpful. Generally, compiler optimization
+    flags and optimized libraries should be investigated to improve serial
+    performance, and where necessary alternative algorithms employed.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#time">Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi">MPI Time</a>, <a href="#omp_time">OpenMP Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="overhead"><h3>Overhead Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent performing major tasks related to measurement, such as
+    creation of the experiment archive directory, clock synchronization or
+    dumping trace buffer contents to a file. Note that normal per-event
+    overheads &ndash; such as event acquisition, reading timers and
+    hardware counters, runtime call-path summarization and storage in trace
+    buffers &ndash; is <em>not</em> included.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Significant measurement overheads are typically incurred when
+    measurement is initialized (e.g., in the program <tt>main</tt> routine
+    or <tt>MPI_Init</tt>) and finalized (e.g., in <tt>MPI_Finalize</tt>),
+    and are generally unavoidable. While they extend the total (wallclock)
+    time for measurement, when they occur before parallel execution starts
+    or after it completes, the quality of measurement of the parallel
+    execution is not degraded.  Trace file writing overhead time can be
+    kept to a minimum by specifying an efficient parallel filesystem (when
+    provided) for the experiment archive (e.g.,
+    <tt>EPK_GDIR=/work/mydir</tt>) and <em>not</em> specifying a different
+    location for intermediate files (i.e., <tt>EPK_LDIR=$EPK_GDIR</tt>).
+    </dd><p><dd>
+    When measurement overhead is reported for other call paths, especially
+    during parallel execution, measurement perturbation is considerable and
+    interpretation of the resulting analysis much more difficult. A common
+    cause of measurement overhead during parallel execution is the flushing
+    of full trace buffers to disk: warnings issued by the EPIK measurement
+    system indicate when this occurs. When flushing occurs simultaneously
+    for all processes and threads, the associated perturbation is
+    localized. More usually, buffer filling and flushing occurs
+    independently at different times on each process/thread and the
+    resulting perturbation is extremely disruptive, often forming a
+    catastrophic chain reaction. It is highly advisable to avoid
+    intermediate trace flushes by appropriate instrumentation and
+    measurement configuration, such as specifying a <em>filter</em> file
+    listing purely computational routines (classified as type USR by
+    <em>cube3_score&nbsp;-r</em>&nbsp;) or an adequate trace buffer size
+    (<tt>ELG_BUFFER_SIZE</tt> larger than max_tbc reported by
+    <em>cube3_score</em>). If the maximum trace buffer capacity requirement
+    remains too large for a full-size measurement, it may be necessary to
+    configure the subject application with a smaller problem size or to
+    perform fewer iterations/timesteps to shorten the measurement (and
+    thereby reduce the size of the trace).
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#time">Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi"><h3>MPI Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in (instrumented) MPI calls.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree to determine which classes of MPI operation
+    contribute the most time. Typically the remaining (exclusive) MPI Time,
+    corresponding to instrumented MPI routines that are not in one of the
+    child classes, will be negligible. There can, however, be significant
+    time in collective operations such as <tt>MPI_Comm_create</tt>,
+    <tt>MPI_Comm_free</tt> and <tt>MPI_Cart_create</tt> that are considered
+    neither explicit synchronization nor communication, but result in
+    implicit barrier synchronization of participating processes. Avoidable
+    waiting time for these operations will be reduced if all processes
+    execute them simultaneously. If these are repeated operations, e.g., in
+    a loop, it is worth investigating whether their frequency can be
+    reduced by re-use.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#execution">Execution Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_synchronization">MPI Synchronization Time</a>, <a href="#mpi_communication">MPI Communication Time</a>, <a href="#mpi_io">MPI File I/O Time</a>, <a href="#mpi_init_exit">MPI Init/Exit Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_synchronization"><h3>MPI Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI explicit synchronization
+    calls, i.e., barriers. Time in point-to-point messages with no data
+    used for coordination is currently part of <a href="#mpi_point2point">MPI Point-to-point Communication Time</a>.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree further to determine the proportion of time in
+    different classes of MPI synchronization operations. Expand the
+    calltree to identify which callpaths are responsible for the most
+    synchronization time. Also examine the distribution of synchronization
+    time on each participating process for indication of load imbalance in
+    preceding code.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi">MPI Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_sync_collective">MPI Collective Synchronization Time</a>, <a href="#mpi_rma_synchronization">Remote Memory Access Synchronization Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_communication"><h3>MPI Communication Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI communication calls.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree further to determine the proportion of time in
+    different classes of MPI communication operations. Expand the calltree
+    to identify which callpaths are responsible for the most communication
+    time. Also examine the distribution of communication time on each
+    participating process for indication of communication imbalance or load
+    imbalance in preceding code.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi">MPI Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_point2point">MPI Point-to-point Communication Time</a>, <a href="#mpi_collective">MPI Collective Communication Time</a>, <a href="#mpi_rma_communication">Remote Memory Access Communication Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_io"><h3>MPI File I/O Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI file I/O calls.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree further to determine the proportion of time in
+    different classes of MPI file I/O operations. Expand the calltree to
+    identify which callpaths are responsible for the most file I/O time. 
+    Also examine the distribution of MPI file I/O time on each process for
+    indication of load imbalance. Use a parallel filesystem (such as
+    <tt>/work</tt>) when possible, and check that appropriate hints values
+    have been associated with the <tt>MPI_Info</tt> object of MPI files.
+    </dd><p><dd>
+    Exclusive MPI file I/O time relates to individual (non-collective)
+    operations. When multiple processes read and write to files, MPI
+    collective file reads and writes can be more efficient.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi">MPI Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_io_collective">MPI Collective File I/O Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_io_collective"><h3>MPI Collective File I/O Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in collective MPI file I/O calls.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the calltree to identify which callpaths are responsible for the
+    most collective file I/O time. Examine the distribution of times on
+    each participating process for indication of imbalance in the operation
+    itself or in preceding code. Examine the number of <a href="#mpi_file_cops">MPI File Collective Operations</a>
+    done by each process as a possible origin of imbalance. Where asychrony
+    or imbalance prevents effective use of collective file I/O,
+    (non-collective) individual file I/O may be preferable.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_io">MPI File I/O Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_init_exit"><h3>MPI Init/Exit Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in MPI initialization and finalization calls, i.e.,
+    <tt>MPI_Init</tt> or <tt>MPI_Init_thread</tt> and
+    <tt>MPI_Finalize</tt>.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    These are unavoidable one-off costs for MPI parallel programs, which
+    can be expected to increase for larger numbers of processes. Some
+    applications may not use all of the processes provided (or not use some
+    of them for the entire execution), such that unused and wasted
+    processes wait in <tt>MPI_Finalize</tt> for the others to finish. If
+    the proportion of time in these calls is significant, it is probably
+    more effective to use a smaller number of processes (or a larger amount
+    of computation).
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi">MPI Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_sync_collective"><h3>MPI Collective Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the total time spent in MPI barriers.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    When the time for MPI explicit barrier synchronization is significant,
+    expand the call tree to determine which <tt>MPI_Barrier</tt> calls are
+    responsible, and compare with their <a href="#visits">Visits</a> count to see how
+    frequently they were executed.  Barrier synchronizations which are not
+    necessary for correctness should be removed. It may also be appropriate
+    to use a communicator containing fewer processes, or a number of
+    point-to-point messages for coordination instead. Also examine the
+    distribution of time on each participating process for indication of
+    load imbalance in preceding code.
+    </dd><p><dd>
+    Automatic trace analysis can be employed to quantify time wasted due to
+    <a href="#mpi_barrier_wait">Wait at MPI Barrier Time</a> at entry and <a href="#mpi_barrier_completion">Barrier Completion Time</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_synchronization">MPI Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_barrier_wait">Wait at MPI Barrier Time</a>, <a href="#mpi_barrier_completion">Barrier Completion Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_barrier_wait"><h3>Wait at MPI Barrier Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern covers the time spent waiting in front of an MPI barrier,
+    which is the time inside the barrier call until the last processes has
+    reached the barrier.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="WaitAtBarrier.png" alt="Wait at Barrier Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    A large amount of waiting time at barriers can be an indication of load
+    imbalance. Examine the waiting times for each process and try to
+    distribute the preceding computation from processes with the shortest
+    waiting times to those with the longest waiting times.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_sync_collective">MPI Collective Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_barrier_completion"><h3>Barrier Completion Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI barriers after the first
+    process has left the operation.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="BarrierCompletion.png" alt="Barrier Completion Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Generally all processes can be expected to leave MPI barriers
+    simultaneously, and any significant barrier completion time may
+    indicate an inefficient MPI implementation or interference from other
+    processes running on the same compute resources.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_sync_collective">MPI Collective Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_point2point"><h3>MPI Point-to-point Communication Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the total time spent in MPI point-to-point
+    communication calls. Note that this is only the respective times for
+    the sending and receiving calls, and <em>not</em> message transmission
+    time.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Investigate whether communication time is commensurate with the number
+    of <a href="#comms">Communications</a> and <a href="#bytes">Bytes Transferred</a>. Consider replacing blocking
+    communication with non-blocking communication that can potentially be
+    overlapped with computation, or using persistent communication to
+    amortize message setup costs for common transfers. Also consider the
+    mapping of processes onto compute resources, especially if there are
+    notable differences in communication time for particular processes,
+    which might indicate longer/slower transmission routes or network
+    congestion.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_communication">MPI Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_latesender">Late Sender Time</a>, <a href="#mpi_latereceiver">Late Receiver Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_latesender"><h3>Late Sender Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Refers to the time lost waiting caused by a blocking receive operation
+    (e.g., <tt>MPI_Recv</tt> or <tt>MPI_Wait</tt>) that is posted earlier
+    than the corresponding send operation.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="LateSender.png" alt="Late Sender Example">
+</div>
+<br>
+
+    </dd><p><dd>
+    If the receiving process is waiting for multiple messages to arrive
+    (e.g., in an call to <tt>MPI_Waitall</tt>), the maximum waiting time is
+    accounted, i.e., the waiting time due to the latest sender.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Try to replace <tt>MPI_Recv</tt> with a non-blocking receive <tt>MPI_Irecv</tt>
+    that can be posted earlier, proceed concurrently with computation, and
+    complete with a wait operation after the message is expected to have been sent.
+    Try to post sends earlier, such that they are available when receivers
+    need them. Note that outstanding messages (i.e., sent before the
+    receiver is ready) will occupy internal message buffers, and that large
+    numbers of posted receive buffers will also introduce message management overhead,
+    therefore moderation is advisable.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_point2point">MPI Point-to-point Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_latesender_wo">Late Sender, Wrong Order Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_latesender_wo"><h3>Late Sender, Wrong Order Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    A Late Sender situation may be the result of messages that are received
+    in the wrong order. If a process expects messages from one or more
+    processes in a certain order, although these processes are sending them
+    in a different order, the receiver may need to wait for a message if it
+    tries to receive a message early that has been sent late.
+    </dd><p><dd>
+    This pattern comes in two variants:
+    <ul>
+      <li>The messages involved were sent from the same source location</li>
+      <li>The messages involved were sent from different source locations</li>
+    </ul>
+    See the description of the corresponding specializations for more details.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Check the proportion of <a href="#comms_recv">Point-to-point Receive Communications</a> that are <a href="#mpi_cls_count">Late Sender Instances (Communications)</a>.
+    Swap the order of receiving from different sources to match the most
+    common ordering. 
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_latesender">Late Sender Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_lswo_different">Late Sender, Wrong Order Time / Different Sources</a>, <a href="#mpi_lswo_same">Late Sender, Wrong Order Time / Same Source</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_lswo_different"><h3>Late Sender, Wrong Order Time / Different Sources</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This specialization of the <i>Late Sender, Wrong Order</i> pattern refers
+    to wrong order situations due to messages received from different source
+    locations.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="LSWO_DifferentSource.png" alt="Messages from different sources Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Check the proportion of <a href="#comms_recv">Point-to-point Receive Communications</a> that are 
+    <a href="#mpi_clswo_count">Late Sender, Wrong Order Instances (Communications)</a>. Swap the order of receiving from different
+    sources to match the most common ordering.  Consider using the wildcard
+    <tt>MPI_ANY_SOURCE</tt> to receive (and process) messages as they
+    arrive from any source rank.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_latesender_wo">Late Sender, Wrong Order Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_lswo_same"><h3>Late Sender, Wrong Order Time / Same Source</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This specialization of the <i>Late Sender, Wrong Order</i> pattern refers
+    to wrong order situations due to messages received from the same source
+    location.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="LSWO_SameSource.png" alt="Messages from same source Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Swap the order of receiving to match the order messages are sent, or
+    swap the order of sending to match the order they are expected to be
+    received. Consider using the wildcard <tt>MPI_ANY_TAG</tt> to receive
+    (and process) messages in the order they arrive from the source.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_latesender_wo">Late Sender, Wrong Order Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_latereceiver"><h3>Late Receiver Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    A send operation may be blocked until the corresponding receive
+    operation is called, and this pattern refers to the time spent waiting
+    as a result of this situation.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="LateReceiver.png" alt="Late Receiver Example">
+</div>
+<br>
+
+    </dd><p><dd>
+    Note that this pattern does currently not apply to nonblocking sends
+    waiting in the corresponding completion call, e.g., <tt>MPI_Wait</tt>.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Check the proportion of <a href="#comms_send">Point-to-point Send Communications</a> that are <a href="#mpi_clr_count">Late Receiver Instances (Communications)</a>.
+    The MPI implementation may be working in synchronous mode by default,
+    such that explicit use of asynchronous nonblocking sends can be tried.
+    If the size of the message to be sent exceeds the available MPI
+    internal buffer space then the operation will be blocked until the data
+    can be transferred to the receiver: some MPI implementations allow
+    larger internal buffers or different thresholds to be specified. Also
+    consider the mapping of processes onto compute resources, especially if
+    there are notable differences in communication time for particular
+    processes, which might indicate longer/slower transmission routes or
+    network congestion.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_point2point">MPI Point-to-point Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_collective"><h3>MPI Collective Communication Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the total time spent in MPI collective
+    communication calls.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    As the number of participating MPI processes
+    increase (i.e., ranks in <tt>MPI_COMM_WORLD</tt> or a subcommunicator),
+    time in collective communication can be expected to increase
+    correspondingly.  Part of the increase will be due to additional data
+    transmission requirements, which are generally similar for all
+    participants. A significant part is typically time some (often many)
+    processes are blocked waiting for the last of the required participants
+    to reach the collective operation. This may be indicated by significant
+    variation in collective communication time across processes, but is
+    most conclusively quantified from the child metrics determinable via
+    automatic trace pattern analysis.
+    </dd><p><dd>
+    Since basic transmission cost per byte for collectives can be relatively high,
+    combining several collective operations of the same type each with small amounts of data
+    (e.g., a single value per rank) into fewer operations with larger payloads
+    using either a vector/array of values or aggregate datatype may be beneficial.
+    (Overdoing this and aggregating very large message payloads is counter-productive
+    due to explicit and implicit memory requirements, and MPI protocol switches
+    for messages larger than an eager transmission threshold.)
+    </dd><p><dd>
+    MPI implementations generally provide optimized collective communication operations,
+    however, in rare cases, it may be appropriate to replace a collective
+    communication operation provided by the MPI implementation with a
+    customized implementation of your own using point-to-point operations.
+    For example, certain MPI implementations of <tt>MPI_Scan</tt> include
+    unnecessary synchronization of all participating processes, or
+    asynchronous variants of collective operations may be preferable to
+    fully synchronous ones where they permit overlapping of computation.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_communication">MPI Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_earlyreduce">Early Reduce Time</a>, <a href="#mpi_earlyscan">Early Scan Time</a>, <a href="#mpi_latebroadcast">Late Broadcast Time</a>, <a href="#mpi_wait_nxn">Wait at N x N Time</a>, <a href="#mpi_nxn_completion">N x N Completion Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_earlyreduce"><h3>Early Reduce Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Collective communication operations that send data from all processes
+    to one destination process (i.e., n-to-1) may suffer from waiting times
+    if the destination process enters the operation earlier than its
+    sending counterparts, that is, before any data could have been sent.
+    The pattern refers to the time lost as a result of this situation. It
+    applies to the MPI calls <tt>MPI_Reduce</tt>, <tt>MPI_Gather</tt> and
+    <tt>MPI_Gatherv</tt>.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="EarlyReduce.png" alt="Early Reduce Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_collective">MPI Collective Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_earlyscan"><h3>Early Scan Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    <tt>MPI_Scan</tt> or <tt>MPI_Exscan</tt> operations may suffer from
+    waiting times if the process with rank <i>n</i> enters the operation
+    earlier than its sending counterparts (i.e., ranks 0..<i>n</i>-1). The
+    pattern refers to the time lost as a result of this situation.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="EarlyScan.png" alt="Early Scan Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_collective">MPI Collective Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_latebroadcast"><h3>Late Broadcast Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Collective communication operations that send data from one source
+    process to all processes (i.e., 1-to-n) may suffer from waiting times
+    if destination processes enter the operation earlier than the source
+    process, that is, before any data could have been sent. The pattern
+    refers to the time lost as a result of this situation. It applies to
+    the MPI calls <tt>MPI_Bcast</tt>, <tt>MPI_Scatter</tt> and
+    <tt>MPI_Scatterv</tt>.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="LateBroadcast.png" alt="Late Broadcast Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_collective">MPI Collective Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_wait_nxn"><h3>Wait at N x N Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Collective communication operations that send data from all processes
+    to all processes (i.e., n-to-n) exhibit an inherent synchronization
+    among all participants, that is, no process can finish the operation
+    until the last process has started it. This pattern covers the time
+    spent in n-to-n operations until all processes have reached it. It
+    applies to the MPI calls <tt>MPI_Reduce_scatter</tt>,
+    <tt>MPI_Reduce_scatter_block</tt>, <tt>MPI_Allgather</tt>,
+    <tt>MPI_Allgatherv</tt>, <tt>MPI_Allreduce</tt> and <tt>MPI_Alltoall</tt>.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="WaitAtNxN.png" alt="Wait at N x N Example">
+</div>
+<br>
+
+    </dd><p><dd>
+    Note that the time reported by this pattern is not necessarily
+    completely waiting time since some processes could &ndash; at least
+    theoretically &ndash; already communicate with each other while others
+    have not yet entered the operation.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_collective">MPI Collective Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_nxn_completion"><h3>N x N Completion Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI n-to-n collectives after
+    the first process has left the operation.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="NxNCompletion.png" alt="N x N Completion Example">
+</div>
+<br>
+
+    </dd><p><dd>
+    Note that the time reported by this pattern is not necessarily
+    completely waiting time since some processes could &ndash; at least
+    theoretically &ndash; still communicate with each other while others
+    have already finished communicating and exited the operation.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_collective">MPI Collective Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_idle_threads"><h3>OpenMP Idle threads Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Idle time on CPUs that may be reserved for teams of threads when the
+    process is executing sequentially before and after OpenMP parallel
+    regions, or with less than the full team within OpenMP parallel
+    regions.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="OMPIdle.png" alt="OMP Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    On shared compute resources, unused threads may simply sleep and allow
+    the resources to be used by other applications, however, on dedicated
+    compute resources (or where unused threads busy-wait and thereby occupy
+    the resources) their idle time is charged to the application. 
+    According to Amdahl's Law, the fraction of inherently serial execution
+    time limits the effectiveness of employing additional threads to reduce
+    the execution time of parallel regions. Where the Idle Threads Time is
+    significant, total <a href="#time">Time</a> (and wall-clock execution time) may be
+    reduced by effective parallelization of sections of code which execute
+    serially. Alternatively, the proportion of wasted Idle Threads Time
+    will be reduced by running with fewer threads, albeit resulting in a
+    longer wall-clock execution time but more effective usage of the
+    allocated compute resources.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#time">Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#omp_limited_parallelism">OpenMP Limited parallelism Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_limited_parallelism"><h3>OpenMP Limited parallelism Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Idle time on CPUs that may be reserved for threads within OpenMP
+    parallel regions where not all of the thread team participates.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="OMPLimitedParallelism.png" alt="OMP Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Code sections marked as OpenMP parallel regions which are executed
+    serially (i.e., only by the master thread) or by less than the full
+    team of threads, can result in allocated but unused compute resources
+    being wasted. Typically this arises from insufficient work being
+    available within the marked parallel region to productively employ all
+    threads. This may be because the loop contains too few iterations or
+    the OpenMP runtime has determined that additional threads would not be
+    productive. Alternatively, the OpenMP <tt>omp_set_num_threads</tt> API
+    or <tt>num_threads</tt> or <tt>if</tt> clauses may have been explicitly
+    specified, e.g., to reduce parallel execution overheads such as
+    <a href="#omp_management">OpenMP Management Time</a> or <a href="#omp_synchronization">OpenMP Synchronization Time</a>. If the proportion of
+    OpenMP Limited parallelism Time is significant, it may be more
+    efficient to run with fewer threads for that problem size.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_idle_threads">OpenMP Idle threads Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_time"><h3>OpenMP Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in OpenMP API calls and code generated by the OpenMP compiler.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#execution">Execution Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#omp_flush">OpenMP Flush Time</a>, <a href="#omp_management">OpenMP Management Time</a>, <a href="#omp_synchronization">OpenMP Synchronization Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_flush"><h3>OpenMP Flush Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in OpenMP <tt>flush</tt> directives.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_time">OpenMP Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_management"><h3>OpenMP Management Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent managing teams of threads, creating and initializing them
+    when forking a new parallel region and clearing up afterwards when
+    joining.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="OMPThreadManagement.png" alt="Management Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Management overhead for an OpenMP parallel region depends on the number
+    of threads to be employed and the number of variables to be initialized
+    and saved for each thread, each time the parallel region is executed.
+    Typically a pool of threads is used by the OpenMP runtime system to
+    avoid forking and joining threads in each parallel region, however, 
+    threads from the pool still need to be added to the team and assigned
+    tasks to perform according to the specified schedule. When the overhead
+    is a significant proportion of the time for executing the parallel
+    region, it is worth investigating whether several parallel regions can
+    be combined to amortize thread management overheads. Alternatively, it
+    may be appropriate to reduce the number of threads either for the
+    entire execution or only for this parallel region (e.g., via
+    <tt>num_threads</tt> or <tt>if</tt> clauses).
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_time">OpenMP Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#omp_fork">OpenMP Management Fork Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_fork"><h3>OpenMP Management Fork Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent creating and initializing teams of threads.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="OMPThreadFork.png" alt="Fork Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_management">OpenMP Management Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_synchronization"><h3>OpenMP Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in OpenMP synchronization, whether barriers or mutual exclusion
+    via ordered sequentialization, critical sections, atomics or lock API calls.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_time">OpenMP Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#omp_barrier">OpenMP Barrier Synchronization Time</a>, <a href="#omp_critical">OpenMP Critical Synchronization Time</a>, <a href="#omp_lock_api">OpenMP Lock API Synchronization Time</a>, <a href="#omp_ordered">OpenMP Ordered Synchronization Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_barrier"><h3>OpenMP Barrier Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in implicit (compiler-generated)
+    or explicit (user-specified) OpenMP barrier synchronization. Note that
+    during measurement implicit barriers are treated similar to explicit
+    ones. The instrumentation procedure replaces an implicit barrier with an
+    explicit barrier enclosed by the parallel construct. This is done by
+    adding a nowait clause and a barrier directive as the last statement of
+    the parallel construct. In cases where the implicit barrier cannot be
+    removed (i.e., parallel region), the explicit barrier is executed in
+    front of the implicit barrier, which will then be negligible because the
+    team will already be synchronized when reaching it. The synthetic
+    explicit barrier appears as a special implicit barrier construct.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_synchronization">OpenMP Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#omp_ebarrier">OpenMP Explicit Barrier Synchronization Time</a>, <a href="#omp_ibarrier">OpenMP Implicit Barrier Synchronization Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_ebarrier"><h3>OpenMP Explicit Barrier Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in explicit (i.e., user-specified) OpenMP <tt>barrier</tt>
+    synchronization, both waiting for other threads <a href="#omp_ebarrier_wait">Wait at Explicit OpenMP Barrier Time</a>
+    and inherent barrier processing overhead.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Locate the most costly barrier synchronizations and determine whether
+    they are necessary to ensure correctness or could be safely removed
+    (based on algorithm analysis). Consider replacing an explicit barrier
+    with a potentially more efficient construct, such as a critical section
+    or atomic, or use explicit locks. Examine the time that each thread
+    spends waiting at each explicit barrier, and try to re-distribute
+    preceding work to improve load balance.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_barrier">OpenMP Barrier Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#omp_ebarrier_wait">Wait at Explicit OpenMP Barrier Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_ebarrier_wait"><h3>Wait at Explicit OpenMP Barrier Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in explicit (i.e., user-specified) OpenMP <tt>barrier</tt>
+    synchronization waiting for the last thread.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    A large amount of waiting time at barriers can be an indication of load
+    imbalance. Examine the waiting times for each thread and try to
+    distribute the preceding computation from threads with the shortest
+    waiting times to those with the longest waiting times.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_ebarrier">OpenMP Explicit Barrier Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_ibarrier"><h3>OpenMP Implicit Barrier Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in implicit (i.e., compiler-generated) OpenMP barrier
+    synchronization, both waiting for other threads <a href="#omp_ibarrier_wait">Wait at Implicit OpenMP Barrier Time</a>
+    and inherent barrier processing overhead.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the time that each thread spends waiting at each implicit
+    barrier, and if there is a significant imbalance then investigate
+    whether a <tt>schedule</tt> clause is appropriate. Note that
+    <tt>dynamic</tt> and <tt>guided</tt> schedules may require more
+    <a href="#omp_management">OpenMP Management Time</a> than <tt>static</tt> schedules. Consider whether
+    it is possible to employ the <tt>nowait</tt> clause to reduce the
+    number of implicit barrier synchronizations.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_barrier">OpenMP Barrier Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#omp_ibarrier_wait">Wait at Implicit OpenMP Barrier Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_ibarrier_wait"><h3>Wait at Implicit OpenMP Barrier Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in implicit (i.e., compiler-generated) OpenMP barrier
+    synchronization.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    A large amount of waiting time at barriers can be an indication of load
+    imbalance. Examine the waiting times for each thread and try to
+    distribute the preceding computation from threads with the shortest
+    waiting times to those with the longest waiting times.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_ibarrier">OpenMP Implicit Barrier Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_critical"><h3>OpenMP Critical Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent waiting to enter OpenMP critical sections and in atomics,
+    where mutual exclusion restricts access to a single thread at a time.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Locate the most costly critical sections and atomics and determine
+    whether they are necessary to ensure correctness or could be safely
+    removed (based on algorithm analysis).
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_synchronization">OpenMP Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_lock_api"><h3>OpenMP Lock API Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent in OpenMP API calls dealing with locks.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Locate the most costly usage of locks and determine whether they are
+    necessary to ensure correctness or could be safely removed (based on
+    algorithm analysis). Consider re-writing the algorithm to use lock-free
+    data structures.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_synchronization">OpenMP Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="omp_ordered"><h3>OpenMP Ordered Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Time spent waiting to enter OpenMP <tt>ordered</tt> regions due to enforced
+    sequentialization of loop iteration execution order in the region.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Locate the most costly <tt>ordered</tt> regions and determine
+    whether they are necessary to ensure correctness or could be safely
+    removed (based on algorithm analysis).
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#omp_synchronization">OpenMP Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="syncs"><h3>Synchronizations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This metric provides the total number of MPI synchronization operations
+    that were executed. This not only includes barrier calls, but also
+    communication operations which transfer no data (i.e., zero-sized
+    messages are considered to be used for coordination synchronization).
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#syncs_p2p">Point-to-point Synchronizations</a>, <a href="#syncs_coll">Collective Synchronizations</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="syncs_p2p"><h3>Point-to-point Synchronizations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The total number of MPI point-to-point synchronization
+    operations, i.e., point-to-point transfers of zero-sized messages used
+    for coordination.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Locate the most costly synchronizations and determine whether they are
+    necessary to ensure correctness or could be safely removed (based on
+    algorithm analysis).
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#syncs">Synchronizations</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#syncs_send">Point-to-point Send Synchronizations</a>, <a href="#syncs_recv">Point-to-point Receive Synchronizations</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="syncs_send"><h3>Point-to-point Send Synchronizations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI point-to-point synchronization operations
+    sending a zero-sized message.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#syncs_p2p">Point-to-point Synchronizations</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_slr_count">Late Receiver Instances (Synchronizations)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="syncs_recv"><h3>Point-to-point Receive Synchronizations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI point-to-point synchronization operations
+    receiving a zero-sized message.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#syncs_p2p">Point-to-point Synchronizations</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_sls_count">Late Sender Instances (Synchronizations)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="syncs_coll"><h3>Collective Synchronizations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI collective synchronization operations. This
+    does not only include barrier calls, but also calls to collective
+    communication operations that are neither sending nor receiving any
+    data.  Each process participating in the operation is counted, as
+    defined by the associated MPI communicator.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Locate synchronizations with the largest <a href="#mpi_sync_collective">MPI Collective Synchronization Time</a> and
+    determine whether they are necessary to ensure correctness or could be
+    safely removed (based on algorithm analysis). Collective communication
+    operations that neither send nor receive data, yet are required for
+    synchronization, can be replaced with the more efficient
+    <tt>MPI_Barrier</tt>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#syncs">Synchronizations</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms"><h3>Communications</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The total number of MPI communication operations, excluding
+    calls transferring no data (which are considered <a href="#syncs">Synchronizations</a>).
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#comms_p2p">Point-to-point Communications</a>, <a href="#comms_coll">Collective Communications</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms_p2p"><h3>Point-to-point Communications</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI point-to-point communication operations,
+    excluding calls transferring zero-sized messages.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms">Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#comms_send">Point-to-point Send Communications</a>, <a href="#comms_recv">Point-to-point Receive Communications</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms_send"><h3>Point-to-point Send Communications</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI point-to-point send operations, excluding calls
+    transferring zero-sized messages.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms_p2p">Point-to-point Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_clr_count">Late Receiver Instances (Communications)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms_recv"><h3>Point-to-point Receive Communications</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI point-to-point receive operations, excluding
+    calls transferring zero-sized messages.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms_p2p">Point-to-point Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_cls_count">Late Sender Instances (Communications)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms_coll"><h3>Collective Communications</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI collective communication operations, excluding
+    calls neither sending nor receiving any data.  Each process participating
+    in the operation is counted, as defined by the associated MPI communicator.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Locate operations with the largest <a href="#mpi_collective">MPI Collective Communication Time</a> and compare <a href="#bytes_coll">Collective Bytes Transferred</a>.
+    Where multiple collective operations of the same type are used in series with single
+    values or small payloads, aggregation may be beneficial in amortizing transfer overhead.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms">Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#comms_cxch">Collective Exchange Communications</a>, <a href="#comms_csrc">Collective Communications as Source</a>, <a href="#comms_cdst">Collective Communications as Destination</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms_cxch"><h3>Collective Exchange Communications</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI collective communication operations which are
+    both sending and receiving data.  In addition to all-to-all and scan operations,
+    root processes of certain collectives transfer data from their source to
+    destination buffer.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms_coll">Collective Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms_csrc"><h3>Collective Communications as Source</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI collective communication operations that are
+    only sending but not receiving data.  Examples are the non-root
+    processes in gather and reduction operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms_coll">Collective Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="comms_cdst"><h3>Collective Communications as Destination</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of MPI collective communication operations that are
+    only receiving but not sending data.  Examples are broadcasts
+    and scatters (for ranks other than the root).
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms_coll">Collective Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes"><h3>Bytes Transferred</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The total number of bytes that were notionally processed in
+    MPI communication operations (i.e., the sum of the bytes that were sent
+    and received). Note that the actual number of bytes transferred is
+    typically not determinable, as this is dependant on the MPI internal
+    implementation, including message transfer and failed delivery recovery
+    protocols.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree to break down the bytes transferred into
+    constituent classes. Expand the call tree to identify where most data
+    is transferred and examine the distribution of data transferred by each
+    process.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#bytes_p2p">Point-to-point Bytes Transferred</a>, <a href="#bytes_coll">Collective Bytes Transferred</a>, <a href="#bytes_rma">Remote Memory Access Bytes Transferred</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_p2p"><h3>Point-to-point Bytes Transferred</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The total number of bytes that were notionally processed by
+    MPI point-to-point communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+
+    Expand the calltree to identify where the most data is transferred
+    using point-to-point communication and examine the distribution of data
+    transferred by each process. Compare with the number of <a href="#comms_p2p">Point-to-point Communications</a>
+    and resulting <a href="#mpi_point2point">MPI Point-to-point Communication Time</a>.
+    </dd><p><dd>
+    Average message size can be determined by dividing by the number of MPI
+    <a href="#comms_p2p">Point-to-point Communications</a> (for all call paths or for particular call paths or
+    communication operations). Instead of large numbers of small
+    communications streamed to the same destination, it may be more
+    efficient to pack data into fewer larger messages (e.g., using MPI
+    datatypes). Very large messages may require a rendez-vous between
+    sender and receiver to ensure sufficient transmission and receipt
+    capacity before sending commences: try splitting large messages into
+    smaller ones that can be transferred asynchronously and overlapped with
+    computation. (Some MPI implementations allow tuning of the rendez-vous
+    threshold and/or transmission capacity, e.g., via environment
+    variables.)
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes">Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#bytes_sent">Point-to-point Bytes Sent</a>, <a href="#bytes_rcvd">Point-to-point Bytes Received</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_sent"><h3>Point-to-point Bytes Sent</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of bytes that were notionally sent using MPI
+    point-to-point communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+
+    Expand the calltree to see where the most data is sent using
+    point-to-point communication operations and examine the distribution of
+    data sent by each process. Compare with the number of <a href="#comms_send">Point-to-point Send Communications</a>
+    and resulting <a href="#mpi_point2point">MPI Point-to-point Communication Time</a>.
+    </dd><p><dd>
+    If the <em>aggregate</em> <a href="#bytes_rcvd">Point-to-point Bytes Received</a> is less than the amount
+    sent, some messages were cancelled, received into buffers which were
+    too small, or simply not received at all. (Generally only aggregate
+    values can be compared, since sends and receives take place on
+    different callpaths and on different processes.) Sending more data than
+    is received wastes network bandwidth. Applications do not conform to
+    the MPI standard when they do not receive all messages that are sent,
+    and the unreceived messages degrade performance by consuming network
+    bandwidth and/or occupying message buffers. Cancelling send operations
+    is typically expensive, since it usually generates one or more internal
+    messages.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes_p2p">Point-to-point Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_rcvd"><h3>Point-to-point Bytes Received</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of bytes that were notionally received using MPI
+    point-to-point communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the calltree to see where the most data is received using
+    point-to-point communication and examine the distribution of data
+    received by each process. Compare with the number of <a href="#comms_recv">Point-to-point Receive Communications</a>
+    and resulting <a href="#mpi_point2point">MPI Point-to-point Communication Time</a>.
+    </dd><p><dd>
+    If the <em>aggregate</em> <a href="#bytes_sent">Point-to-point Bytes Sent</a> is greater than the amount
+    received, some messages were cancelled, received into buffers which
+    were too small, or simply not received at all. (Generally only
+    aggregate values can be compared, since sends and receives take place
+    on different callpaths and on different processes.)  Applications do
+    not conform to the MPI standard when they do not receive all messages
+    that are sent, and the unreceived messages degrade performance by
+    consuming network bandwidth and/or occupying message buffers.
+    Cancelling receive operations may be necessary where speculative
+    asynchronous receives are employed, however, managing the associated
+    requests also involves some overhead.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes_p2p">Point-to-point Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_coll"><h3>Collective Bytes Transferred</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The total number of bytes that were notionally processed in
+    MPI collective communication operations. This assumes that collective
+    communications are implemented naively using point-to-point
+    communications, e.g., a broadcast being implemented as sends to each
+    member of the communicator (including the root itself). Note that
+    effective MPI implementations use optimized algorithms and/or special
+    hardware, such that the actual number of bytes transferred may be very
+    different.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the calltree to see where the most data is transferred using
+    collective communication and examine the distribution of data
+    transferred by each process. Compare with the number of
+    <a href="#comms_coll">Collective Communications</a> and resulting <a href="#mpi_collective">MPI Collective Communication Time</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes">Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#bytes_cout">Collective Bytes Outgoing</a>, <a href="#bytes_cin">Collective Bytes Incoming</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_cout"><h3>Collective Bytes Outgoing</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of bytes that were notionally sent by MPI
+    collective communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the calltree to see where the most data is transferred using
+    collective communication and examine the distribution of data outgoing
+    from each process.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes_coll">Collective Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_cin"><h3>Collective Bytes Incoming</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of bytes that were notionally received by MPI
+    collective communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the calltree to see where the most data is transferred using
+    collective communication and examine the distribution of data incoming
+    to each process.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes_coll">Collective Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_rma"><h3>Remote Memory Access Bytes Transferred</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The total number of bytes that were processed by MPI one-sided
+    communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes">Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#bytes_get">Remote Memory Access Bytes Received</a>, <a href="#bytes_put">Remote Memory Access Bytes Sent</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_get"><h3>Remote Memory Access Bytes Received</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of bytes that were gotten using MPI one-sided
+    communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes_rma">Remote Memory Access Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="bytes_put"><h3>Remote Memory Access Bytes Sent</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    The number of bytes that were put using MPI one-sided
+    communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#bytes_rma">Remote Memory Access Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_cls_count"><h3>Late Sender Instances (Communications)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Provides the total number of Late Sender instances ( see
+    <a href="#mpi_latesender">Late Sender Time</a> for details) found in point-to-point communication
+    operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms_recv">Point-to-point Receive Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_clswo_count">Late Sender, Wrong Order Instances (Communications)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_clswo_count"><h3>Late Sender, Wrong Order Instances (Communications)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Provides the total number of Late Sender instances found in
+    point-to-point communication operations were messages where sent in
+    wrong order (see also <a href="#mpi_latesender_wo">Late Sender, Wrong Order Time</a>).
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_cls_count">Late Sender Instances (Communications)</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_clr_count"><h3>Late Receiver Instances (Communications)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Provides the total number of Late Receiver instances (see
+    <a href="#mpi_latereceiver">Late Receiver Time</a> for details) found in point-to-point
+    communication operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#comms_send">Point-to-point Send Communications</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_sls_count"><h3>Late Sender Instances (Synchronizations)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Provides the total number of Late Sender instances (see
+    <a href="#mpi_latesender">Late Sender Time</a> for details) found in point-to-point
+    synchronization operations (i.e., zero-sized message transfers).
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#syncs_recv">Point-to-point Receive Synchronizations</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_slswo_count">Late Sender, Wrong Order Instances (Synchronizations)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_slswo_count"><h3>Late Sender, Wrong Order Instances (Synchronizations)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Provides the total number of Late Sender instances found in
+    point-to-point synchronization operations (i.e., zero-sized message
+    transfers) where messages are received in wrong order (see also
+    <a href="#mpi_latesender_wo">Late Sender, Wrong Order Time</a>).
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_sls_count">Late Sender Instances (Synchronizations)</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_slr_count"><h3>Late Receiver Instances (Synchronizations)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Provides the total number of Late Receiver instances (see
+    <a href="#mpi_latereceiver">Late Receiver Time</a> for details) found in point-to-point
+    synchronization operations (i.e., zero-sized message transfers).
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#syncs_send">Point-to-point Send Synchronizations</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_ops"><h3>MPI File Operations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of MPI file operations of any type.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree to see the breakdown of different classes of MPI
+    file operation, expand the calltree to see where they occur, and look
+    at the distribution of operations done by each process.
+    Compare with the corresponding number of <a href="#mpi_file_bytes">MPI File Bytes Transferred</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_file_iops">MPI File Individual Operations</a>, <a href="#mpi_file_cops">MPI File Collective Operations</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_iops"><h3>MPI File Individual Operations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of individual MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the distribution of individual MPI file operations done by each
+    process and compare with the corresponding number of <a href="#mpi_file_ibytes">MPI File Individual Bytes Transferred</a>
+    and resulting <em>exclusive</em> <a href="#mpi_io">MPI File I/O Time</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_ops">MPI File Operations</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_file_irops">MPI File Individual Read Operations</a>, <a href="#mpi_file_iwops">MPI File Individual Write Operations</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_irops"><h3>MPI File Individual Read Operations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of individual MPI file read operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where individual MPI file reads occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_irbytes">MPI File Individual Bytes Read</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_iops">MPI File Individual Operations</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_iwops"><h3>MPI File Individual Write Operations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of individual MPI file write operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where individual MPI file writes occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_iwbytes">MPI File Individual Bytes Written</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_iops">MPI File Individual Operations</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_cops"><h3>MPI File Collective Operations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of collective MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the distribution of collective MPI file operations done by each
+    process and compare with the corresponding number of <a href="#mpi_file_cbytes">MPI File Collective Bytes Transferred</a>
+    and resulting <a href="#mpi_io_collective">MPI Collective File I/O Time</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_ops">MPI File Operations</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_file_crops">MPI File Collective Read Operations</a>, <a href="#mpi_file_cwops">MPI File Collective Write Operations</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_crops"><h3>MPI File Collective Read Operations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of collective MPI file read operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where collective MPI file reads occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_crbytes">MPI File Collective Bytes Read</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_cops">MPI File Collective Operations</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_cwops"><h3>MPI File Collective Write Operations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of collective MPI file write operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where collective MPI file writes occur and the
+    distribution of operations done by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_cwbytes">MPI File Collective Bytes Written</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_cops">MPI File Collective Operations</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_bytes"><h3>MPI File Bytes Transferred</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of bytes read or written in MPI file operations of any type.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Expand the metric tree to see the breakdown of different classes of MPI
+    file operation, expand the calltree to see where they occur, and look
+    at the distribution of bytes transferred by each process.
+    Compare with the corresponding number of <a href="#mpi_file_ops">MPI File Operations</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_file_ibytes">MPI File Individual Bytes Transferred</a>, <a href="#mpi_file_cbytes">MPI File Collective Bytes Transferred</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_ibytes"><h3>MPI File Individual Bytes Transferred</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of bytes read or written in individual MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the distribution of bytes transferred in individual MPI file operations done by each
+    process and compare with the corresponding number of <a href="#mpi_file_iops">MPI File Individual Operations</a>
+    and resulting <em>exclusive</em> <a href="#mpi_io">MPI File I/O Time</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_bytes">MPI File Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_file_irbytes">MPI File Individual Bytes Read</a>, <a href="#mpi_file_iwbytes">MPI File Individual Bytes Written</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_irbytes"><h3>MPI File Individual Bytes Read</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of bytes read in individual MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where individual MPI file reads occur and the
+    distribution of bytes read by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_irops">MPI File Individual Read Operations</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_ibytes">MPI File Individual Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_iwbytes"><h3>MPI File Individual Bytes Written</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of bytes written in individual MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where individual MPI file writes occur and the
+    distribution of bytes written by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_iwops">MPI File Individual Write Operations</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_ibytes">MPI File Individual Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_cbytes"><h3>MPI File Collective Bytes Transferred</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of bytes read or written in collective MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the distribution of bytes transferred in collective MPI file operations done by each
+    process and compare with the corresponding number of <a href="#mpi_file_cops">MPI File Collective Operations</a>
+    and resulting <a href="#mpi_io_collective">MPI Collective File I/O Time</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_bytes">MPI File Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_file_crbytes">MPI File Collective Bytes Read</a>, <a href="#mpi_file_cwbytes">MPI File Collective Bytes Written</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_crbytes"><h3>MPI File Collective Bytes Read</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of bytes read in collective MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where collective MPI file reads occur and the
+    distribution of bytes read by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_crops">MPI File Collective Read Operations</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_cbytes">MPI File Collective Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_file_cwbytes"><h3>MPI File Collective Bytes Written</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    Number of bytes written in collective MPI file operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Bytes</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Examine the callpaths where collective MPI file writes occur and the
+    distribution of bytes written by each process in them, and compare with
+    the corresponding number of <a href="#mpi_file_cwops">MPI File Collective Write Operations</a>.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_file_cbytes">MPI File Collective Bytes Transferred</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_synchronization"><h3>Remote Memory Access Synchronization Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI remote memory access
+    synchronization calls.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_synchronization">MPI Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_rma_late_post">Late Post Time</a>, <a href="#mpi_rma_early_wait">Early Wait Time</a>, <a href="#mpi_rma_wait_at_fence">Wait at Fence Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_communication"><h3>Remote Memory Access Communication Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI remote memory access
+    communication calls, i.e. MPI_Accumulate, MPI_Put, and MPI_Get.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_communication">MPI Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_rma_early_transfer">Early Transfer Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_late_post"><h3>Late Post Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in the MPI remote memory
+    access 'Late Post' inefficiency pattern.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="RmaLatePost.png" alt="Late Post Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_rma_synchronization">Remote Memory Access Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_early_wait"><h3>Early Wait Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to idle time in MPI_Win_wait, due to an early
+    call to this function, as it will block, until all pending completes
+    have arrived.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="RmaEarlyWait.png" alt="Early Wait Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_rma_synchronization">Remote Memory Access Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_rma_late_complete">Late Complete Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_late_complete"><h3>Late Complete Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in the 'Early Wait' pattern,
+    due to a late complete call.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="RmaLateComplete.png" alt="Late Complete Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_rma_early_wait">Early Wait Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_early_transfer"><h3>Early Transfer Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent waiting in MPI remote memory access 
+    communication routines, i.e. MPI_Accumulate, MPI_Put, and MPI_Get, due to
+    an access before the exposure epoch is opened at the target.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="RmaEarlyTransfer.png" alt="Early Transfer Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_rma_communication">Remote Memory Access Communication Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_wait_at_fence"><h3>Wait at Fence Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent waiting in MPI fence
+    synchronization calls for other participating processes.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="RmaWaitAtFence.png" alt="Wait at Fence Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_rma_synchronization">Remote Memory Access Synchronization Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_rma_early_fence">Early Fence Time</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_early_fence"><h3>Early Fence Time</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the time spent in MPI_Win_fence waiting for
+    outstanding remote memory access operations to this location to
+    finish.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="RmaEarlyFence.png" alt="Early Fence Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_rma_wait_at_fence">Wait at Fence Time</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_pairsync_count"><h3>MPI RMA Pairwise Synchronizations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#mpi_rma_pairsync_unneeded_count">MPI RMA Unneeded Pairwise Synchronizations</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="mpi_rma_pairsync_unneeded_count"><h3>MPI RMA Unneeded Pairwise Synchronizations</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This pattern refers to the number of pairwise synchronizations done
+    with MPI RMA active target synchronization mechanisms that do not
+    complete rma operations.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Counts</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#mpi_rma_pairsync_count">MPI RMA Pairwise Synchronizations</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="imbalance"><h3>Computational load imbalance heuristic</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This simple heuristic allows to identify computational load imbalances and
+    is calculated for each (call-path, process/thread) pair. Its value
+    represents the absolute difference to the average exclusive execution
+    time. This average value is the aggregated exclusive time spent by all
+    processes/threads in this call-path, divided by the number of
+    processes/threads visiting it.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="Imbalance.png" alt="Computational load imbalance Example">
+</div>
+<br>
+
+    </dd><p><dd>
+    <b>Note:</b>
+    A high value for a collapsed call tree node does not necessarily mean that
+    there is a load imbalance in this particular node, but the imbalance can
+    also be somewhere in the subtree underneath.  Unused threads outside
+    of OpenMP parallel regions are considered to constitute <a href="#omp_idle_threads">OpenMP Idle threads Time</a>
+    and expressly excluded from the computational load imbalance heuristic.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    Total load imbalance comprises both above average computation time
+    and below average computation time, therefore at most half of it could
+    potentially be recovered with perfect (zero-overhead) load balance
+    that distributed the excess from overloaded to unloaded
+    processes/threads, such that all took exactly the same time.
+    </dd><p><dd>
+    Computation imbalance is often the origin of communication and
+    synchronization inefficiencies, where processes/threads block and
+    must wait idle for partners, however, work partitioning and
+    parallelization overheads may be prohibitive for complex computations
+    or unproductive for short computations.  Replicating computation on
+    all processes/threads will eliminate imbalance, but would typically
+    not result in recover of this imbalance time (though it may reduce
+    associated communication and synchronization requirements).
+    </dd><p><dd>
+    Call-paths with significant amounts of computational imbalance should
+    be examined, along with processes/threads with above/below-average
+    computation time, to identify parallelization inefficiencies.  Call-paths
+    executed by a subset of processes/threads may relate to parallelization
+    that hasn't been fully realized (<a href="#imbalance_below_bypass">Computational load imbalance heuristic (non-participation)</a>), whereas
+    call-paths executed only by a single process/thread
+    (<a href="#imbalance_above_single">Computational load imbalance heuristic (single participant)</a>) often represent unparallelized serial code,
+    which will be scalability impediments as the number of processes/threads
+    increase.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd>None</dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#imbalance_above">Computational load imbalance heuristic (overload)</a>, <a href="#imbalance_below">Computational load imbalance heuristic (underload)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="imbalance_above"><h3>Computational load imbalance heuristic (overload)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This metric identifies processes/threads where the exclusive execution
+    time spent for a particular call-path was above the average value.
+    It is a complement to <a href="#imbalance_below">Computational load imbalance heuristic (underload)</a>.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="Imbal_Overload.png" alt="Overload Example">
+</div>
+<br>
+
+    </dd><p><dd>
+    See <a href="#imbalance">Computational load imbalance heuristic</a> for details on how this heuristic is calculated.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+     The CPU time which is above the average time for computation is the
+     maximum that could potentially be recovered with perfect (zero-overhead)
+     load balance that distributed the excess from overloaded to underloaded
+     processes/threads.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#imbalance">Computational load imbalance heuristic</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#imbalance_above_single">Computational load imbalance heuristic (single participant)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="imbalance_above_single"><h3>Computational load imbalance heuristic (single participant)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This heuristic distinguishes the execution time for call-paths executed
+    by single processes/threads that potentially could be recovered with
+    perfect parallelization using all available processes/threads.
+    </dd><p><dd>
+    It is the <a href="#imbalance_above">Computational load imbalance heuristic (overload)</a> time for call-paths that only have
+    non-zero <a href="#visits">Visits</a> for one process or thread, and complements
+    <a href="#imbalance_below_singularity">Computational load imbalance heuristic (non-participation in singularity)</a>.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="Imbal_Single.png" alt="Single participant Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    This time is often associated with activities done exclusively by a
+    "Master" process/thread (often rank 0) such as initialization,
+    finalization or I/O, but can apply to any process/thread that
+    performs computation that none of its peers do (or that does its
+    computation on a call-path that differs from the others).
+    </dd><p><dd>
+    The CPU time for singular execution of the particular call-path
+    typically presents a serial bottleneck impeding scalability as none of
+    the other available processes/threads are being used, and
+    they may well wait idling until the result of this computation becomes
+    available.  (Check the MPI communication and synchronization times,
+    particularly waiting times, for proximate call-paths.)
+    In such cases, even small amounts of singular execution can
+    have substantial impact on overall performance and parallel efficiency.
+    With perfect partitioning and (zero-overhead) parallel
+    execution of the computation, it would be possible to recover this time.
+    </dd><p><dd>
+    When the amount of time is small compared to the total execution time,
+    or when the cost of parallelization is prohibitive, it may not be
+    worth trying to eliminate this inefficiency.  As the number of
+    processes/threads are increased and/or total execution time decreases,
+    however, the relative impact of this inefficiency can be expected to grow.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#imbalance_above">Computational load imbalance heuristic (overload)</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="imbalance_below"><h3>Computational load imbalance heuristic (underload)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This metric identifies processes/threads where the exclusive execution
+    time spent for a particular call-path was below the average value.
+    It is a complement to <a href="#imbalance_above">Computational load imbalance heuristic (overload)</a>.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="Imbal_Underload.png" alt="Underload Example">
+</div>
+<br>
+
+    </dd><p><dd>
+    See <a href="#imbalance">Computational load imbalance heuristic</a> for details on how this heuristic is calculated.
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+      The CPU time which is below the average time for computation could 
+      potentially be used to reduce the excess from overloaded processes/threads
+      with perfect (zero-overhead) load balancing.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#imbalance">Computational load imbalance heuristic</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#imbalance_below_bypass">Computational load imbalance heuristic (non-participation)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="imbalance_below_bypass"><h3>Computational load imbalance heuristic (non-participation)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This heuristic distinguishes the execution time for call-paths not executed
+    by a subset of processes/threads that potentially could be used with
+    perfect parallelization using all available processes/threads.
+    </dd><p><dd>
+    It is the <a href="#imbalance_below">Computational load imbalance heuristic (underload)</a> time for call-paths which have zero
+    <a href="#visits">Visits</a> and were therefore not executed by this process/thread.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="Imbal_Bypass.png" alt="Non-participation Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    The CPU time used for call-paths where not all processes or threads
+    are exploited typically presents an ineffective parallelization that
+    limits scalability, if the unused processes/threads wait idling for
+    the result of this computation to become available.  With perfect
+    partitioning and (zero-overhead) parallel execution of the computation,
+    it would be possible to recover this time.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#imbalance_below">Computational load imbalance heuristic (underload)</a></dd>
+<dt><b>Children:</b></dt>
+<dd><a href="#imbalance_below_singularity">Computational load imbalance heuristic (non-participation in singularity)</a></dd>
+</dl>
+
+<hr width="75%" align="center">
+
+<a name="imbalance_below_singularity"><h3>Computational load imbalance heuristic (non-participation in singularity)</h3></a>
+<dl>
+<dt><b>Description:</b></dt>
+<dd>
+    This heuristic distinguishes the execution time for call-paths not executed
+    by all but a single process/thread that potentially could be recovered with
+    perfect parallelization using all available processes/threads.
+    </dd><p><dd>
+    It is the <a href="#imbalance_below">Computational load imbalance heuristic (underload)</a> time for call paths that only have
+    non-zero <a href="#visits">Visits</a> for one process/thread, and complements
+    <a href="#imbalance_above_single">Computational load imbalance heuristic (single participant)</a>.
+    </dd><p><dd>
+    <br>
+<div align="center">
+<img src="Imbal_Singularity.png" alt="Singularity Example">
+</div>
+<br>
+
+</dd>
+<dt><b>Unit:</b></dt>
+<dd>Seconds</dd>
+<dt><b>Diagnosis:</b></dt>
+<dd>
+    The CPU time for singular execution of the particular call-path
+    typically presents a serial bottleneck impeding scalability as none of
+    the other processes/threads that are available are being used, and
+    they may well wait idling until the result of this computation becomes
+    available.  With perfect partitioning and (zero-overhead) parallel
+    execution of the computation, it would be possible to recover this time.
+</dd>
+<dt><b>Parent:</b></dt>
+<dd><a href="#imbalance_below_bypass">Computational load imbalance heuristic (non-participation)</a></dd>
+<dt><b>Children:</b></dt>
+<dd>None</dd>
+</dl>
+
+<hr>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td><img src="logo_small.png" alt="SCALASCA"></td>
+<td>&nbsp;&nbsp;</td>
+<td>
+Copyright &copy; 1998-2013 Forschungszentrum J&uuml;lich GmbH
+</td>
+</tr>
+</table>
+</body>
+</html>

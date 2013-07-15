@@ -1,0 +1,829 @@
+/* -- manually modified -- not automatically generated version -------------- */
+/* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
+
+
+/* -- EPILOG Internal -- */
+
+void ElgGen_write_LOG_OFF(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[]) {
+  elg_ui1 type   = ELG_LOG_OFF;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}
+
+void ElgGen_write_LOG_ON(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[]) {
+  elg_ui1 type   = ELG_LOG_ON;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}
+
+void ElgGen_write_ENTER_TRACING(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[]) {
+#ifdef USE_ELG_ENTER_TRACING
+  elg_ui1 type   = ELG_ENTER_TRACING;
+#else
+  elg_ui1 type   = ELG_ENTER;
+  elg_ui4 rid    = esd_tracing_rid;
+#endif
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+#ifndef USE_ELG_ENTER_TRACING
+    sizeof(rid) +
+#endif
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  /* NB: No ELGGEN_ALLOC since space reserved at buffer creation */
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+#ifndef USE_ELG_ENTER_TRACING
+  ELGGEN_COPY_NUM(gen, rid);
+#endif
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}
+
+void ElgGen_write_EXIT_TRACING(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[]) {
+#ifdef USE_ELG_ENTER_TRACING
+  elg_ui1 type   = ELG_EXIT_TRACING;
+#else
+  elg_ui1 type   = ELG_EXIT;
+  /*elg_ui4 rid    = esd_tracing_rid; */
+#endif
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+#ifndef USE_ELG_ENTER_TRACING
+  /*sizeof(rid)*/ (0) +
+#endif
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+#ifndef USE_ELG_ENTER_TRACING
+/*ELGGEN_COPY_NUM(gen, rid);*/
+#endif
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}
+
+/* -- Region -- */
+
+void ElgGen_write_ENTER(ElgGen* gen, elg_ui4 rid, elg_ui1 metc, elg_ui8 metv[]) {
+  elg_ui1 type   = ELG_ENTER;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(rid) +
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, rid);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}
+
+void ElgGen_write_ENTER_CS(ElgGen* gen, elg_ui4 csid,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  elg_ui1 type   = ELG_ENTER_CS;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(csid) +
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, csid);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}
+
+void ElgGen_write_EXIT(ElgGen* gen, /*elg_ui4 rid,*/ elg_ui1 metc, elg_ui8 metv[]) {
+  elg_ui1 type   = ELG_EXIT;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+  /*sizeof(rid)*/ (0) +
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+/*ELGGEN_COPY_NUM(gen, rid);*/
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}
+
+/* -- MPI-1 -- */
+
+void ElgGen_write_MPI_SEND(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+        elg_ui4 dpid, elg_ui4 cid, elg_ui4 tag, elg_ui4 sent) {
+  elg_ui1 type   = ELG_MPI_SEND;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(cid) +
+    sizeof(tag) +
+    sizeof(sent);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, cid);
+  ELGGEN_COPY_NUM(gen, tag);
+  ELGGEN_COPY_NUM(gen, sent);
+}
+
+void ElgGen_write_MPI_RECV(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+        elg_ui4 spid, elg_ui4 cid, elg_ui4 tag, elg_ui4 recvd) {
+  elg_ui1 type   = ELG_MPI_RECV;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(spid) +
+    sizeof(cid) +
+    sizeof(tag) +
+  /*sizeof(recvd)*/ (0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, spid);
+  ELGGEN_COPY_NUM(gen, cid);
+  ELGGEN_COPY_NUM(gen, tag);
+/*ELGGEN_COPY_NUM(gen, recvd);*/
+}
+
+void ElgGen_write_MPI_COLLEXIT(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+       elg_ui4 rid, elg_ui4 rpid, elg_ui4 cid, elg_ui4 sent, elg_ui4 recvd) {
+  elg_ui1 type   = ELG_MPI_COLLEXIT;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    (metc ? metc * sizeof(elg_ui8) : 0) +
+  /*sizeof(rid)*/ (0) +
+    sizeof(rpid) +
+    sizeof(cid) +
+    sizeof(sent) +
+    sizeof(recvd);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+/*ELGGEN_COPY_NUM(gen, rid);*/
+  ELGGEN_COPY_NUM(gen, rpid);
+  ELGGEN_COPY_NUM(gen, cid);
+  ELGGEN_COPY_NUM(gen, sent);
+  ELGGEN_COPY_NUM(gen, recvd);
+}
+
+void ElgGen_write_MPI_SEND_COMPLETE(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+       elg_ui4 reqid) {
+  elg_ui1 type   = ELG_MPI_SEND_COMPLETE;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(reqid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, reqid);
+}
+
+void ElgGen_write_MPI_RECV_REQUEST(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+        elg_ui4 reqid) {
+  elg_ui1 type   = ELG_MPI_RECV_REQUEST;
+  elg_ui8  time  = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(reqid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, reqid);
+}
+
+void ElgGen_write_MPI_REQUEST_TESTED(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+        elg_ui4 reqid) {
+  elg_ui1 type   = ELG_MPI_REQUEST_TESTED;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(reqid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, reqid);
+}
+
+void ElgGen_write_MPI_CANCELLED(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[], 
+        elg_ui4 reqid) {
+  elg_ui1 type   = ELG_MPI_CANCELLED;
+  elg_ui8  time  = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(reqid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, reqid);
+}
+
+/* -- MPI-2 One-sided Operations -- */
+
+void ElgGen_write_MPI_PUT_1TS(ElgGen* gen, elg_ui4 dpid, elg_ui4 wid,
+       elg_ui4 rmaid, elg_ui4 nbytes) {
+  elg_ui1 type   = ELG_MPI_PUT_1TS;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(wid) +
+    sizeof(rmaid) +
+    sizeof(nbytes);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+  ELGGEN_COPY_NUM(gen, nbytes);
+}
+
+void ElgGen_write_MPI_PUT_1TE(ElgGen* gen, elg_ui4 spid, elg_ui4 wid,
+       elg_ui4 rmaid) {
+  elg_ui1 type   = ELG_MPI_PUT_1TE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(spid) +
+    sizeof(wid) +
+    sizeof(rmaid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, spid);
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+}
+
+void ElgGen_write_MPI_PUT_1TE_REMOTE(ElgGen* gen, elg_ui4 dpid, elg_ui4 wid,
+       elg_ui4 rmaid) {
+  elg_ui1 type   = ELG_MPI_PUT_1TE_REMOTE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(wid) +
+    sizeof(rmaid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+}
+
+void ElgGen_write_MPI_GET_1TS(ElgGen* gen, elg_ui4 dpid, elg_ui4 wid,
+       elg_ui4 rmaid, elg_ui4 nbytes) {
+  elg_ui1 type   = ELG_MPI_GET_1TS;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(wid) +
+    sizeof(rmaid) +
+    sizeof(nbytes);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+  ELGGEN_COPY_NUM(gen, nbytes);
+}
+
+void ElgGen_write_MPI_GET_1TS_REMOTE(ElgGen* gen, elg_ui4 dpid, elg_ui4 wid,
+       elg_ui4 rmaid, elg_ui4 nbytes) {
+  elg_ui1 type   = ELG_MPI_GET_1TS_REMOTE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(wid) +
+    sizeof(rmaid) +
+    sizeof(nbytes);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+  ELGGEN_COPY_NUM(gen, nbytes);
+}
+
+void ElgGen_write_MPI_GET_1TE(ElgGen* gen, elg_ui4 spid, elg_ui4 wid,
+       elg_ui4 rmaid) {
+  elg_ui1 type   = ELG_MPI_GET_1TE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(spid) +
+    sizeof(wid) +
+    sizeof(rmaid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, spid);
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+}
+
+void ElgGen_write_MPI_WINEXIT(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+       /*elg_ui4 rid,*/ elg_ui4 wid, elg_ui4 cid, elg_ui1 synex) {
+  elg_ui1 type   = ELG_MPI_WINEXIT;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    (metc ? metc * sizeof(elg_ui8) : 0) +
+  /*sizeof(rid)*/ (0) +
+    sizeof(wid) +
+    sizeof(cid) +
+    sizeof(synex);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+/*ELGGEN_COPY_NUM(gen, rid);*/
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, cid);
+  ELGGEN_COPY_NUM(gen, synex);
+}
+
+void ElgGen_write_MPI_WINCOLLEXIT(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+       /*elg_ui4 rid,*/ elg_ui4 wid) {
+  elg_ui1 type   = ELG_MPI_WINCOLLEXIT;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+    (metc ? metc * sizeof(elg_ui8) : 0) +
+  /*sizeof(rid)*/ (0) +
+    sizeof(wid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+/*ELGGEN_COPY_NUM(gen, rid);*/
+  ELGGEN_COPY_NUM(gen, wid);
+}
+
+void ElgGen_write_MPI_WIN_LOCK(ElgGen* gen, elg_ui4 lpid, elg_ui4 wid,
+       elg_ui1 ltype) {
+  elg_ui1 type   = ELG_MPI_WIN_LOCK;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(lpid) +
+    sizeof(wid) +
+    sizeof(ltype);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, lpid);
+  ELGGEN_COPY_NUM(gen, wid);
+  ELGGEN_COPY_NUM(gen, ltype);
+}
+
+void ElgGen_write_MPI_WIN_UNLOCK(ElgGen* gen, elg_ui4 lpid, elg_ui4 wid) {
+  elg_ui1 type   = ELG_MPI_WIN_UNLOCK;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(lpid) +
+    sizeof(wid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, lpid);
+  ELGGEN_COPY_NUM(gen, wid);
+}
+
+/* -- Generic One-sided Operations -- */
+
+void ElgGen_write_PUT_1TS(ElgGen* gen, elg_ui4 dpid, elg_ui4 rmaid,
+       elg_ui4 nbytes) {
+  elg_ui1 type   = ELG_PUT_1TS;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(rmaid) +
+    sizeof(nbytes);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+  ELGGEN_COPY_NUM(gen, nbytes);
+}
+
+void ElgGen_write_PUT_1TE(ElgGen* gen, elg_ui4 spid, elg_ui4 rmaid) {
+  elg_ui1 type   = ELG_PUT_1TE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(spid) +
+    sizeof(rmaid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, spid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+}
+
+void ElgGen_write_PUT_1TE_REMOTE(ElgGen* gen, elg_ui4 dpid, elg_ui4 rmaid) {
+  elg_ui1 type   = ELG_PUT_1TE_REMOTE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(rmaid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+}
+
+void ElgGen_write_GET_1TS(ElgGen* gen, elg_ui4 dpid, elg_ui4 rmaid,
+       elg_ui4 nbytes) {
+  elg_ui1 type   = ELG_GET_1TS;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(rmaid) +
+    sizeof(nbytes);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+  ELGGEN_COPY_NUM(gen, nbytes);
+}
+
+void ElgGen_write_GET_1TS_REMOTE(ElgGen* gen, elg_ui4 dpid, elg_ui4 rmaid,
+       elg_ui4 nbytes) {
+  elg_ui1 type   = ELG_GET_1TS_REMOTE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(dpid) +
+    sizeof(rmaid) +
+    sizeof(nbytes);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, dpid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+  ELGGEN_COPY_NUM(gen, nbytes);
+}
+
+void ElgGen_write_GET_1TE(ElgGen* gen, elg_ui4 spid, elg_ui4 rmaid) {
+  elg_ui1 type   = ELG_GET_1TE;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(spid) +
+    sizeof(rmaid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, spid);
+  ELGGEN_COPY_NUM(gen, rmaid);
+}
+
+void ElgGen_write_COLLEXIT(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[],
+       /*elg_ui4 rid,*/ elg_ui4 rpid, elg_ui4 cid, elg_ui4 sent, elg_ui4 recvd) {
+  elg_ui1 type   = ELG_COLLEXIT;
+  elg_ui8 time   = metv[metc]; /* actually a double */
+  elg_ui1 length =
+    sizeof(time) +
+    (metc ? metc * sizeof(elg_ui8) : 0) +
+  /*sizeof(rid)*/ (0) +
+    sizeof(rpid) +
+    sizeof(cid) +
+    sizeof(sent) +
+    sizeof(recvd);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+/*ELGGEN_COPY_NUM(gen, rid);*/
+  ELGGEN_COPY_NUM(gen, rpid);
+  ELGGEN_COPY_NUM(gen, cid);
+  ELGGEN_COPY_NUM(gen, sent);
+  ELGGEN_COPY_NUM(gen, recvd);
+}
+
+void ElgGen_write_ALOCK(ElgGen* gen, elg_ui4 lkid) {
+  elg_ui1 type   = ELG_ALOCK;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(lkid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, lkid);
+}
+
+void ElgGen_write_RLOCK(ElgGen* gen, elg_ui4 lkid) {
+  elg_ui1 type   = ELG_RLOCK;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(lkid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, lkid);
+}
+
+/* -- OpenMP -- */
+
+void ElgGen_write_OMP_FORK(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[]) {
+  elg_ui1 type   = ELG_OMP_FORK;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+}
+
+void ElgGen_write_OMP_JOIN(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[]) {
+  elg_ui1 type   = ELG_OMP_JOIN;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+}
+
+void ElgGen_write_OMP_ALOCK(ElgGen* gen, elg_ui4 lkid) {
+  elg_ui1 type   = ELG_OMP_ALOCK;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(lkid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, lkid);
+}
+
+void ElgGen_write_OMP_RLOCK(ElgGen* gen, elg_ui4 lkid) {
+  elg_ui1 type   = ELG_OMP_RLOCK;
+  elg_d8  time   = elg_pform_wtime();
+  elg_ui1 length =
+    sizeof(time) +
+    sizeof(lkid);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+  ELGGEN_COPY_NUM(gen, lkid);
+}
+
+void ElgGen_write_OMP_COLLEXIT(ElgGen* gen, elg_ui1 metc, elg_ui8 metv[]
+        /*, elg_ui4 rid*/ ) {
+  elg_ui1 type   = ELG_OMP_COLLEXIT;
+  elg_ui8 time   = metv[metc]; /* actually double */
+  elg_ui1 length =
+    sizeof(time) +
+  /*sizeof(rid)*/ (0) +
+    (metc ? metc * sizeof(elg_ui8) : 0);
+
+  ELGGEN_CHECK(gen, type);
+  ELGGEN_ALLOC(gen, sizeof(length) + sizeof(type) + length);
+
+  ELGGEN_COPY_NUM(gen, length);
+  ELGGEN_COPY_NUM(gen, type);
+  ELGGEN_COPY_NUM(gen, time);
+/*ELGGEN_COPY_NUM(gen, rid);*/
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGGEN_COPY_NUM(gen, metv[i]);
+      }
+  }
+}

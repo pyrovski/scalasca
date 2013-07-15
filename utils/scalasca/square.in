@@ -1,0 +1,254 @@
+#!/bin/sh
+#/****************************************************************************
+#**  SCALASCA    http://www.scalasca.org/                                   **
+#*****************************************************************************
+#**  Copyright (c) 1998-2013                                                **
+#**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+#**                                                                         **
+#**  See the file COPYRIGHT in the package base directory for details       **
+#****************************************************************************/
+
+
+# "Constants"
+VERSION="1.4.3"
+BINDIR=`dirname $0`
+DOCDIR=@DOCDIR@
+MAPPER="${BINDIR}/cube3_remap"
+MERGER="${BINDIR}/cube3_merge"
+SCORER="${BINDIR}/cube3_score"
+VIEWER="cube3"
+
+# Variables
+unset FILE
+unset FILTER
+unset FORCE
+unset VIEW
+QUIET=">/dev/null"
+
+# show usage when executed without argument
+if [ $# -eq 0 ]; then
+  echo "SCALASCA $VERSION: analysis report explorer"
+  echo "usage: `basename $0` [-v] [-s] [-f filtfile] [-F] <experiment archive | cube file>"
+  echo "   -F          : Force remapping of already existing reports"
+  echo "   -f filtfile : Use specified filter file when doing scoring"
+  echo "   -s          : Skip display and output textual score report"
+  echo "   -v          : Enable verbose mode"
+  exit 1
+fi
+
+# Process command line arguments
+while getopts ":Ff:sv" arg; do
+  case $arg in
+    F)      # force remap
+      FORCE=yes
+      ;;
+
+    f)      # score filter
+      FILTER=$OPTARG
+      if [ ! -f ${FILTER} ]; then
+        echo "ERROR: Filter file \"${FILTER}\" not found!"
+        exit 1
+      fi
+      ;;
+
+    s)      # score & skip display
+      VIEW=no
+      ;;
+
+    v)      # verbose
+      unset QUIET
+      ;;
+
+    *)      # unknown -> print usage
+      exec $0 # usage
+      ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# Validate remaining command line
+if [ $# -ne 1 ]; then
+  exec $0 # usage
+fi
+
+# Process file/directory
+if [ -f $1 ]; then
+  FILE="$1"
+else
+  # Verify experiment archive
+  ARCHIVE=`dirname $1`/`basename $1 /`
+  if [ ! -d ${ARCHIVE} ]; then
+    echo "ERROR: Missing experiment archive '${ARCHIVE}'!"
+    exit 1
+  fi
+
+  # Verify experiment unlocked
+  if [ -f ${ARCHIVE}/epik.lock ]; then
+    echo "ERROR: Experiment archive '${ARCHIVE}' still locked!"
+    exit 1
+  fi
+
+  CUBE_FILES=`ls ${ARCHIVE}/*.cube ${ARCHIVE}/*.cube.gz 2> /dev/null | wc -l`
+  if [ ${CUBE_FILES} -eq 0 ]; then
+    echo "ERROR: No CUBE file in experiment archive '${ARCHIVE}'!"
+    exit 1
+  fi
+
+  # Check which files are available or need to be remapped
+  if [ -f ${ARCHIVE}/epitome.cube ]; then
+    NEWER1=`find ${ARCHIVE}/epitome.cube -prune -newer ${ARCHIVE}/summary.cube 2>/dev/null`
+    NEWER2=`find ${ARCHIVE}/epitome.cube -prune -newer ${ARCHIVE}/summary.cube.gz 2>/dev/null`
+    if [ -n "$FORCE" ] ||
+       [ ! -f ${ARCHIVE}/summary.cube -a ! -f ${ARCHIVE}/summary.cube.gz ] ||
+       [ -n "${NEWER1}" -a -n "${NEWER2}" ]; then
+      # Check availability of remapper
+      if [ ! -x "${MAPPER}" ]; then
+        echo "ERROR: ${MAPPER} is either not available or not executable!"
+        exit 1
+      fi
+      # Verify writability of experiment archive
+      if [ ! -w ${ARCHIVE} ]; then
+        echo "ERROR: Experiment archive ${ARCHIVE} needs to be writable!"
+        exit 1
+      fi
+      echo "INFO: Post-processing runtime summarization report..."
+      eval "${MAPPER} -o ${ARCHIVE}/remap.out ${ARCHIVE}/epitome.cube ${QUIET}"
+      UNZIPPED=`head -1 ${ARCHIVE}/remap.out | cut -c1-10 | grep xml`
+      if [ -z "${UNZIPPED}" ]; then
+        mv ${ARCHIVE}/remap.out ${ARCHIVE}/summary.cube.gz
+      else
+        mv ${ARCHIVE}/remap.out ${ARCHIVE}/summary.cube
+      fi
+    fi
+  fi
+  if [ -f ${ARCHIVE}/scout.cube ]; then
+    NEWER1=`find ${ARCHIVE}/scout.cube -prune -newer ${ARCHIVE}/trace.cube 2>/dev/null`
+    NEWER2=`find ${ARCHIVE}/scout.cube -prune -newer ${ARCHIVE}/trace.cube.gz 2>/dev/null`
+    if [ -n "$FORCE" ] ||
+       [ ! -f ${ARCHIVE}/trace.cube -a ! -f ${ARCHIVE}/trace.cube.gz ] ||
+       [ -n "${NEWER1}" -a -n "${NEWER2}" ]; then
+      # Check availability of remapper
+      if [ ! -x "${MAPPER}" ]; then
+        echo "ERROR: ${MAPPER} is either not available or not executable!"
+        exit 1
+      fi
+      # Verify writability of experiment archive
+      if [ ! -w ${ARCHIVE} ]; then
+        echo "ERROR: Experiment archive ${ARCHIVE} needs to be writable!"
+        exit 1
+      fi
+      echo "INFO: Post-processing trace analysis report..."
+      eval "${MAPPER} -o ${ARCHIVE}/remap.out ${ARCHIVE}/scout.cube ${QUIET}"
+      UNZIPPED=`head -1 ${ARCHIVE}/remap.out | cut -c1-10 | grep xml`
+      if [ -z "${UNZIPPED}" ]; then
+        mv ${ARCHIVE}/remap.out ${ARCHIVE}/trace.cube.gz
+      else
+        mv ${ARCHIVE}/remap.out ${ARCHIVE}/trace.cube
+      fi
+    fi
+  fi
+
+  # Check whether to merge reports
+  CONF=${ARCHIVE}/epik.conf
+  LAST_T=`/bin/ls -1tr ${ARCHIVE}/trace.cube* 2>/dev/null | head -1`
+  LAST_S=`/bin/ls -1tr ${ARCHIVE}/summary.cube* 2>/dev/null | head -1`
+  if [ -f ${CONF} ] && [ -f "${LAST_T}" ] && [ -f "${LAST_S}" ]; then
+    # Got all necessary files
+    METRICS=`grep 'EPK_METRICS =' $CONF | cut -d= -f2`
+    if [ ${#METRICS} -gt 1 ]; then
+      # Worth merging HWC metrics from summary with trace cubefile
+      MERGED=${ARCHIVE}/trace+HWC.cube
+      OLDER1=`find ${MERGED}* -prune -newer ${LAST_T} 2>/dev/null`
+      OLDER2=`find ${MERGED}* -prune -newer ${LAST_S} 2>/dev/null`
+      if [ -n "$FORCE" ] || [ -z "${OLDER1}" ] || [ -z "${OLDER2}" ]; then
+        # Check availability of merger
+        if [ ! -x "${MERGER}" ]; then
+          echo "ERROR: ${MERGER} is either not available or not executable!"
+          exit 1
+        fi
+        # Verify writability of experiment archive
+        if [ ! -w ${ARCHIVE} ]; then
+          echo "ERROR: Experiment archive ${ARCHIVE} needs to be writable!"
+          exit 1
+        fi
+        echo "INFO: Merging trace and HWC summary analysis reports..."
+        eval "${MERGER} -o ${ARCHIVE}/merge.out ${LAST_T} ${LAST_S} ${QUIET}"
+        UNZIPPED=`head -1 ${ARCHIVE}/merge.out | cut -c1-10 | grep xml`
+        if [ -z "${UNZIPPED}" ]; then
+          mv ${ARCHIVE}/merge.out ${MERGED}.gz
+        else
+          mv ${ARCHIVE}/merge.out ${MERGED}
+        fi
+        if [ -f ${ARCHIVE}/trace.stat ]; then
+           (cd ${ARCHIVE}; ln -s -f trace.stat trace+HWC.stat)
+        fi
+      fi
+    fi
+  fi
+
+  if [ -z "${FILE}" ]; then
+     # Check for existing file (in order of preference)
+     [ -f ${ARCHIVE}/summary.cube ] && FILE=${ARCHIVE}/summary.cube
+     [ -f ${ARCHIVE}/summary.cube.gz ] && FILE=${ARCHIVE}/summary.cube.gz
+     [ -f ${ARCHIVE}/trace.cube ] && FILE=${ARCHIVE}/trace.cube
+     [ -f ${ARCHIVE}/trace.cube.gz ] && FILE=${ARCHIVE}/trace.cube.gz
+     [ -f ${ARCHIVE}/trace+HWC.cube ] && FILE=${ARCHIVE}/trace+HWC.cube
+     [ -f ${ARCHIVE}/trace+HWC.cube.gz ] && FILE=${ARCHIVE}/trace+HWC.cube.gz
+  fi
+
+  # Always override by expert for now
+  [ -f ${ARCHIVE}/expert.cube ] && FILE=${ARCHIVE}/expert.cube
+  [ -f ${ARCHIVE}/expert.cube.gz ] && FILE=${ARCHIVE}/expert.cube.gz
+
+  if [ -z "${FILE}" ] && [ ${CUBE_FILES} -eq 0 ]; then
+    echo "ERROR: No known CUBE file in experiment archive '${ARCHIVE}'!"
+    exit 1
+  fi
+fi
+
+# Check whether to score analysis report
+if [ "${VIEW}" = "no" ]; then
+    # Check availability of scorer
+    if [ ! -x "${SCORER}" ]; then
+      echo "ERROR: ${SCORER} is either not available or not executable!"
+      exit 1
+    fi
+    SCORE=${ARCHIVE}/epik.score
+    if [ -n "${FILTER}" ]; then
+        SCORE=${SCORE}_`basename ${FILTER}`
+        SCORER="${SCORER} -f ${FILTER}"
+    fi
+    echo "${SCORER} -r ${FILE} > ${SCORE}"
+    eval "${SCORER} -r ${FILE} > ${SCORE}"
+    echo "INFO: Score report written to ${SCORE}"
+    exit 0
+fi
+
+if [ -n "${FILTER}" ]; then
+    echo "INFO: Ignoring specified filter \"${FILTER}\" when not scoring!"
+fi
+
+# Check availability of CUBE viewer
+CUBE3=`which $VIEWER 2>/dev/null`
+case "$CUBE3" in
+    */$VIEWER)
+        eval "echo INFO: Found CUBE viewer $CUBE3 $QUIET"
+        VIEWER=$CUBE3
+        ;;
+    *)
+        # check installation directory
+        if [ ! -x "${BINDIR}/${VIEWER}" ]; then
+            echo "ERROR: Unable to detect suitable CUBE viewer!"
+            exit 1
+        fi
+        VIEWER="${BINDIR}/${VIEWER}"
+        ;;
+esac
+
+if [ -n "$FILE" ]; then
+  echo "INFO: Displaying ${FILE}..."
+  CUBE_DOCPATH="$DOCDIR:$CUBE_DOCPATH" ${VIEWER} ${FILE}
+else
+  echo "INFO: Select CUBE file from archive ${ARCHIVE}..."
+  CUBE_DOCPATH="$DOCDIR:$CUBE_DOCPATH" ${VIEWER} ${ARCHIVE}
+fi

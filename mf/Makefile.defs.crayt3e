@@ -1,0 +1,131 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.crayt3e)
+#------------------------------------------------------------------------------
+
+CFGKEY = crayt3e
+CONFIG = Cray T3E system
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC   = 32
+PFLAG  =
+AFLAG  =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = crayt3e
+MACHINE   = -DMACHINE=\"Cray\ T3E\"
+PLAT_LDIR = -DPFORM_LDIR=\".\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = cc
+PLAT_CFLAGS =
+
+OPTFLAGS =
+CC       = cc
+CFLAGS   = $(OPTFLAGS)
+CXX      = CC -h conform
+CXXFLAGS = $(OPTFLAGS)
+F77      = f90
+F90      = f90
+FFLAGS   = $(OPTFLAGS)
+FPP      =
+FDOPT    = -D
+LDFLAGS  = $(OPTFLAGS)
+UTILLIB  =
+FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+MPICC     = $(CC)
+MPICXX    = $(CXX)
+MPIF90    = $(F90)
+MPILIB    = -lmpi
+PMPILIB   = -lpmpi
+FMPILIB   = -lepk.ad.fmpi
+FMPIOBJ   = libepk.ad.fmpi.a-t3e
+MPIEXTRA  =
+MPIELGLIB = libelg.mpi.a
+
+MPI_BUILD_TARGETS   = all-salsa
+MPI_INSTALL_TARGETS = install-salsa
+MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+# T3E doesn't have OpenMP but we need these two values for kinst-pomp
+OMPCC      = $(CC)
+#OMPCXX     =
+#OMPF90     =
+OMPFLAG    = -OpenMPnotAvailable
+#OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+#HYBCC      = $(MPICC)
+#HYBCXX     = $(MPICXX)
+#HYBF90     = $(MPIF90)
+#HYBFLAG    = $(OMPFLAG)
+#HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+#SZLIB          = szlib
+#SZLIB_OPTFLAGS =
+#SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+#SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+#SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+#METR       = papi
+#METRDIR    = /usr/local/papi
+#METRINC    = -I$(METRDIR)/include
+#METRLIB32  = -lpapi
+#METRLIB64  = -lpapi
+#METRLDIR32 = $(METRDIR)/lib
+#METRLDIR64 = $(METRDIR)/lib
+#METRLIB    = -L$(METRLDIR$(PREC)) $(METRLIB$(PREC))
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+ECXX         = g++ -O3
+ECXXLIBS     = -lstdc++
+ECXX_AR      = ar
+ECXX_ARFLAGS = -rcs
+
+LIBERTY      =
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = generic
+#CINSTFLAG =
+#LINSTFLAG =
+#EXTRAOBJS =
+#KINST_EXTRA =
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#VTF3LIB     = -L$(VTF3DIR)/crayt3e/lib -lvtf3
+#INST_VTF3   = install-vtf3
+

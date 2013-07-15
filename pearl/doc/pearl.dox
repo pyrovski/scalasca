@@ -1,0 +1,40 @@
+/****************************************************************************
+**  SCALASCA    http://www.scalasca.org/                                   **
+*****************************************************************************
+**  Copyright (c) 1998-2013                                                **
+**  Forschungszentrum Juelich GmbH, Juelich Supercomputing Centre          **
+**                                                                         **
+**  See the file COPYRIGHT in the package base directory for details       **
+****************************************************************************/
+
+
+//--- Library description ---------------------------------------------------
+
+/**
+@mainpage PEARL
+
+The PEARL library provides a set of parallel abstractions to access trace data
+files. It also provides the functionality to transfer event data between
+different processes. It consists of the following modules:
+
+- @ref PEARL_base
+- @ref PEARL_mpi
+- @ref PEARL_omp
+- @ref PEARL_hybrid
+- @ref PEARL_replay
+- @ref PEARL_writer
+
+The entire functionality is encapsulated in the namespace @ref pearl.
+*/
+
+
+//--- Namespace description -------------------------------------------------
+
+/**
+@namespace pearl
+@brief     Namespace of the PEARL library
+
+The C++ namespace pearl encapsulates all classes, functions, and identifiers
+that are related to the Parallel Event Analysis and Recognition Library
+PEARL.
+*/

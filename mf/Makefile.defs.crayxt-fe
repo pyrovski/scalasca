@@ -1,0 +1,147 @@
+#------------------------------------------------------------------------------
+# KOJAK Makefile Definitions (Makefile.defs.crayxt-fe)
+#------------------------------------------------------------------------------
+
+CFGKEY = crayxt
+CONFIG = Cray XT system (generic)
+
+#------------------------------------------------------------------------------
+# Platform Settings
+#------------------------------------------------------------------------------
+PREC   = 64
+PFLAG  =
+AFLAG  =
+
+PREFIX = /opt/scalasca
+OPARI2DIR = /opt/scalasca
+
+PLAT      = generic
+PLAT_LDIR = -DPFORM_LDIR=\".\"
+MACHINE   = -DMACHINE=\"Cray\ XT\"
+PLAT_CONF = $(MACHINE) $(PLAT_LDIR)
+PLATCC    = gcc
+PLAT_CFLAGS =
+
+OPTFLAGS =
+CC       = gcc
+CFLAGS   = $(OPTFLAGS)
+CXX      = g++
+CXXFLAGS = $(OPTFLAGS)
+F77      = 
+F90      =
+FFLAGS   = $(OPTFLAGS)
+FPP      =
+FDOPT    = -D
+LDFLAGS  = $(OPTFLAGS)
+UTILLIB  =
+#FOBASE   = pomp2_fwrapper_base.o
+
+#------------------------------------------------------------------------------
+# MPI Settings
+#------------------------------------------------------------------------------
+
+#MPICC     =
+#MPIF90    =
+#MPILIB    = -lmpi
+#PMPILIB   = -lpmpi
+#FMPILIB   = -lepk.ad.fmpi
+#FMPIOBJ   = libepk.ad.fmpi.a
+#MPIEXTRA  = -DHAS_MPI2_1SIDED
+#MPIELGLIB = libelg.mpi.a
+
+#MPI_BUILD_TARGETS   = all-salsa
+#MPI_INSTALL_TARGETS = install-salsa
+#MPI_CONFIG_TARGETS  = mpi_gen_headers
+
+#------------------------------------------------------------------------------
+# OpenMP Settings
+#------------------------------------------------------------------------------
+
+OMPCC      = $(CC)
+#OMPCXX     = $(CXX)
+#OMPF90     = $(F90)
+OMPFLAG    = -OpenMPnotAvailable
+#OMPELGLIB  = libelg.omp.a
+
+#------------------------------------------------------------------------------
+# Hybrid MPI/OpenMP Settings
+#------------------------------------------------------------------------------
+
+#HYBCC      = $(MPICC)
+#HYBCXX     = $(MPICXX)
+#HYBF90     = $(MPIF90)
+#HYBFLAG    = $(OMPFLAG)
+#HYBELGLIB  = libelg.ompi.a
+
+#------------------------------------------------------------------------------
+# Hardware-Counter Settings
+#------------------------------------------------------------------------------
+
+# The module xt-papi defines PAPI_INCLUDE_OPTS and PAPI_POST_LINK_OPTS
+# which are independent of the METRDIR (set by configure --with-papi=METRDIR)
+
+#METR       = papi
+#METRDIR    = /opt/xt-tools/papi/default
+#METRINC    = $(PAPI_INCLUDE_OPTS)
+#METRLIB    = $(PAPI_POST_LINK_OPTS)
+#METROBJS   = esd_metric_$(METR).o
+#METRCFLAGS = -DEPK_METR
+
+#------------------------------------------------------------------------------
+# Compression Support
+#------------------------------------------------------------------------------
+
+SZLIB          = szlib
+SZLIB_OPTFLAGS = -O3
+SZLIB_CFLAGS   = -I$(TOPDIR)/utils/szlib -DELG_COMPRESSED -DCUBE_COMPRESSED
+SZLIB_LIBPATH  = -L$(TOPDIR)/utils/szlib
+SZLIB_LIB      = -lsc.z
+
+#------------------------------------------------------------------------------
+# Alternative compiler for SCAN, EARL, EXPERT, and CUBE
+#------------------------------------------------------------------------------
+
+# explicitly use /usr/bin/g++ to avoid newer versions on PATH from PrgEnv-gnu
+# which are not configured with other PrgEnvs for PathScale/PGI/Intel/Cray
+ECXX         = /usr/bin/g++ -O3
+ECXXLIBS     = -lstdc++
+ECXX_AR      = ar
+ECXX_ARFLAGS = -rcs
+
+LIBERTY      = -L/opt/gcc/default/snos/lib64 -liberty
+
+#------------------------------------------------------------------------------
+# Special compiler interface: generic|pgi|intel|gnu|xl|hitachi|phat|ftrace
+#------------------------------------------------------------------------------
+
+COMP      = generic
+#CINSTFLAG =
+#LINSTFLAG =
+#EXTRAOBJS =
+#KINST_EXTRA =
+
+#------------------------------------------------------------------------------
+# VTF3 Support
+#------------------------------------------------------------------------------
+
+#VTF3DIR     =
+#ELG_VTF3    = elg_vtf3
+#VTF3LIB     = -L$(VTF3DIR)/x86_64/lib -lvtf3
+#INST_VTF3   = install-vtf3
+
+#------------------------------------------------------------------------------
+# OTF Support
+#-----------------------------------------------------------------------------
+
+#OTFDIR      =
+#OTFRTTI     =
+#OTFUNIFY    = elg_otfunify
+##OTFUNIFY    = elg_otfunify.omp
+#ELG_OTF     = elg2otf
+#OTFLIB      = -L$(OTFDIR)/lib64 -L$(OTFDIR)/lib -lotf -lz
+#INST_OTF    = install-otf
+# --> not on frontend: OTFELGLIB     = libelg.otf.a
+# --> not on frontend: OTFMPIELGLIB  = libelg.otf.mpi.a
+# --> not on frontend: OTFOMPELGLIB  = libelg.otf.omp.a
+# --> not on frontend: OTFHYBELGLIB  = libelg.otf.ompi.a
+

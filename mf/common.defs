@@ -1,0 +1,25 @@
+MKDIR = $(TOPDIR)/utils/build/mkinstalldirs
+INSTALL = $(TOPDIR)/utils/build/install-sh
+
+BINDIR = ${PREFIX}/bin$(DSUF)
+LIBDIR = ${PREFIX}/lib$(DSUF)
+INCDIR = ${PREFIX}/include$(DSUF)
+DOCDIR = ${PREFIX}/doc
+
+OMPTRGT = opari2
+
+#NOSRC = -nosrc
+
+C_AR = $(SX)ar
+C_NM = $(SX)nm
+
+# for cube makefile compatibility
+CCC       = $(CC)
+CCFLAGS   = $(PFLAG) $(CFLAGS)
+CCXX      = $(ECXX)
+CCXXFLAGS = $(CXXFLAGS)
+CCXXLIBS  = $(ECXXLIBS)
+CLDFLAGS  = $(SFLAG) $(LDFLAGS)
+AR        = $(ECXX_AR)
+ARFLAGS   = $(AFLAG) $(ECXX_ARFLAGS)
+CUBEVER   = 3.4.3

@@ -1,0 +1,103 @@
+#------------------------------------------------------------------------------
+# Dependencies
+# (automatically generated using 'make depend')
+#------------------------------------------------------------------------------
+
+OmpALock_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpALock_rep.cpp \
+	OmpALock_rep.h \
+	OmpLock_rep.h
+OmpCollExit_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/Exit_rep.h \
+	$(PB_DIR)/Flow_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpCollExit_rep.cpp \
+	OmpCollExit_rep.h
+OmpEventFactory.o: \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/EventFactory.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/Exit_rep.h \
+	$(PB_DIR)/Flow_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpALock_rep.h \
+	OmpCollExit_rep.h \
+	OmpEventFactory.cpp \
+	OmpEventFactory.h \
+	OmpFork_rep.h \
+	OmpJoin_rep.h \
+	OmpLock_rep.h \
+	OmpRLock_rep.h
+OmpFork_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpFork_rep.cpp \
+	OmpFork_rep.h
+OmpJoin_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpJoin_rep.cpp \
+	OmpJoin_rep.h
+OmpLock_rep.o: \
+	$(PB_DIR)/Buffer.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpLock_rep.cpp \
+	OmpLock_rep.h
+OmpRLock_rep.o: \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpLock_rep.h \
+	OmpRLock_rep.cpp \
+	OmpRLock_rep.h
+OmpSmallObjAllocator.o: \
+	$(PB_DIR)/BlockAllocator.h \
+	$(PB_DIR)/SmallObjAllocator.h \
+	OmpSmallObjAllocator.cpp \
+	OmpSmallObjAllocator.h
+pearl_omp.o: \
+	$(PB_DIR)/CNode.h \
+	$(PB_DIR)/Calltree.h \
+	$(PB_DIR)/Cartesian.h \
+	$(PB_DIR)/DefsFactory.h \
+	$(PB_DIR)/Enter_rep.h \
+	$(PB_DIR)/Error.h \
+	$(PB_DIR)/Event.h \
+	$(PB_DIR)/EventFactory.h \
+	$(PB_DIR)/Event_rep.h \
+	$(PB_DIR)/Flow_rep.h \
+	$(PB_DIR)/GlobalDefs.h \
+	$(PB_DIR)/Group.h \
+	$(PB_DIR)/IdObject.h \
+	$(PB_DIR)/$(PEARL_DS)/Event.h \
+	$(PB_DIR)/$(PEARL_DS)/LocalTrace.h \
+	$(PB_DIR)/LocalTrace.h \
+	$(PB_DIR)/NamedObject.h \
+	$(PB_DIR)/Region.h \
+	$(PB_DIR)/SmallObjAllocator.h \
+	$(PB_DIR)/SmallObject.h \
+	$(PB_DIR)/Topology.h \
+	$(PB_DIR)/pearl.h \
+	$(PB_DIR)/pearl_padding.h \
+	$(PB_DIR)/pearl_types.h \
+	OmpEventFactory.h \
+	OmpSmallObjAllocator.h \
+	pearl_omp.cpp

@@ -1,0 +1,120 @@
+PROLOG {
+  #include "epk_archive.h"
+  #include "Region.h"
+}
+
+PATTERN "MPI_COMM_MATRIX" = [
+  NAME      = "Communication Matrix"
+  CLASS     = "Pattern_CommMatrix"
+  INFO      = "Communication matrix for MPI point-to-point communication"
+  UNIT      = "sec"
+  DATA      = {
+    int           m_size;
+    int           m_rank;
+    unsigned int* m_visits;
+    unsigned int* m_bytes;
+    double*       m_transfer;
+    double*       m_receive;
+  }
+  INIT      = {
+    MPI_Comm_size(MPI_COMM_WORLD, &m_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &m_rank);
+
+    m_visits   = new unsigned int[m_size];
+    m_bytes    = new unsigned int[m_size];
+    m_transfer = new double[m_size];
+    m_receive  = new double[m_size];
+
+    for (int i = 0; i < m_size; ++i) {
+      m_visits[i]   = 0;
+      m_bytes[i]    = 0;
+      m_transfer[i] = 0.0;
+      m_receive[i]  = 0.0;
+    }
+  }
+  CLEANUP   = {
+    delete[] m_visits;
+    delete[] m_bytes;
+    delete[] m_transfer;
+    delete[] m_receive;
+  }
+  CALLBACKS = [
+    "POST_RECV" = {
+      RemoteEvent send = data.remote.get_event(ROLE_SEND);
+
+      char* env = getenv("SCOUT_CNODE");
+      if (!env)
+        return;
+      string name = env;
+      CNode* node = event->cnode();
+      bool found = false;
+      while (node) {
+        if (node->get_region()->get_name() == name) {
+          found = true;
+          break;
+        }
+        node = node->get_parent();
+      }
+      if (!found)
+        return;
+
+      int sender = event->get_source()->get_process()->get_id();
+      m_visits[sender]++;
+      m_bytes[sender]    += send.get_sent();
+      m_transfer[sender] += (event->get_time() - send.get_time());
+      m_receive[sender]  += (event.exitptr()->get_time() -
+                             event.enterptr()->get_time());
+    }
+
+    "LAST" = {
+      int dummy;
+      MPI_Status status;
+      if (m_rank > 0)
+        MPI_Recv(&dummy, 1, MPI_INT, m_rank - 1, 14, MPI_COMM_WORLD, &status);
+
+      string dirname = epk_archive_get_name();
+      string filename = dirname + "/visits.csv";
+      FILE* fp = fopen(filename.c_str(), "a");
+      for (int i = 0; i < m_size; ++i) {
+        if (i > 0)
+          fputc(',', fp);
+        fprintf(fp, "%d", m_visits[i]);
+      }
+      fputc('\n', fp);
+      fclose(fp);
+
+      filename = dirname + "/bytes.csv";
+      fp = fopen(filename.c_str(), "a");
+      for (int i = 0; i < m_size; ++i) {
+        if (i > 0)
+          fputc(',', fp);
+        fprintf(fp, "%d", m_bytes[i]);
+      }
+      fputc('\n', fp);
+      fclose(fp);
+
+      filename = dirname + "/transfer.csv";
+      fp = fopen(filename.c_str(), "a");
+      for (int i = 0; i < m_size; ++i) {
+        if (i > 0)
+          fputc(',', fp);
+        fprintf(fp, "%.12g", m_transfer[i]);
+      }
+      fputc('\n', fp);
+      fclose(fp);
+
+      filename = dirname + "/receive.csv";
+      fp = fopen(filename.c_str(), "a");
+      for (int i = 0; i < m_size; ++i) {
+        if (i > 0)
+          fputc(',', fp);
+        fprintf(fp, "%.12g", m_receive[i]);
+      }
+      fputc('\n', fp);
+      fclose(fp);
+
+      if (m_rank < m_size - 1)
+        MPI_Send(&dummy, 1, MPI_INT, m_rank + 1, 14, MPI_COMM_WORLD);
+    }
+  ]
+]

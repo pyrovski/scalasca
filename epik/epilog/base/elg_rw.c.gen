@@ -1,0 +1,623 @@
+/* -- automatically generated -- do not change ------------------------------ */
+/* vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv */
+
+/* -- Region -- */
+
+int ElgOut_write_ENTER(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 rid,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_ENTER);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, rid);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_ENTER_CS(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 csid,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_ENTER_CS);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, csid);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_EXIT(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_EXIT);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+/* -- MPI-1 -- */
+
+int ElgOut_write_MPI_SEND(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 cid, elg_ui4 tag, elg_ui4 sent) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_SEND);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, cid);
+  ELGREC_WRITE_VAR(rec, tag);
+  ELGREC_WRITE_VAR(rec, sent);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_RECV(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 slid,
+       elg_ui4 cid, elg_ui4 tag) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_RECV);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, slid);
+  ELGREC_WRITE_VAR(rec, cid);
+  ELGREC_WRITE_VAR(rec, tag);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_COLLEXIT(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 rlid, elg_ui4 cid, elg_ui4 sent,
+       elg_ui4 recvd) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_COLLEXIT);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  ELGREC_WRITE_VAR(rec, rlid);
+  ELGREC_WRITE_VAR(rec, cid);
+  ELGREC_WRITE_VAR(rec, sent);
+  ELGREC_WRITE_VAR(rec, recvd);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+/* -- MPI-1 Non-blocking -- */
+
+int ElgOut_write_MPI_SEND_COMPLETE(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 reqid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_SEND_COMPLETE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, reqid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_RECV_REQUEST(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 reqid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_RECV_REQUEST);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, reqid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_REQUEST_TESTED(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 reqid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_REQUEST_TESTED);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, reqid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_CANCELLED(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 reqid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_CANCELLED);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, reqid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+/* -- MPI-2 One-sided Operations -- */
+
+int ElgOut_write_MPI_PUT_1TS(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 dlid, elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_PUT_1TS);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  ELGREC_WRITE_VAR(rec, nbytes);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_PUT_1TE(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 slid, elg_ui4 wid, elg_ui4 rmaid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_PUT_1TE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, slid);
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_PUT_1TE_REMOTE(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 dlid, elg_ui4 wid, elg_ui4 rmaid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_PUT_1TE_REMOTE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_GET_1TO(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 rmaid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_GET_1TO);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_GET_1TS(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 dlid, elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_GET_1TS);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  ELGREC_WRITE_VAR(rec, nbytes);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_GET_1TS_REMOTE(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 dlid, elg_ui4 wid, elg_ui4 rmaid, elg_ui4 nbytes) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_GET_1TS_REMOTE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  ELGREC_WRITE_VAR(rec, nbytes);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_GET_1TE(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 slid, elg_ui4 wid, elg_ui4 rmaid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_GET_1TE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, slid);
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_WINEXIT(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 wid, elg_ui4 cid, elg_ui1 synex) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_WINEXIT);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, cid);
+  ELGREC_WRITE_VAR(rec, synex);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_WINCOLLEXIT(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 wid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_WINCOLLEXIT);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  ELGREC_WRITE_VAR(rec, wid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_WIN_LOCK(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 llid, elg_ui4 wid, elg_ui1 ltype) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_WIN_LOCK);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, llid);
+  ELGREC_WRITE_VAR(rec, wid);
+  ELGREC_WRITE_VAR(rec, ltype);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_MPI_WIN_UNLOCK(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 llid, elg_ui4 wid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_MPI_WIN_UNLOCK);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, llid);
+  ELGREC_WRITE_VAR(rec, wid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+/* -- Generic One-sided Operations -- */
+
+int ElgOut_write_PUT_1TS(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 rmaid, elg_ui4 nbytes) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_PUT_1TS);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  ELGREC_WRITE_VAR(rec, nbytes);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_PUT_1TE(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 slid,
+       elg_ui4 rmaid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_PUT_1TE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, slid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_PUT_1TE_REMOTE(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 dlid, elg_ui4 rmaid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_PUT_1TE_REMOTE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_GET_1TS(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 dlid,
+       elg_ui4 rmaid, elg_ui4 nbytes) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_GET_1TS);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  ELGREC_WRITE_VAR(rec, nbytes);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_GET_1TS_REMOTE(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui4 dlid, elg_ui4 rmaid, elg_ui4 nbytes) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_GET_1TS_REMOTE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, dlid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  ELGREC_WRITE_VAR(rec, nbytes);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_GET_1TE(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 slid,
+       elg_ui4 rmaid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_GET_1TE);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, slid);
+  ELGREC_WRITE_VAR(rec, rmaid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_COLLEXIT(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[], elg_ui4 rlid, elg_ui4 cid, elg_ui4 sent,
+       elg_ui4 recvd) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_COLLEXIT);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  ELGREC_WRITE_VAR(rec, rlid);
+  ELGREC_WRITE_VAR(rec, cid);
+  ELGREC_WRITE_VAR(rec, sent);
+  ELGREC_WRITE_VAR(rec, recvd);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_ALOCK(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 lkid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_ALOCK);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, lkid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_RLOCK(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 lkid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_RLOCK);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, lkid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+/* -- OpenMP -- */
+
+int ElgOut_write_OMP_FORK(ElgOut* out, elg_ui4 lid, elg_d8 time) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_OMP_FORK);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_OMP_JOIN(ElgOut* out, elg_ui4 lid, elg_d8 time) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_OMP_JOIN);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_OMP_ALOCK(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 lkid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_OMP_ALOCK);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, lkid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_OMP_RLOCK(ElgOut* out, elg_ui4 lid, elg_d8 time, elg_ui4 lkid) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_OMP_RLOCK);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  ELGREC_WRITE_VAR(rec, lkid);
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_OMP_COLLEXIT(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_OMP_COLLEXIT);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+/* -- EPILOG Internal -- */
+
+int ElgOut_write_LOG_OFF(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_LOG_OFF);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_LOG_ON(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_LOG_ON);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_ENTER_TRACING(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_ENTER_TRACING);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}
+
+int ElgOut_write_EXIT_TRACING(ElgOut* out, elg_ui4 lid, elg_d8 time,
+       elg_ui1 metc, elg_ui8 metv[]) {
+  ElgRec* rec = out->rec;
+  ElgRec_reset_type(rec, ELG_EXIT_TRACING);
+  if (lid != ELG_NO_ID)
+    ELGREC_WRITE_VAR(rec, lid);
+  ELGREC_WRITE_VAR(rec, time);
+  { int i;
+    for (i = 0; i < metc; i++)
+      {
+        ELGREC_WRITE_VAR(rec, metv[i]);
+      }
+  }
+  rec->length = rec->pos - rec->body;
+  ElgOut_write_record(out,rec);
+  return rec->length + sizeof(rec->type) + sizeof(rec->length);
+}

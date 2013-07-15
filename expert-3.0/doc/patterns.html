@@ -1,0 +1,2729 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html><head><title>KOJAK Patterns</title></head>
+<body bgcolor="#ffffff">
+
+<h2>KOJAK Patterns</h2> 
+
+<ul>
+<li><a href="#general_patterns">General</a>
+<li><a href="#mpi_patterns">MPI</a>
+<li><a href="#omp_patterns">OpenMP</a>
+<li><a href="#shmem_patterns">SHMEM</a>
+<li><a href="#cpu_patterns">CPU &amp; Memory</a>
+</ul>
+
+<!--======================================================================-->
+<!-- General Patterns ====================================================-->
+<!--======================================================================-->
+
+<h3><a name="general_patterns"></a>General Patterns</h3>
+
+<ul>
+<li><a href="#time">Time</a>
+<ul>
+<li><a href="#execution">Execution</a>
+<ul>
+<li><a name="mpi_top" href="#mpi">MPI</a>
+<ul>
+<li><a href="#mpi_communication">Communication</a>
+<ul>
+<li><a href="#mpi_collective">Collective</a>
+<ul>
+<li><a href="#mpi_early_reduce">Early Reduce</a>
+<li><a href="#mpi_late_bcast">Late Broadcast</a>
+<li><a href="#mpi_wait_at_n2n">Wait at NxN</a>
+</ul>
+<li><a href="#mpi_p2p">P2P</a>
+<ul>
+<li><a href="#mpi_late_receiver">Late Receiver</a>
+<ul>
+<li><a href="#mpi_wrong_order_lr">Messages in Wrong Order</a>
+</ul>
+<li><a href="#mpi_late_sender">Late Sender</a>
+<ul>
+<li><a href="#mpi_wrong_order_ls">Messages in Wrong Order</a>
+</ul>
+</ul>
+<li><a href="#mpi_rma_communication">RMA Communication</a>
+<ul>
+<li><a href="#mpi_early_transfer">Early Transfer</a>
+</ul>
+</ul>
+<li><a href="#mpi_io">IO</a>
+<li><a href="#mpi_synchronization">Synchronization</a>
+
+<ul>
+<li> <a href="#mpi_barrier"> Barrier</a>    
+<ul>
+<li><a href="#mpi_barrier_completion">Barrier Completion</a>
+<li><a href="#mpi_wait_at_barrier">Wait at Barrier</a>
+</ul>
+<li> <a href="#mpi_rma_synchronization">RMA Synchronization</a>    
+<ul>
+    <li><a href="#mpi_window_management">Window Management</a>
+<ul>
+<li><a href="#mpi_wait_at_win_create">Wait at Create</a>
+<li><a href="#mpi_wait_at_win_free">Wait at Free</a>
+</ul>    
+<li><a href="#mpi_fence">Fence</a>
+<ul>
+<li><a href="#mpi_wait_at_fence">Wait at Fence</a>
+</ul>    
+<li><a href="#mpi_gats">General Active Target Synchronization</a>
+<ul>
+<li><a href="#mpi_early_wait">Early Wait</a>
+<ul>
+<li><a href="#mpi_late_complete">Late Complete</a>
+</ul>
+<li><a href="#mpi_late_post">Late Post</a> 
+</ul>
+<li><a href="#mpi_locks">Passive Target Synchronization (Locks)</a>
+</ul>    
+</ul> 
+<ul>
+<li> <a href="#mpi_init_exit">Init/Exit</a>    
+</ul>
+</ul> 
+
+
+<li><a name="omp_top" href="#omp">OMP</a>
+<ul>
+<li><a href="#omp_flush">Flush</a>
+<li><a href="#omp_fork">Fork</a>
+<li><a href="#omp_synchronization">Synchronization</a>
+<ul>
+<li><a href="#omp_barrier">Barrier</a>
+<ul>
+<li><a href="#omp_explicit_barrier">Explicit</a>
+<ul>
+<li><a href="#omp_wait_at_ebarrier">Wait at Barrier</a>
+</ul>
+<li><a href="#omp_implicit_barrier">Implicit</a>
+<ul>
+<li><a href="#omp_wait_at_ibarrier">Wait at Barrier</a>
+</ul>
+</ul>
+<li><a href="#omp_lock">Lock Competition</a>
+<ul>
+<li><a href="#omp_lock_api">API</a>
+<li><a href="#omp_lock_critical">Critical</a>
+</ul>
+</ul>
+</ul>
+</ul>
+
+
+<ul>
+  <li><a name="shmem_top" href="#shmem">SHMEM</a>
+  <ul>
+     <li><a href="#shmem_communication">Communication</a>
+     <ul>
+        <li><a href="#shmem_collective">Collective</a>
+        <ul>
+          <li><a href="#shmem_late_bcast">Late Bradcast</a>
+          <li><a href="#shmem_wait_at_NxN">Wait at NxN</a>
+        </ul>
+     </ul>
+     <ul>
+         <li><a href="#shmem_rma_communication">RMA</a>
+     </ul>
+  </ul>
+  <ul>
+     <li><a href="#shmem_synchronization">Synchronization</a>
+     <ul>
+        <li><a href="#shmem_barrier">Barrier</a>
+        <ul>
+           <li><a href="#shmem_wait_at_barrier">Wait at Barrier</a>
+        </ul>
+    </ul>
+    <ul>
+        <li><a href="#shmem_p2p_synchronization">P2P Synchronization</a>
+       <ul>
+          <li><a href="#shmem_lock">Lock Completion</a>
+          <li><a href="#shmem_wait_until">Wait Until</a>
+       </ul>
+   </ul>
+   <ul>
+      <li><a href="#shmem_init_exit">Init/Exit</a>
+      <li><a href="#shmem_memory_management">Memory Management (SHMEM)</a>
+   </ul>
+  </ul>
+</ul>
+
+
+
+<li><a href="#overhead">Overhead</a>
+<li><a href="#idle_threads">Idle Threads</a>
+</ul>
+<li><a href="#visits">Visits</a>
+<li><a href="#cpu_patterns">Hardware Counters</a>
+</ul>
+
+<p>&nbsp; 
+
+
+<h4><a name="time" href="#general_patterns">Time</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>CPU allocation time
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent on program execution including the idle
+times of CPUs reserved for slave threads during OpenMP sequential
+execution. Total assumes that every thread of a process allocated a
+separate CPU during the entire runtime of the process.
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children: </dt><dd><a href="#execution">Execution</a>, <a href="#idle_threads">Idle Threads</a>
+
+</dd></dl>
+
+
+<h4><a name="execution" href="#general_patterns">Execution</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>Execution time
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent on program execution but without the
+idle times of slave threads during OpenMP sequential execution. Note
+that for pure MPI applications, this pattern is equal to <a href="#time">Time</a>.
+
+</dd><dt>Parent:</dt><dd><a href="#time">Time</a>
+
+</dd><dt>Children: </dt><dd><a href="#mpi">MPI</a>, 
+<a href="#omp">OpenMP</a>,
+<a href="#shmem">SHMEM</a>
+
+</dd></dl>
+
+
+<!--==================================================================-->
+<!-- MPI Patterns ====================================================-->
+<!--==================================================================-->
+
+<h3><a name="mpi_patterns">MPI Patterns</a></h3>
+
+
+<h4><a name="mpi" href="#mpi_top">MPI</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+calls.
+
+</dd><dt>Parent:</dt><dd><a href="#execution">Execution</a>
+
+</dd><dt>Children:</dt><dd><a href="#mpi_communication">Communication</a>,
+                           <a href="#mpi_io">IO (MPI)</a>, 
+                           <a href="#mpi_synchronization">Synchronization (MPI)</a>
+</dd></dl>
+
+
+<h4><a name="mpi_communication" href="#mpi_top">Communication</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+communication calls.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi">MPI</a>
+
+</dd><dt>Children: </dt><dd>
+<a href="#mpi_collective">Collective (MPI)</a>, 
+<a href="#mpi_p2p">Point-to-Point (MPI)</a>
+<a href="#mpi_rma_communication">RMA Communication (MPI-2)</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_collective" href="#mpi_top">Collective (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, collective communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent on MPI collective communication.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_communication">Communication (MPI)</a>
+
+</dd><dt>Children: </dt><dd><a href="#mpi_early_reduce">Early Reduce</a>,
+                            <a href="#mpi_late_bcast">Late Broadcast (MPI)</a>, 
+                            <a href="#mpi_wait_at_n2n">Wait at N x N (MPI)</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_early_reduce" href="#mpi_top">Early Reduce</a></h4>
+
+<dl> 
+
+<dt>Keywords:</dt><dd>MPI, n-to-1 communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Collective communication operations that send
+data from all processes to one destination process (i.e., n-to-1) may
+suffer from waiting times if the destination process enters the
+operation earlier than its sending counterparts, that is, before any
+data could have been sent. The pattern refers to the time lost as a
+result of this situation. It applies to MPI calls MPI_Reduce(),
+MPI_Gather() and MPI_Gatherv().
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_collective">Collective (MPI)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_late_bcast" href="#mpi_top">Late Broadcast (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, 1-to-n communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Collective communication operations that send data
+from one source process to all processes (i.e., 1-to-n) may suffer
+from waiting times if destination processes enter the operation
+earlier than the source process, that is, before any data could have
+been sent. The pattern refers to the time lost as a result of this
+situation. It applies to MPI calls MPI_Bcast(), MPI_Scatter() and
+MPI_Scatterv().
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_collective">Collective (MPI)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_wait_at_n2n" href="#mpi_top">Wait at N x N (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, n-to-n communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Collective communication operations that send data
+from all processes to all processes (i.e., n-to-n) exhibit an inherent
+synchronization among all participants, that is, no process can finish
+the operation until the last process has started it. This pattern
+covers the time spent in n-to-n operations until all processes have
+reached it. It applies to MPI calls MPI_Reduce_scatter(), MPI_Allgather(),
+MPI_Allgatherv(), MPI_Allreduce(), MPI_Alltoall(), MPI_Alltoallv().
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_collective">Collective (MPI)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_p2p" href="#mpi_top">Point-to-Point</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, point-to-point communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+point-to-point communication calls.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_communication">Communication (MPI)</a>
+
+</dd><dt>Children:</dt><dd><a href="#mpi_late_receiver">Late Receiver</a>, <a href="#mpi_late_sender">Late Sender</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_late_receiver" href="#mpi_top">Late Receiver</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, delayed sender
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>A send operation is blocked until the
+corresponding receive operation is called. This can happen for several
+reasons. Either the MPI implementation is working in synchronous mode
+by default or the size of the message to be sent exceeds the available
+MPI-internal buffer space and the operation is blocked until the data
+is transferred to the receiver. The pattern refers to the time spend
+waiting as a result of this situation.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_p2p">Point-to-Point</a>
+
+</dd><dt>Children:</dt><dd><a href="#mpi_wrong_order_lr">Messages in Wrong Order
+(Late Receiver)</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_wrong_order_lr" href="#mpi_top">Messages in Wrong Order (Late Receiver)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, sending order of messages
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>A <a href="#mpi_late_receiver">Late Receiver</a>
+situation may be the result of messages that are sent in the wrong
+order. If a process sends messages to processes that are not ready to
+receive them, the sender's MPI-internal buffer may overflow so that
+from then on the process needs to send in synchronous mode causing a
+Late Receiver situation. This pattern refers to the time spent in a
+wait state as a result of this situation.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_late_receiver">Late Receiver</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_late_sender" href="#mpi_top">Late Sender</a></h4>
+    
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, delayed receiver
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>The time lost waiting caused by a blocking
+receive operation (e.g, MPI_Recv or MPI_Wait) that is posted earlier
+than the corresponding send operation.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_p2p">Point-to-Point</a>
+
+</dd><dt>Children:</dt><dd><a href="#mpi_wrong_order_ls">Messages in Wrong Order
+(Late Sender)</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_wrong_order_ls" href="#mpi_top">Messages in Wrong Order (Late Sender)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, acceptance order of messages
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>A <a href="#mpi_late_sender">Late Sender</a>
+situation may be the result of messages that are received in the wrong
+order. If a process expects messages from one or more processes in a
+certain order, although these processes are sending them in a
+different order, the receiver may need to wait for a message if it
+tries to receive a message early that has been sent late. The
+situation can be avoided by receiving messages in the order in which
+they are sent instead. This pattern refers to the time spent in a wait
+state as a result of this situation.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_late_sender">Late Sender</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_rma_communication" href="#mpi_top">RMA Communication (MPI-2)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+RMA communication calls. RMA communication calls are MPI_Get(), MPI_Put() and
+MPI_Accumulate().
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_communication">Communication (MPI)</a>
+
+</dd><dt>Children:</dt><dd><a href="#mpi_early_transfer">Early Transfer</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_early_transfer" href="#mpi_top">Early Transfer</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Remote Memory Access, 1-sided communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>
+
+The time lost waiting caused by a blocking RMA transfer operation ( e.g,
+MPI_Get() or MPI_Put() ) that is posted earlier than the corresponding exposure 
+epoch begins.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_rma_communication">RMA Communication (MPI)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_io" href="#mpi_top">IO (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, IO
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI IO calls.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi">MPI</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_synchronization" href="#mpi_top">Synchronization (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+barriers and RMA synchronisation calls. 
+</dd><dt>Parent:</dt><dd><a href="#mpi">MPI</a>
+
+</dd><dt>Children:</dt><dd>
+           <a href="#mpi_barrier">Barrier (MPI)</a>,
+           <a href="#mpi_rma_synchronization">RMA Synchronisation</a>,
+           <a href="#mpi_init_exit">Init/Exit (MPI)</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_barrier" href="#mpi_top">Barrier (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, synchronization
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+barriers.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_synchronization">Synchronization (MPI)</a>
+
+</dd><dt>Children:</dt><dd><a href="#mpi_barrier_completion">Barrier Completion (MPI)</a>, 
+                           <a href="#mpi_wait_at_barrier">Wait at Barrier (MPI)</a>
+</dd></dl>
+
+<h4><a name="mpi_barrier_completion" href="#mpi_top">Barrier Completion (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, synchronization
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+barriers after the first process has left the operation.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_synchronization">Synchronization (MPI)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_wait_at_barrier" href="#mpi_top">Wait at Barrier (MPI)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI, barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern covers the time spent waiting in
+front of an MPI barrier, which is the time inside the barrier call
+until the last processes has reached the barrier. A large amount of
+waiting time spent in front of barriers can be an indication of load
+imbalance.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_synchronization">Synchronization (MPI)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="mpi_rma_synchronization" href="#mpi_top">RMA Synchronization</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Synchronization, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI
+RMA synchronization calls. RMA Synchronisation calls are MPI_Win_fence(),
+MPI_Win_lock(), MPI_Win_unlock(), MPI_Win_post(), MPI_Win_wait(), MPI_Win_test(),
+MPI_Win_start(), MPI_Win_complete() MPI_Win_create() and MPI_Win_free().
+
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_synchronization">Synchronization (MPI)</a>
+
+</dd><dt>Children:</dt><dd><a href="#mpi_window_management">Window Management</a>,
+                           <a href="#mpi_fence">Fence</a>,
+                           <a href="#mpi_gats">General Active Target Synchronization</a>,
+                           <a href="#mpi_locks">Passive Target Synchronization (Locks)</a>
+</dd></dl>
+
+
+<h4><a name="mpi_window_management" href="#mpi_top">Window Management</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Window, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in collective
+window construction/destruction calls: MPI_Win_Create() and MPI_Win_free().
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_rma_synchronization">RMA Synchronization</a>
+
+</dd><dt>Children:</dt><dd> <a href="#mpi_wait_at_win_create">Wait at Create</a>,
+                            <a href="#mpi_wait_at_win_free">Wait at Free</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_wait_at_win_create" href="#mpi_top">Wait at Create</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Window, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd> This pattern covers the time spent waiting in
+front of an MPI_Win_create(), which is the time inside the collective window creation call
+until the last processes has reached the MPI_Win_create(). A large amount of
+waiting time spent in front of MPI_Win_create() can be an indication of load
+imbalance.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_window_management">Window Management</a>
+
+</dd><dt>Children:</dt><dd> None 
+
+</dd></dl>
+
+
+<h4><a name="mpi_wait_at_win_free" href="#mpi_top">Wait at Free</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Window, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd> This pattern covers the time spent waiting in
+front of an MPI_Win_free(), which is the time inside the collective window destruction call
+until the last processes has reached the MPI_Win_free(). A large amount of
+waiting time spent in front of MPI_Win_free() can be an indication of load
+imbalance.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_window_management">Window Management</a>
+
+</dd><dt>Children:</dt><dd> None 
+
+</dd></dl>
+
+
+<h4><a name="mpi_fence" href="#mpi_top">Fence</a></h4>
+
+<dl>
+
+    <dt>Keywords:</dt><dd>MPI-2, RMA, Collective Synchronization, Fence, 
+    Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in collective 
+RMA synchronization call MPI_Win_fernce().
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_rma_synchronization">RMA Synchronization</a>
+
+</dd><dt>Children:</dt><dd> <a href="#mpi_wait_at_fence">Wait at Fence</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_wait_at_fence" href="#mpi_top">Wait at Fence</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Collective Synchronization, Fence, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern covers the time spent waiting in
+front of an MPI_Win_fence(), which is the time inside the collective synchronization call
+until the last processes has reached the MPI_Win_fence(). A large amount of
+waiting time spent in front of MPI_Win_fence() can be an indication of load
+imbalance.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_fence">Fence</a>
+
+</dd><dt>Children:</dt><dd> None
+
+</dd></dl>
+
+
+<h4><a name="mpi_gats" href="#mpi_top">General Active Target Synchronization</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Synchronization, GATS, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in general active target
+synchronization calls. These are MPI_Win_post(), MPI_Win_wait(), MPI_Win_test(), 
+MPI_Win_start() and MPI_Win_complete().
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_rma_synchronization">RMA Synchronization</a>
+
+</dd><dt>Children:</dt><dd> <a href="#mpi_early_wait">Early Wait</a>,
+                            <a href="#mpi_late_post">Late Post</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_early_wait" href="#mpi_top">Early Wait</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Synchronization, GATS, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd> Time lost in MPI_Win_wait() call, which will block until
+all matching calls to MPI_Win_Complete() have occurred. Part of lost time can be 
+caused by <a href=#mpi_late_complete>Late Complete</a>
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_gats">General Active Target Synchronization</a>
+
+</dd><dt>Children:</dt><dd> <a href="#mpi_late_complete">Late Complete</a>
+
+</dd></dl>
+
+
+<h4><a name="mpi_late_complete" href="#mpi_top">Late Complete</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Synchronization, GATS, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd> The end of exposure epoch marked by a MPI_Win_wait call is
+delayed as one or more MPI_Win_complete() calls are executed too late. (i.e., not
+immediately after the last communication call.)
+
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_early_wait">Early Wait</a>
+
+</dd><dt>Children:</dt><dd> None 
+
+</dd></dl>
+
+
+<h4><a name="mpi_late_post" href="#mpi_top">Late Post</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Synchronization, GATS, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd> The access to the target window is delayed either 
+by a RMA synchronisation call MPI_Win_Start() or MPI_Win_complete() until the window is
+exposed.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_gats">General Active Target Synchronization</a>
+
+</dd><dt>Children:</dt><dd> None 
+
+</dd></dl>
+
+<h4><a name="mpi_locks" href="#mpi_top">Passive Target Synchronization (Locks)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>MPI-2, RMA, Synchronization, Locks, Remote Memory Access, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in MPI_Lock() and MPI_Unlock()
+function calls.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_rma_synchronization">RMA Synchronization</a>
+
+</dd><dt>Children:</dt><dd> None
+
+</dd></dl>
+
+
+<h4><a name="mpi_init_exit" href="#mpi_top">Init/Exit (MPI)</a></h4>
+
+<dl>
+
+    <dt>Keywords:</dt><dd>MPI, initialize, finalize 
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent
+on MPI initialization calls. It applies to MPI_Init() and MPI_Finalize()
+calls.
+
+</dd><dt>Parent:</dt><dd><a href="#mpi_synchronization">Synchronization (MPI)</a>
+
+</dd><dt>Children:</dt><dd> None
+</dd></dl>
+
+
+
+<!--======================================================================-->
+<!--  OpenMP Patterns ====================================================-->
+<!--======================================================================-->
+
+<h3><a name="omp_patterns">OpenMP Patterns</a></h3>
+
+
+<h4><a name="omp" href="#omp_top">OpenMP</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent on behalf of the OpenMP. This includes
+time spent in OpenMP API calls as well as time spent in code generated
+by the OpenMP compiler.
+
+</dd><dt>Parent:</dt><dd><a href="#execution">Execution</a>
+
+</dd><dt>Children:</dt><dd><a href="#omp_flush">Flush</a>, <a href="#omp_fork">Fork</a>, <a href="#omp_synchronization">Synchronization (OpenMP)</a>
+ 
+</dd></dl>
+
+
+<h4><a name="omp_flush" href="#omp_top">Flush</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, flush directive
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent in OpenMP flush directives.
+
+</dd><dt>Parent:</dt><dd><a href="#omp">OpenMP</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="omp_fork" href="#omp_top">Fork</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, team creation
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent by the master thread creating a team of
+threads.
+
+</dd><dt>Parent:</dt><dd><a href="#omp">OpenMP</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="omp_synchronization" href="#omp_top">Synchronization (OpenMP)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, synchronization
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent in OpenMP barrier or lock
+synchronization. Lock synchronization may be accomplished using either
+API calls or critical sections.
+
+</dd><dt>Parent:</dt><dd><a href="#omp">OpenMP</a>
+
+</dd><dt>Children:</dt><dd><a href="#omp_barrier">Barrier (OpenMP)</a>, <a href="#omp_lock">Lock Competition (OpenMP)</a>
+
+</dd></dl>
+
+
+<h4><a name="omp_barrier" href="#omp_top">Barrier (OpenMP)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in implicit
+(compiler-generated) or explicit (user-specified) OpenMP barrier
+synchronization. Note that during measurement implicit barriers are
+treated similar to explicit ones. The instrumentation procedure
+replaces an implicit barrier with an explicit barrier enclosed by the
+parallel construct. This is done by adding a nowait clause and a
+barrier directive as the last statement of the parallel construct. In
+cases where the implicit barrier cannot be removed (i.e., parallel
+region), the explicit barrier is executed in front of the implicit
+barrier, which will then be negligible because the team will already
+be synchronized when reaching it. The synthetic explicit barrier
+appears in the display as a special implicit barrier construct.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_synchronization">OpenMP</a>
+
+</dd><dt>Children:</dt><dd><a href="#omp_explicit_barrier">Explicit</a>, <a href="#omp_implicit_barrier">Implicit</a>
+
+</dd></dl>
+
+
+<h4><a name="omp_explicit_barrier" href="#omp_top">Explicit</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, explicit barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent in explicit (i.e., user-specified)
+OpenMP barriers.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_barrier">Barrier (OpenMP)</a>
+
+</dd><dt>Children:</dt><dd><a href="#omp_wait_at_ebarrier">Wait at Barrier (Explicit)</a>
+
+</dd></dl>
+
+
+<h4><a name="omp_wait_at_ebarrier" href="#omp_top">Wait at Barrier (Explicit)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, explicit barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern covers the time spent waiting in
+front of an explicit (user-specified) OpenMP barrier. It refers to the
+time spent in the barrier until all threads have reached it.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_explicit_barrier">Explicit</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="omp_implicit_barrier" href="#omp_top">Implicit</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, implicit barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent in implicit (i.e., compiler-generated)
+OpenMP barriers.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_barrier">Barrier (OpenMP)</a>
+
+</dd><dt>Children:</dt><dd><a href="#omp_wait_at_ibarrier">Wait at Barrier (Implicit)</a>
+
+</dd></dl>
+
+
+<h4><a name="omp_wait_at_ibarrier" href="#omp_top">Wait at Barrier (Implicit)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, implicit barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern covers the time spent waiting in
+front of an implicit (compiler-generated) OpenMP barrier. It refers to
+the time spent in the barrier until all threads have reached it.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_implicit_barrier">Implicit</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="omp_lock" href="#omp_top">Lock Competition (OpenMP)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, lock synchronization
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time a thread spent
+waiting for a lock that had been previously acquired by another
+thread. The lock may either had been acquired transparently at the
+beginning of a critical section or using an explicit API call.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_synchronization">Synchronization (OpenMP)</a>
+
+</dd><dt>Children:</dt><dd><a href="#omp_lock_api">API Lock Synchronization</a>,
+<a href="#omp_lock_critical">Critical</a>
+
+</dd></dl>
+
+
+<h4><a name="omp_lock_api" href="#omp_top">API Lock Synchronization</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, API lock routines
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time a thread spent in
+an OpenMP API lock routine waiting for a lock that had been
+previously acquired by another thread.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_synchronization">Synchronization (OpenMP)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="omp_lock_critical" href="#omp_top">Critical</a></h4>
+     
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, critical section
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent waiting in
+front of a critical section occupied by another thread.
+
+</dd><dt>Parent:</dt><dd><a href="#omp_lock">Lock Competition (OpenMP)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<!--======================================================================-->
+<!--  SHMEM Patterns ====================================================-->
+<!--======================================================================-->
+
+<h3><a name="shmem_patterns">SHMEM Patterns</a></h3>
+
+<h4><a name="shmem" href="#shmem_top">SHMEM</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd> SHMEM
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent in SHMEM API calls.
+
+
+</dd><dt>Parent:</dt><dd><a href="#execution">Execution</a>
+
+</dd><dt>Children:</dt><dd><a href="#shmem_communication">Communication (SHMEM)</a>, 
+                           <a href="#shmem_synchronization">Synchronization (SHMEM)</a>
+ 
+</dd></dl>
+
+
+<h4><a name="shmem_communication" href="#shmem_top">Communication (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in SHMEM 
+RMA, collective and atomic communication calls. SHMEM RMA are get and put transfer
+calls,  Collective 
+
+</dd><dt>Parent:</dt><dd><a href="#shmem">SHMEM</a>
+
+</dd><dt>Children: </dt><dd>
+<a href="#shmem_collective">Collective(SHMEM)</a>, 
+<a href="#shmem_rma_communication">RMA Communication (SHMEM)</a>
+
+</dd></dl>
+
+
+<h4><a name="shmem_collective" href="#shmem_top">Collective (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, collective communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent on SHMEM collective communication. It applies
+to SHMEM calls: shmem_broadcast(), shmem_broadcast_all(), shmem_and(), shmem_max(),
+shmem_min(), shmem_or(), shmem_prod(), shmem_sum(), shmem_xor(), shmem_collect() and
+shmem_fcollect().
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_communication">Communication (SHMEM)</a>
+
+</dd><dt>Children: </dt><dd> <a href="#shmem_late_bcast">Late Broadcast (SHMEM)</a>, 
+                             <a href="#shmem_wait_at_NxN">Wait at N x N (SHMEM)</a>
+
+</dd></dl>
+
+
+<h4><a name="shmem_late_bcast" href="#shmem_top">Late Broadcast (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, 1-to-n communication, Broadcast
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Collective communication operations that send data
+from one source process to all processes (i.e., 1-to-n) may suffer
+from waiting times if destination processes enter the operation
+earlier than the source process, that is, before any data could have
+been sent. The pattern refers to the time lost as a result of this
+situation.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_collective">Collective (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="shmem_wait_at_NxN" href="#shmem_top">Wait at N x N (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, n-to-n communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Collective communication operations that send data
+from all processes to all processes (i.e., n-to-n) exhibit an inherent
+synchronization among all participants, that is, no process can finish
+the operation until the last process has started it. This pattern
+covers the time spent in n-to-n operations until all processes have
+reached it. It applies to SHMEM calls: shmem_and(), shmem_max(), shmem_min(),
+shmem_or(), shmem_prod(), shmem_sum(), shmem_xor(), shmem_collect() and
+shmem_fcollect().
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_collective">Collective (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="shmem_rma_communication" href="#shmem_top">RMA Communication (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, RMA, 1-Sided Communication
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in SHMEM 
+RMA communication calls. RMA communication calls are SHMEM get and put transfers and
+SHMEM atomic operations. Atomic operations are shmem_swap(), shmem_cswap(), shmem_mswap(),
+shmem_inc(), shmem_finc(), shmem_add() and shmem_fadd() SHMEM calls.
+
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_communication">Communication (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="shmem_synchronization" href="#shmem_top">Synchronization (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in SHMEM 
+synchronisation calls. This applies to SHMEM barriers, point-to-point synchronisation
+and management function calls.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem">SHMEM</a>
+
+</dd><dt>Children:</dt><dd>
+           <a href="#shmem_barrier">Barrier (SHMEM)</a>,
+           <a href="#shmem_p2p_synchronization">p2p Synchronisation</a>
+           <a href="#shmem_init_exit">Init/Exit (SHMEM)</a>
+           <a href="#shmem_memory_management">Memory Management (SHMEM)</a>
+</dd></dl>
+
+
+<h4><a name="shmem_barrier" href="#shmem_top">Barrier (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, synchronization
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in SHMEM 
+barriers.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_synchronization">Synchronization (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd> <a href="#shmem_wait_at_barrier">Wait at Barrier (SHMEM)</a>
+</dd></dl>
+
+
+<h4><a name="shmem_wait_at_barrier" href="#shmem_top">Wait at Barrier (SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, barrier
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern covers the time spent waiting in
+front of an SHMEM barrier, which is the time inside the barrier call
+until the last processes has reached the barrier. A large amount of
+waiting time spent in front of barriers can be an indication of load
+imbalance.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_barrier">Barrier (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="shmem_p2p_synchronization" href="#shmem_top">P2P Synchronization</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd> SHMEM, RMA
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent in SHMEM
+point-to-point synchronization calls.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_synchronization">Synchronization (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd><a href="#shmem_lock">Lock Completion (SHMEM)</a>,
+                           <a href="#shmem_wait_until">Wait Until</a>                           
+</dd></dl>
+
+
+<h4><a name="shmem_lock" href="#shmem_top">Lock Competition(SHMEM)</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>SHMEM, lock synchronization
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time a PE spent
+waiting for a lock that had been previously acquired by another PE.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_p2p_synchronization">P2P Synchronization</a>
+
+</dd><dt>Children:</dt><dd> None
+</dd></dl>
+
+
+<h4><a name="shmem_wait_until" href="#shmem_top">Wait Until</a></h4>
+
+<dl>
+
+    <dt>Keywords:</dt><dd>SHMEM, wait, wait_until, synchronization
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent
+waiting for a shared variable to be changed by a remote write or
+atomic swap issued by a different PE. It applies to SHMEM calls
+shmem_wait(), shem_wait_until()
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_p2p_synchronization">P2P Synchronization</a>
+
+</dd><dt>Children:</dt><dd> None
+</dd></dl>
+
+
+<h4><a name="shmem_init_exit" href="#shmem_top">Init/Exit (SHMEM)</a></h4>
+
+<dl>
+
+    <dt>Keywords:</dt><dd>SHMEM, initialize, finalize 
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent
+on SHMEM initialization calls. It applies to shmem_init() and shmem_finalize()
+calls.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_synchronization">Synchronization (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd> None
+</dd></dl>
+
+
+<h4><a name="shmem_memory_management" href="#shmem_top">Memory Management (SHMEM)</a></h4>
+
+<dl>
+
+    <dt>Keywords:</dt><dd>SHMEM, memory allocation, realocation, free. 
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to the time spent
+on SHMEM memory management calls. It applies to shmalloc(), shmalloc_nb,  
+shfree() and shrealloc() calls.
+
+</dd><dt>Parent:</dt><dd><a href="#shmem_synchronization">Synchronization (SHMEM)</a>
+
+</dd><dt>Children:</dt><dd> None
+</dd></dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h4><a name="idle_threads" href="#general_patterns">Idle Threads</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>OpenMP, sequential execution
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>This pattern refers to idle times on CPUs reserved
+for slave threads when a process is executed sequentially before or
+after an OpenMP parallel region.
+
+</dd><dt>Parent:</dt><dd><a href="#time">Time</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="overhead" href="#general_patterns">Overhead</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>Trace generation overhead
+
+<dt>Unit:</dt><dd>Seconds
+
+</dd><dt>Description:</dt><dd>Time spent performing major tasks
+related to trace generation, such as time synchronization or dumping
+the trace-buffer contents to a file. Note that the normal per-event
+overhead is not included.
+
+</dd><dt>Parent:</dt><dd><a href="#time">Time</a>
+
+</dd><dt>Children: </dt><dd>None
+
+</dd></dl>
+
+
+<h4><a name="visits" href="#general_patterns">Visits</a></h4>
+
+<dl>
+
+<dt>Keywords:</dt><dd>Function calls
+
+<dt>Unit:</dt><dd>Number of visits
+
+</dd><dt>Description:</dt><dd>Number of times a certain call path has
+been visited.
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd>None
+
+</dd></dl>
+
+
+<!--======================================================================-->
+<!-- CPU & Memory Patterns ===============================================-->
+<!--======================================================================-->
+
+<h3><a name="cpu_patterns"></a>CPU &amp; Memory Patterns</h3>
+
+<!--======================================================================-->
+<!-- Hardware Counter Patterns ===========================================-->
+<!--======================================================================-->
+
+
+<h3><a name="#CYCLES">Processor Cycles Patterns</a></h3>
+
+<h4><a name="CYCLES" href="#CYCLES">CYCLES</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of processor cycles of occurrence
+
+</dd><dt>Description:</dt><dd>Total processor cycles
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd><a xref="#BUSY">BUSY</a>
+                         + <a xref="#IDLE">IDLE</a>
+                         + <a xref="#STALL">STALL</a>
+
+</dd></dl>
+
+
+<h3><a name="#INSTRUCTION">Instruction Patterns</a></h3>
+
+<ul>
+<li><a href="#INSTRUCTION">INSTRUCTION</a>
+<ul>
+<li><a name="#BRANCH" href="#BRANCH">BRANCH</a>
+<ul>
+<li><a name="#BRANCH_PRED" href="#BRANCH_PRED">BRANCH_PRED</a>
+<li><a name="#BRANCH_MISP" href="#BRANCH_MISP">BRANCH_MISP</a>
+</ul>
+<li><a name="#FLOATING_POINT" href="#FLOATING_POINT">FLOATING_POINT</a>
+<ul>
+<li><a name="#FP_ADD" href="#FP_ADD">FP_ADD</a>
+<li><a name="#FP_MUL" href="#FP_MUL">FP_MUL</a>
+<li><a name="#FP_FMA" href="#FP_FMA">FP_FMA</a>
+<li><a name="#FP_DIV" href="#FP_DIV">FP_DIV</a>
+<li><a name="#FP_INV" href="#FP_INV">FP_INV</a>
+<li><a name="#FP_SQRT" href="#FP_SQRT">FP_SQRT</a>
+<li><a name="#FP_MISC" href="#FP_MISC">FP_MISC</a>
+</ul>
+<li><a name="#INTEGER" href="#INTEGER">INTEGER</a>
+<li><a name="#MEMORY" href="#MEMORY">MEMORY</a>
+<ul>
+<li><a name="#LOAD" href="#LOAD">LOAD</a>
+<li><a name="#STORE" href="#STORE">STORE</a>
+<li><a name="#SYNCH" href="#SYNCH">SYNCH</a>
+</ul>
+<li><a name="#VECTOR" href="#VECTOR">VECTOR</a>
+</ul>
+</ul>
+<p>&nbsp;
+
+<h4> <a name="INSTRUCTION" href="##INSTRUCTION">INSTRUCTION</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Total instructions completed
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd><a href="#BRANCH">BRANCH</a>
+		         + <a href="#FLOATING_POINT">FLOATING_POINT</a>
+                         + <a href="#INTEGER">INTEGER</a>
+                         + <a href="#MEMORY">MEMORY</a>
+		         + <a href="#VECTOR">VECTOR</a>
+
+</dd>
+</dl>
+
+<h4><a name="BRANCH" href="##INSTRUCTION">BRANCH</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of branch instructions
+
+</dd><dt>Parent:</dt><dd><a href="#INSTRUCTION">INSTRUCTION</a>
+
+</dd><dt>Children:</dt><dd><a href="#COND_BRANCH">COND_BRANCH</a>
+                         + <a href="#UNCOND_BRANCH">UNCOND_BRANCH</a>
+
+</dd>
+</dl>
+
+<h4><a name="BRANCH_PRED" href="##INSTRUCTION">BRANCH_PRED</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of branch instructions which were correctly predicted
+
+</dd><dt>Parent:</dt><dd><a href="#BRANCH">BRANCH</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="BRANCH_MISP" href="##INSTRUCTION">BRANCH_MISP</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of branch instructions which were mis-predicted
+
+</dd><dt>Parent:</dt><dd><a href="#BRANCH">BRANCH</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4>
+    <a name="floating_point"></a>  <!-- old label name -->
+    <a name="FLOATING_POINT" href="##INSTRUCTION">FLOATING_POINT</a>
+</h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of floating-point instructions
+
+</dd><dt>Parent:</dt><dd><a href="#INSTRUCTION">INSTRUCTION</a>
+
+</dd><dt>Children:</dt><dd><a href="#FP_ADD">FP_ADD</a>
+                         + <a href="#FP_MUL">FP_MUL</a>
+                         + <a href="#FP_FMA">FP_FMA</a>
+                         + <a href="#FP_DIV">FP_DIV</a>
+                         + <a href="#FP_INV">FP_INV</a>
+                         + <a href="#FP_SQRT">FP_SQRT</a>
+                         + <a href="#FP_MISC">FP_MISC</a>
+
+</dd>
+</dl>
+
+<h4><a name="FP_ADD" href="##INSTRUCTION">FP_ADD</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of floating-point addition instructions
+
+</dd><dt>Parent:</dt><dd><a href="#FLOATING_POINT">FLOATING_POINT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="FP_MUL" href="##INSTRUCTION">FP_MUL</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of floating-point multiplication instructions
+
+</dd><dt>Parent:</dt><dd><a href="#FLOATING_POINT">FLOATING_POINT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4> <a name="FP_MADD"></a>
+<a name="FP_FMA" href="##INSTRUCTION">FP_FMA</a> </h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of floating-point fused multiply-add instructions
+
+</dd><dt>Parent:</dt><dd><a href="#FLOATING_POINT">FLOATING_POINT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="FP_DIV" href="##INSTRUCTION">FP_DIV</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of floating-point division instructions
+
+</dd><dt>Parent:</dt><dd><a href="#FLOATING_POINT">FLOATING_POINT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="FP_INV" href="##INSTRUCTION">FP_INV</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of floating-point inverse (reciprocal?) instructions
+
+</dd><dt>Parent:</dt><dd><a href="#FLOATING_POINT">FLOATING_POINT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="FP_SQRT" href="##INSTRUCTION">FP_SQRT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of floating-point square-root instructions
+
+</dd><dt>Parent:</dt><dd><a href="#FLOATING_POINT">FLOATING_POINT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="FP_MISC" href="##INSTRUCTION">FP_MISC</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of miscellaneous floating-point instructions
+such as moves and estimates
+
+</dd><dt>Parent:</dt><dd><a href="#FLOATING_POINT">FLOATING_POINT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="INTEGER" href="##INSTRUCTION">INTEGER</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of fixed-point (integer) instructions
+
+</dd><dt>Parent:</dt><dd><a href="#INSTRUCTION">INSTRUCTION</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="MEMORY" href="##INSTRUCTION">MEMORY</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of memory-referencing instructions
+
+</dd><dt>Parent:</dt><dd><a href="#INSTRUCTION">INSTRUCTION</a>
+
+</dd><dt>Children:</dt><dd><a href="#LOAD">LOAD</a>
+                         + <a href="#STORE">STORE</a>
+                         + <a href="#SYNCH">SYNCH</a>
+
+</dd>
+</dl>
+
+<h4><a name="LOAD" href="##INSTRUCTION">LOAD</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of memory load (read) instructions
+
+</dd><dt>Parent:</dt><dd><a href="#MEMORY">MEMORY</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="STORE" href="##INSTRUCTION">STORE</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of memory store (write) instructions
+
+</dd><dt>Parent:</dt><dd><a href="#MEMORY">MEMORY</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="SYNCH" href="##INSTRUCTION">SYNCH</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of memory synchronization instructions
+
+</dd><dt>Parent:</dt><dd><a href="#MEMORY">MEMORY</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="VECTOR" href="##INSTRUCTION">VECTOR</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+
+<dt>Unit:</dt><dd>Number of instructions
+
+</dd><dt>Description:</dt><dd>Number of vector instructions
+
+</dd><dt>Parent:</dt><dd><a href="#INSTRUCTION">INSTRUCTION</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+
+<h3><a name="#DATA_ACCESS">Data Access Patterns</a></h3>
+
+<ul>
+<li><a href="#DATA_ACCESS">DATA_ACCESS</a>
+<ul>
+<li><a name="#DATA_HIT_L1$" href="#DATA_HIT_L1$">DATA_HIT_L1$</a>
+<ul>
+<li><a name="#DATA_STORE_INTO_L1$" href="#DATA_STORE_INTO_L1$">DATA_STORE_INTO_L1$</a>
+<li><a name="#DATA_LOAD_FROM_L1$" href="#DATA_LOAD_FROM_L1$">DATA_LOAD_FROM_L1$</a>
+</ul>
+<li><a name="#DATA_HIT_L2$" href="#DATA_HIT_L2$">DATA_HIT_L2$</a>
+<ul>
+<li><a name="#DATA_STORE_INTO_L2$" href="#DATA_STORE_INTO_L2$">DATA_STORE_INTO_L2$</a>
+<li><a name="#DATA_LOAD_FROM_L2$" href="#DATA_LOAD_FROM_L2$">DATA_LOAD_FROM_L2$</a>
+</ul>
+<li><a name="#DATA_HIT_L3$" href="#DATA_HIT_L3$">DATA_HIT_L3$</a>
+<ul>
+<li><a name="#DATA_STORE_INTO_L3$" href="#DATA_STORE_INTO_L3$">DATA_STORE_INTO_L3$</a>
+<li><a name="#DATA_LOAD_FROM_L3$" href="#DATA_LOAD_FROM_L3$">DATA_LOAD_FROM_L3$</a>
+</ul>
+<li><a name="#DATA_HIT_MEM" href="#DATA_HIT_MEM">DATA_HIT_MEM</a>
+<ul>
+<li><a name="#DATA_STORE_INTO_MEM" href="#DATA_STORE_INTO_MEM">DATA_STORE_INTO_MEM</a>
+<li><a name="#DATA_LOAD_FROM_MEM" href="#DATA_LOAD_FROM_MEM">DATA_LOAD_FROM_MEM</a>
+</ul>
+</ul>
+</ul>
+<p>&nbsp;
+
+
+<h4><a name="DATA_ACCESS" href="##DATA_ACCESS">DATA_ACCESS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data accesses
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd><a href="#DATA_HIT_L1$">DATA_HIT_L1$</a>
+			 + <a href="#DATA_HIT_L2$">DATA_HIT_L2$</a>
+			 + <a href="#DATA_HIT_L3$">DATA_HIT_L3$</a>
+			 + <a href="#DATA_HIT_MEM">DATA_HIT_MEM</a>
+
+</dd>
+</dl>
+
+<a name="L1_D_HIT"></a>
+<h4><a name="DATA_HIT_L1$" href="##DATA_HIT_L1$">DATA_HIT_L1$</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_D_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data accesses (stores and loads) which hit in 1st-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_ACCESS">DATA_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#DATA_STORE_INTO_L1$">DATA_STORE_INTO_L1$</a>
+                         + <a href="#DATA_LOAD_FROM_L1$">DATA_LOAD_FROM_L1$</a>
+
+</dd>
+</dl>
+
+<a name="L1_D_WRITE_HIT"></a>
+<h4><a name="DATA_STORE_INTO_L1$" href="##DATA_STORE_INTO_L1$">DATA_STORE_INTO_L1$</a></h4>
+
+<dl>
+<dt>Synonyms:</dt><dd>L1_D_READ_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data stores (writes) which hit in 1st-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_L1$">DATA_HIT_L1$</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L1_D_READ_HIT"></a>
+<h4><a name="DATA_LOAD_FROM_L1$" href="##DATA_LOAD_FROM_L1$">DATA_LOAD_FROM_L1$</a></h4>
+
+<dl>
+<dt>Synonyms:</dt><dd>L1_D_WRITE_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data loads (reads) which hit in 1st-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_L1$">DATA_HIT_L1$</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L2_D_HIT"></a>
+<h4><a name="DATA_HIT_L2$" href="##DATA_HIT_L2$">DATA_HIT_L2$</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L2_D_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data accesses (stores and loads) which miss in 1st-level cache and hit in 2nd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_ACCESS">DATA_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#DATA_STORE_INTO_L2$">DATA_STORE_INTO_L2$</a>
+                         + <a href="#DATA_LOAD_FROM_L2$">DATA_LOAD_FROM_L2$</a>
+
+</dd>
+</dl>
+
+<a name="L2_D_WRITE_HIT"></a>
+<h4><a name="DATA_STORE_INTO_L2$" href="##DATA_STORE_INTO_L2$">DATA_STORE_INTO_L2$</a></h4>
+
+<dl>
+<dt>Synonyms:</dt><dd>L2_D_READ_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data stores (writes) which miss in 1st-level cache and hit in 2nd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_L2$">DATA_HIT_L2$</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L2_D_READ_HIT"></a>
+<h4><a name="DATA_LOAD_FROM_L2$" href="##DATA_LOAD_FROM_L2$">DATA_LOAD_FROM_L2$</a></h4>
+
+<dl>
+<dt>Synonyms:</dt><dd>L2_D_WRITE_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data loads (reads) which miss in 1st-level cache and hit in 2nd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_L2$">DATA_HIT_L2$</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L3_D_HIT"></a>
+<h4><a name="DATA_HIT_L3$" href="##DATA_HIT_L3$">DATA_HIT_L3$</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L3_D_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data accesses (stores and loads) which miss in 1st-level and 2nd-level caches and hit in 3rd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_ACCESS">DATA_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#DATA_STORE_INTO_L3$">DATA_STORE_INTO_L3$</a>
+                         + <a href="#DATA_LOAD_FROM_L3$">DATA_LOAD_FROM_L3$</a>
+
+</dd>
+</dl>
+
+<a name="L3_D_WRITE_HIT"></a>
+<h4><a name="DATA_STORE_INTO_L3$" href="##DATA_STORE_INTO_L3$">DATA_STORE_INTO_L3$</a></h4>
+
+<dl>
+<dt>Synonyms:</dt><dd>L3_D_READ_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data stores (writes) which miss in 1st-level and 2nd-level caches and hit in 3rd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_L3$">DATA_HIT_L3$</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L3_D_READ_HIT"></a>
+<h4><a name="DATA_LOAD_FROM_L3$" href="##DATA_LOAD_FROM_L3$">DATA_LOAD_FROM_L3$</a></h4>
+
+<dl>
+<dt>Synonyms:</dt><dd>L3_D_READ_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data loads (reads) which miss in 1st-level and 2nd-level caches and hit in 3rd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_L3$">DATA_HIT_L3$</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="DATA_HIT_MEM" href="##DATA_HIT_MEM">DATA_HIT_MEM</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data accesses (stores and loads) which miss in all caches and must go to memory (system)
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_ACCESS">DATA_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#DATA_STORE_INTO_MEM">DATA_STORE_INTO_MEM</a>
+                         + <a href="#DATA_LOAD_FROM_MEM">DATA_LOAD_FROM_MEM</a>
+
+</dd>
+</dl>
+
+<h4><a name="DATA_STORE_INTO_MEM" href="##DATA_STORE_INTO_MEM">DATA_STORE_INTO_MEM</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data stores (writes) which miss in all caches and must go to memory (system)
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_MEM">DATA_HIT_MEM</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="DATA_LOAD_FROM_MEM" href="##DATA_LOAD_FROM_MEM">DATA_LOAD_FROM_MEM</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of data accesses
+
+</dd><dt>Description:</dt><dd>Total data loads (reads) which miss in all caches and must go to memory (system)
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_HIT_MEM">DATA_HIT_MEM</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+
+<h3><a name="#INST_ACCESS">Instruction Access Patterns</a></h3>
+
+<ul>
+<li><a href="#INST_ACCESS">INST_ACCESS</a>
+<ul>
+<li><a name="#INST_HIT_PREF" href="#INST_HIT_PREF">INST_HIT_PREF</a>
+<li><a name="#INST_HIT_L1$" href="#INST_HIT_L1$">INST_HIT_L1$</a>
+<li><a name="#INST_HIT_L2$" href="#INST_HIT_L2$">INST_HIT_L2$</a>
+<li><a name="#INST_HIT_L3$" href="#INST_HIT_L3$">INST_HIT_L3$</a>
+<li><a name="#INST_HIT_MEM" href="#INST_HIT_MEM">INST_HIT_MEM</a>
+</ul>
+</ul>
+<p>&nbsp;
+
+
+<h4><a name="INST_ACCESS" href="##INST_ACCESS">INST_ACCESS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of instruction accesses
+
+</dd><dt>Description:</dt><dd>Total instruction accesses (fetches)
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd><a href="#INST_HIT_PREF">INST_HIT_PREF</a>
+			 + <a href="#INST_HIT_L1$">INST_HIT_L1$</a>
+			 + <a href="#INST_HIT_L2$">INST_HIT_L2$</a>
+			 + <a href="#INST_HIT_L3$">INST_HIT_L3$</a>
+			 + <a href="#INST_HIT_MEM">INST_HIT_MEM</a>
+
+</dd>
+</dl>
+
+<h4><a name="INST_HIT_PREF" href="##INST_HIT_PREF">INST_HIT_PREF</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of instruction accesses
+
+</dd><dt>Description:</dt><dd>Total instruction prefetches
+
+</dd><dt>Parent:</dt><dd><a href="#INST_ACCESS">INST_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L1_I_HIT"></a>
+<h4><a name="INST_HIT_L1$" href="##INST_HIT_L1$">INST_HIT_L1$</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_I_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of instruction accesses
+
+</dd><dt>Description:</dt><dd>Total instruction accesses (fetches) which hit in 1st-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#INST_ACCESS">INST_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L2_I_HIT"></a>
+<h4><a name="INST_HIT_L2$" href="##INST_HIT_L2$">INST_HIT_L2$</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L2_I_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of instruction accesses
+
+</dd><dt>Description:</dt><dd>Total instruction accesses (fetches) which miss in 1st-level cache and hit in 2nd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#INST_ACCESS">INST_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L3_I_HIT"></a>
+<h4><a name="INST_HIT_L3$" href="##INST_HIT_L3$">INST_HIT_L3$</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L3_I_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of instruction accesses
+
+</dd><dt>Description:</dt><dd>Total instruction accesses (fetches) which miss in 1st-level and 2nd-level caches and hit in 3rd-level cache
+
+</dd><dt>Parent:</dt><dd><a href="#INST_ACCESS">INST_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="INST_HIT_MEM" href="##INST_HIT_MEM">INST_HIT_MEM</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of instruction accesses
+
+</dd><dt>Description:</dt><dd>Total instruction accesses (fetches) which miss in all caches and must go to memory (system)
+
+</dd><dt>Parent:</dt><dd><a href="#INST_ACCESS">INST_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+
+<h3><a name="#L1_ACCESS">1st-level Cache Patterns</a></h3>
+
+<ul>
+<li><a href="#L1_ACCESS">L1_ACCESS</a>
+<ul>
+<li><a name="#L1_INST" href="#L1_INST">L1_INST</a>
+<ul>
+<li><a name="#L1_INST_HIT" href="#L1_INST_HIT">L1_INST_HIT</a>
+<li><a name="#L1_INST_MISS" href="#L1_INST_MISS">L1_INST_MISS</a>
+</ul>
+<li><a name="#L1_LOAD" href="#L1_LOAD">L1_LOAD</a>
+<ul>
+<li><a name="#L1_LOAD_HIT" href="#L1_LOAD_HIT">L1_LOAD_HIT</a>
+<li><a name="#L1_LOAD_MISS" href="#L1_LOAD_MISS">L1_LOAD_MISS</a>
+</ul>
+<li><a name="#L1_STORE" href="#L1_STORE">L1_STORE</a>
+<ul>
+<li><a name="#L1_STORE_HIT" href="#L1_STORE_HIT">L1_STORE_HIT</a>
+<li><a name="#L1_STORE_MISS" href="#L1_STORE_MISS">L1_STORE_MISS</a>
+</ul>
+</ul>
+</ul>
+<p>&nbsp;
+
+
+<h4><a name="L1_ACCESS" href="##L1_ACCESS">L1_ACCESS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level cache accesses
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd><a href="#L1_INST">L1_INST</a>
+			 + <a href="#L1_LOAD">L1_LOAD</a>
+			 + <a href="#L1_STORE">L1_STORE</a>
+
+</dd>
+</dl>
+
+<h4><a name="L1_INST" href="##L1_ACCESS">L1_INST</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level instruction-cache accesses
+
+</dd><dt>Parent:</dt><dd><a href="#L1_ACCESS">L1_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#L1_INST_HIT">L1_INST_HIT</a>
+                         + <a href="#L1_INST_MISS">L1_INST_MISS</a>
+
+</dd>
+</dl>
+
+<a name="L1_I_HIT"></a>
+<h4><a name="L1_INST_HIT" href="##L1_ACCESS">L1_INST_HIT</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_I_HIT
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level instruction-cache hits
+
+</dd><dt>Parent:</dt><dd><a href="#L1_INST">L1_INST</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L1_I_MISS"></a>
+<h4><a name="L1_INST_MISS" href="##L1_ACCESS">L1_INST_MISS</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_I_MISS
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level instruction-cache misses
+
+</dd><dt>Parent:</dt><dd><a href="#L1_INST">L1_INST</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L1_D_READ"></a>
+<h4><a name="L1_LOAD" href="##L1_ACCESS">L1_LOAD</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_D_READ
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level data-cache loads (reads)
+
+</dd><dt>Parent:</dt><dd><a href="#L1_ACCESS">L1_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#L1_LOAD_HIT">L1_LOAD_HIT</a>
+                         + <a href="#L1_LOAD_MISS">L1_LOAD_MISS</a>
+
+</dd>
+</dl>
+
+<a name="L1_D_READ_HIT"></a>
+<h4><a name="L1_LOAD_HIT" href="##L1_ACCESS">L1_LOAD_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level data-cache load (read) hits
+
+</dd><dt>Parent:</dt><dd><a href="#L1_LOAD">L1_LOAD</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L1_D_READ_MISS"></a>
+<h4><a name="L1_LOAD_MISS" href="##L1_ACCESS">L1_LOAD_MISS</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_D_READ_MISS
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level data-cache load (read) misses
+
+</dd><dt>Parent:</dt><dd><a href="#L1_LOAD">L1_LOAD</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L1_D_WRITE"></a>
+<h4><a name="L1_STORE" href="##L1_ACCESS">L1_STORE</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_D_WRITE
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level data-cache stores (writes)
+
+</dd><dt>Parent:</dt><dd><a href="#L1_ACCESS">L1_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#L1_STORE_HIT">L1_STORE_HIT</a>
+                         + <a href="#L1_STORE_MISS">L1_STORE_MISS</a>
+
+</dd>
+</dl>
+
+<a name="L1_D_WRITE_HIT"></a>
+<h4><a name="L1_STORE_HIT" href="##L1_ACCESS">L1_STORE_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level data-cache store (write) hits
+
+</dd><dt>Parent:</dt><dd><a href="#L1_STORE">L1_STORE</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="L1_D_WRITE_MISS"></a>
+<h4><a name="L1_STORE_MISS" href="##L1_ACCESS">L1_STORE_MISS</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>L1_D_WRITE_MISS
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level data-cache store (write) misses
+
+</dd><dt>Parent:</dt><dd><a href="#L1_STORE">L1_STORE</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4> <a name="l1_data_cache"></a>
+<a name="L1_D_MISS">L1_D_MISS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 1st-level data-cache misses
+
+</dd><dt>Parent:</dt><dd>None (Not currently parented)
+
+</dd><dt>Children:</dt><dd><a href="#L1_D_READ_MISS">L1_D_READ_MISS</a>
+                         + <a href="#L1_D_WRITE_MISS">L1_D_WRITE_MISS</a>
+
+</dd>
+</dl>
+
+
+<h3><a name="#L2_ACCESS">2nd-level Cache Patterns </a></h3>
+
+<ul>
+<li><a href="#L2_ACCESS">L2_ACCESS</a>
+<ul>
+<li><a name="#L2_HIT" href="#L2_HIT">L2_HIT</a>
+<ul>
+<li><a name="#L2_INST_HIT" href="#L2_INST_HIT">L2_INST_HIT</a>
+<li><a name="#L2_LOAD_HIT" href="#L2_LOAD_HIT">L2_LOAD_HIT</a>
+<li><a name="#L2_STORE_HIT" href="#L2_STORE_HIT">L2_STORE_HIT</a>
+</ul>
+<li><a name="#L2_MISS" href="#L2_MISS">L2_MISS</a>
+<ul>
+<li><a name="#L2_INST_MISS" href="#L2_INST_MISS">L2_INST_MISS</a>
+<li><a name="#L2_LOAD_MISS" href="#L2_LOAD_MISS">L2_LOAD_MISS</a>
+<li><a name="#L2_STORE_MISS" href="#L2_STORE_MISS">L2_STORE_MISS</a>
+</ul>
+</ul>
+</ul>
+<p>&nbsp;
+
+
+<h4><a name="L2_ACCESS" href="##L2_ACCESS">L2_ACCESS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level cache accesses
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd><a href="#L2_HIT">L2_HIT</a>
+		         + <a href="#L2_MISS">L2_MISS</a>
+
+</dd>
+</dl>
+
+<h4><a name="L2_HIT" href="##L2_ACCESS">L2_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of access hits
+
+</dd><dt>Description:</dt><dd>Total 2nd-level cache hits
+
+</dd><dt>Parent:</dt><dd><a href="#L2_ACCESS">L2_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#L2_INST_HIT">L2_INST_HIT</a>
+                         + <a href="#L2_LOAD_HIT">L2_LOAD_HIT</a>
+                         + <a href="#L2_STORE_HIT">L2_STORE_HIT</a>
+
+</dd>
+</dl>
+
+<h4><a name="L2_INST_HIT" href="##L2_ACCESS">L2_INST_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level instruction-cache hits
+
+</dd><dt>Parent:</dt><dd><a href="#L2_HIT">L2_HIT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="L2_LOAD_HIT" href="##L2_ACCESS">L2_LOAD_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level data-cache load (read) hits
+
+</dd><dt>Parent:</dt><dd><a href="#L2_HIT">L2_HIT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="L2_STORE_HIT" href="##L2_ACCESS">L2_STORE_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level data-cache store (write) hits
+
+</dd><dt>Parent:</dt><dd><a href="#L2_HIT">L2_HIT</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="L2_MISS" href="##L2_ACCESS">L2_MISS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of access misses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level cache misses
+
+</dd><dt>Parent:</dt><dd><a href="#L2_ACCESS">L2_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#L2_INST_MISS">L2_INST_MISS</a>
+                         + <a href="#L2_LOAD_MISS">L2_LOAD_MISS</a>
+                         + <a href="#L2_STORE_MISS">L2_STORE_MISS</a>
+
+</dd>
+</dl>
+
+<h4><a name="L2_INST_MISS" href="##L2_ACCESS">L2_INST_MISS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level instruction-cache misses
+
+</dd><dt>Parent:</dt><dd><a href="#L2_MISS">L2_MISS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="L2_LOAD_MISS" href="##L2_ACCESS">L2_LOAD_MISS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level data-cache load (read) misses
+
+</dd><dt>Parent:</dt><dd><a href="#L2_MISS">L2_MISS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="L2_STORE_MISS" href="##L2_ACCESS">L2_STORE_MISS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of accesses
+
+</dd><dt>Description:</dt><dd>Total 2nd-level data-cache store (write) misses
+
+</dd><dt>Parent:</dt><dd><a href="#L2_MISS">L2_MISS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+
+<h3><a name="#TLB_ACCESS">TLB Access Patterns</a></h3>
+
+<ul>
+<li><a href="#TLB_ACCESS">TLB_ACCESS</a>
+<ul>
+<li><a name="#DATA_TLB_ACCESS" href="#DATA_TLB_ACCESS">DATA_TLB_ACCESS</a>
+<ul>
+<li><a name="#DATA_TLB_HIT" href="#DATA_TLB_HIT">DATA_TLB_HIT</a>
+<li><a name="#DATA_TLB_MISS" href="#DATA_TLB_MISS">DATA_TLB_MISS</a>
+</ul>
+<li><a name="#INST_TLB_ACCESS" href="#INST_TLB_ACCESS">INST_TLB_ACCESS</a>
+<ul>
+<li><a name="#INST_TLB_HIT" href="#INST_TLB_HIT">INST_TLB_HIT</a>
+<li><a name="#INST_TLB_MISS" href="#INST_TLB_MISS">INST_TLB_MISS</a>
+</ul>
+</ul>
+</ul>
+<p>&nbsp;
+
+
+<h4><a name="TLB_ACCESS" href="##TLB_ACCESS">TLB_ACCESS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of TLB accesses
+
+</dd><dt>Description:</dt><dd>Total TLB (Translation Lookaside Buffer) accesses
+
+</dd><dt>Parent:</dt><dd>None
+
+</dd><dt>Children:</dt><dd><a href="#DATA_TLB_ACCESS">DATA_TLB_ACCESS</a> 
+                         + <a href="#INST_TLB_ACCESS">INST_TLB_ACCESS</a>
+
+</dd>
+</dl>
+
+<h4><a name="DATA_TLB_ACCESS" href="##DATA_TLB_ACCESS">DATA_TLB_ACCESS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of Data-TLB accesses
+
+</dd><dt>Description:</dt><dd>Total Data-TLB (Translation Lookaside Buffer) accesses
+
+</dd><dt>Parent:</dt><dd><a href="#TLB_ACCESS">TLB_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#DATA_TLB_HIT">DATA_TLB_HIT</a> 
+                         + <a href="#DATA_TLB_MISS">DATA_TLB_MISS</a>
+
+</dd>
+</dl>
+
+<h4><a name="DATA_TLB_HIT" href="##DATA_TLB_HIT">DATA_TLB_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of Data-TLB hits
+
+</dd><dt>Description:</dt><dd>Data-TLB (Translation Lookaside Buffer) hits
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_TLB_ACCESS">DATA_TLB_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="TLB_D_MISS"></a>
+<h4><a name="DATA_TLB_MISS" href="##DATA_TLB_MISS">DATA_TLB_MISS</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>TLB_D_MISS
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of Data-TLB misses
+
+</dd><dt>Description:</dt><dd>Data-TLB (Translation Lookaside Buffer) misses
+
+</dd><dt>Parent:</dt><dd><a href="#DATA_TLB_ACCESS">DATA_TLB_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<h4><a name="INST_TLB_ACCESS" href="##INST_TLB_ACCESS">INST_TLB_ACCESS</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of Instruction-TLB accesses
+
+</dd><dt>Description:</dt><dd>Total Instruction-TLB (Translation Lookaside Buffer) accesses
+
+</dd><dt>Parent:</dt><dd><a href="#TLB_ACCESS">TLB_ACCESS</a>
+
+</dd><dt>Children:</dt><dd><a href="#INST_TLB_HIT">INST_TLB_HIT</a> 
+                         + <a href="#INST_TLB_MISS">INST_TLB_MISS</a>
+
+</dd>
+</dl>
+
+<h4><a name="INST_TLB_HIT" href="##INST_TLB_HIT">INST_TLB_HIT</a></h4>
+
+<dl>
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of Instruction-TLB hits
+
+</dd><dt>Description:</dt><dd>Instruction-TLB (Translation Lookaside Buffer) hits
+
+</dd><dt>Parent:</dt><dd><a href="#INST_TLB_ACCESS">INST_TLB_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+<a name="TLB_I_MISS"></a>
+<h4><a name="INST_TLB_MISS" href="##INST_TLB_MISS">INST_TLB_MISS</a></h4>
+
+<dl>
+<dt>Synonym:</dt><dd>TLB_I_MISS
+<dt>Keywords:</dt><dd>Hardware counter
+<dt>Unit:</dt><dd>Number of Instruction-TLB misses
+
+</dd><dt>Description:</dt><dd>Instruction-TLB (Translation Lookaside Buffer) misses
+
+</dd><dt>Parent:</dt><dd><a href="#INST_TLB_ACCESS">INST_TLB_ACCESS</a>
+
+</dd><dt>Children:</dt><dd>None
+
+</dd>
+</dl>
+
+
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</body></html>
+
