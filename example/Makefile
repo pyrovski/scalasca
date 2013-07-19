@@ -46,7 +46,7 @@ else
 endif
 
 # -- MPI test cases
-MCPROGS   = ctest-mpi ftest-mpi
+MCPROGS   = ctest-mpi ftest-mpi ctest-pomp
 MPPROGS   = ctest-pomp-mpi ftest-pomp-mpi
 MEPROGS   = ctest-epik-mpi ftest-epik-mpi
 MOPROGS   = ctest-elg-mpi ftest-elg-mpi
